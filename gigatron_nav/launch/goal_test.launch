@@ -9,10 +9,8 @@
 
 <launch>
 	<arg name="route" default="template_route" />
-	<arg name="loop" default="true" />
 
-	<node pkg="gigatron_nav" type="nav_goal_publisher" name="nav_goals" output="screen">
+	<node pkg="gigatron_nav" type="nav_goal_publisher" name="nav_goal_publisher" output="screen">
 		<param name="plan_file" value="$(find gigatron_nav)/maps/routes/$(arg route).yaml" />
-		<param name="loop" value="$(arg loop)" />
 	</node>
 </launch>

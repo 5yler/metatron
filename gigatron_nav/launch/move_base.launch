@@ -26,5 +26,6 @@
         <!-- additional parameter if using teb -->
         <param if="$(arg teb_planner)" name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
         <param name="controller_frequency" value="10.0" />
+        <param name="clearing_rotation_allowed" value="false" /> <!-- Our carlike robot is not able to rotate in place -->
     </node>
 </launch>
