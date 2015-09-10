@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  geometry_msgs
   message_generation
 )
 
@@ -69,6 +70,7 @@ add_message_files(
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
 )
 
 ###################################
@@ -83,7 +85,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES gigatron
-  CATKIN_DEPENDS message_runtime roscpp rospy std_msgs
+  CATKIN_DEPENDS message_runtime roscpp rospy std_msgs geometry_msgs
 #  DEPENDS system_lib
 )
 
@@ -109,12 +111,14 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 ## Declare a cpp executable
 add_executable(SteeringPub src/SteeringPub.cpp)
 add_executable(ThrottlePub src/ThrottlePub.cpp)
+add_executable(control_pub_sub src/control_pub_sub.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(gigatron_node gigatron_generate_messages_cpp)
 add_dependencies(SteeringPub gigatron_generate_messages_cpp)
 add_dependencies(ThrottlePub gigatron_generate_messages_cpp)
+add_dependencies(control_pub_sub gigatron_generate_messages_cpp)
 
 
 ## Specify libraries to link a library or executable target against
@@ -123,6 +127,7 @@ add_dependencies(ThrottlePub gigatron_generate_messages_cpp)
 # )
 target_link_libraries(SteeringPub ${catkin_LIBRARIES})
 target_link_libraries(ThrottlePub ${catkin_LIBRARIES})
+target_link_libraries(control_pub_sub ${catkin_LIBRARIES})
 
 #############
 ## Install ##
