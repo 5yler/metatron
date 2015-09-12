@@ -27,7 +27,7 @@
 #include "geometry_msgs/Twist.h"
 #include "std_msgs/MultiArrayLayout.h"
 #include "std_msgs/MultiArrayDimension.h"
-#include "std_msgs/Int16MultiArray.h"
+#include "std_msgs/UInt16MultiArray.h"
 
 class ControlPubSub
 {
@@ -35,20 +35,20 @@ public:
   ControlPubSub()
   {
     sub_ = n_.subscribe("cmd_vel", 1000, &ControlPubSub::velCommandCallback, this);
-    pub_ = n_.advertise<std_msgs::Int16MultiArray>("control", 1000);
+    pub_ = n_.advertise<std_msgs::UInt16MultiArray>("control", 1000);
 
     // odometry stuff - move eventually
     ros::Subscriber osub_ = n_.subscribe("odo_val", 1000, &ControlPubSub::odoCommandCallback, this);
 
   }
 
-  void odoCommandCallback(const std_msgs::Int16MultiArray::ConstPtr& odomsg) 
+  void odoCommandCallback(const std_msgs::UInt16MultiArray::ConstPtr& odomsg) 
   {
 
-    int servoPWM = odomsg->data[0];
+    unsigned int servoPWM = odomsg->data[0];
 
-    int leftRPM  = odomsg->data[1];
-    int rightRPM = odomsg->data[2];
+    unsigned int leftRPM  = odomsg->data[1];
+    unsigned int rightRPM = odomsg->data[2];
 
    // const int ZERO_STEERING_ANGLE_PWM = 128;
     const double STEERING_PWM_RANGE = 255.0;
@@ -84,13 +84,13 @@ public:
     /**
      * This is a message object. You stuff it with data, and then publish it.
      */
-    std_msgs::Int16MultiArray control;
+    std_msgs::UInt16MultiArray control;
     control.data.clear();   // clear message array
 
     // conversion (does nothing right now)
-    int desiredSteeringCommand   = (int) (desiredSteeringAngle * 1);
-    int desiredLeftMotorCommand  = (int) (desiredLeftWheelVelocity * 1);
-    int desiredRightMotorCommand = (int) (desiredRightWheelVelocity * 1);
+    unsigned int desiredSteeringCommand   = (unsigned int) (desiredSteeringAngle * 1);
+    unsigned int desiredLeftMotorCommand  = (unsigned int) (desiredLeftWheelVelocity * 1);
+    unsigned int desiredRightMotorCommand = (unsigned int) (desiredRightWheelVelocity * 1);
 
     // add steering angle and motor commands to message
     control.data.push_back(desiredSteeringCommand);
