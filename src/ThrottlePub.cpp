@@ -160,7 +160,7 @@ int main(int argc, char **argv)
   while (ros::ok() && count >= 0)   // count down again, but faster
   {
     std_msgs::Int16MultiArray msg = m;
-    m.sgdata[2] = count;
+    msg.data[2] = count;
 
     ROS_INFO_STREAM("Right motor PWM command: " << msg.data[2]);
     control_pub.publish(msg);
