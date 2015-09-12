@@ -17,7 +17,10 @@
  **/
 
 #include "ros/ros.h"
-#include "std_msgs/UInt16.h"
+#include "std_msgs/Int16MultiArray.h"
+#include "std_msgs/MultiArrayLayout.h"
+#include "std_msgs/MultiArrayDimension.h"
+
 
 /**
  * This node demonstrates simple sending of messages over the ROS system.
@@ -60,7 +63,7 @@ int main(int argc, char **argv)
    * than we can send them, the number here specifies how many messages to
    * buffer up before throwing some away.
    */
-  ros::Publisher servo_pub = n.advertise<std_msgs::UInt16>("servo", 1000);
+  ros::Publisher servo_pub = n.advertise<std_msgs::Int16MultiArray>("control", 1000);
 
   /**
    * A ros::Rate object allows you to specify a frequency that you would 
@@ -79,11 +82,11 @@ int main(int argc, char **argv)
     /**
      * This is a message object. You stuff it with data, and then publish it.
      */
-    std_msgs::UInt16 msg;
-    msg.data = count;
+    std_msgs::Int16MultiArray msg;
+    msg.data[1] = count;
 
     // ROS_INFO_STREAM is a replacement for cout
-    ROS_INFO_STREAM("% max angular velocity: " << msg.data);
+    ROS_INFO_STREAM("% max angular velocity: " << msg.data[1]);
     /**
      * The publish() function is how you send messages. The parameter
      * is the message object. The type of this object must agree with the type
@@ -112,10 +115,10 @@ int main(int argc, char **argv)
   while (ros::ok() && count > 0)   // count down
   {
 
-    std_msgs::UInt16 msg;
-    msg.data = count;
+    std_msgs::Int16MultiArray msg;
+    msg.data[1] = count;
 
-    ROS_INFO_STREAM("% max angular velocity: " << msg.data);
+    ROS_INFO_STREAM("% max angular velocity: " << msg.data[1]);
     servo_pub.publish(msg);
 
     ros::spinOnce();
@@ -125,10 +128,10 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("SPEED!");
   while (ros::ok() && count < 100)   // count up again, but faster
   {
-    std_msgs::UInt16 msg;
-    msg.data = count;
+    std_msgs::Int16MultiArray msg;
+    msg.data[2] = count;
 
-    ROS_INFO_STREAM("% max angular velocity: " << msg.data);
+    ROS_INFO_STREAM("% max angular velocity: " << msg.data[2]);
     servo_pub.publish(msg);
 
     ros::spinOnce();
@@ -138,10 +141,10 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("Slowing down again, but FASTER!");
   while (ros::ok() && count >= 0)   // count down again, but faster
   {
-    std_msgs::UInt16 msg;
-    msg.data = count;
+    std_msgs::Int16MultiArray msg;
+    msg.data[2] = count;
 
-    ROS_INFO_STREAM("% max angular velocity: " << msg.data);
+    ROS_INFO_STREAM("% max angular velocity: " << msg.data[2]);
     servo_pub.publish(msg);
 
     ros::spinOnce();
