@@ -36,7 +36,31 @@ public:
   {
     sub_ = n_.subscribe("cmd_vel", 1000, &ControlPubSub::velCommandCallback, this);
     pub_ = n_.advertise<std_msgs::Int16MultiArray>("control", 1000);
+
+    // odometry stuff - move eventually
+    ros::Subscriber osub_ = n_.subscribe("odo_val", 1000, &ControlPubSub::odoCommandCallback, this);
+
   }
+
+  void odoCommandCallback(const std_msgs::Int16MultiArray::ConstPtr& odomsg) 
+  {
+
+    int servoPWM = odomsg->data[0];
+
+    int leftRPM  = odomsg->data[1];
+    int rightRPM = odomsg->data[2];
+
+   // const int ZERO_STEERING_ANGLE_PWM = 128;
+    const double STEERING_PWM_RANGE = 255.0;
+
+    const double PI = 3.141592653589793238463;
+    const double ZERO_STEERING_ANGLE = 0.0; // [radians]
+    const double STEERING_ANGLE_RANGE = PI / 3; //$ [radians] TODO: fix
+    const double ABS_MAX_STEERING_ANGLE = PI / 6; //$ [radians] TODO: fix
+
+    double steeringAngle = STEERING_ANGLE_RANGE * (servoPWM / STEERING_PWM_RANGE) - ABS_MAX_STEERING_ANGLE;
+  }
+
   void velCommandCallback(const geometry_msgs::Twist::ConstPtr& msg) 
   {
 

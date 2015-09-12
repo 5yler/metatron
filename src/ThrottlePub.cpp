@@ -63,7 +63,7 @@ int main(int argc, char **argv)
    * than we can send them, the number here specifies how many messages to
    * buffer up before throwing some away.
    */
-  ros::Publisher servo_pub = n.advertise<std_msgs::Int16MultiArray>("control", 1000);
+  ros::Publisher control_pub = n.advertise<std_msgs::Int16MultiArray>("control", 1000);
 
   /**
    * A ros::Rate object allows you to specify a frequency that you would 
@@ -77,23 +77,41 @@ int main(int argc, char **argv)
    * a unique string for each message.
    */
   int count = 0;
+
+
+  const unsigned int data_sz = 3;
+  /**
+   * This is a message object. You stuff it with data, and then publish it.
+   */
+  std_msgs::Int16MultiArray m;
+
+  m.layout.dim.push_back(std_msgs::MultiArrayDimension());
+  m.layout.dim[0].size = data_sz;
+  m.layout.dim[0].stride = 1;
+  m.layout.dim[0].label = "controls";
+
+  // only needed if you don't want to use push_back
+  m.data.resize(data_sz);
+
+  m.data[0] = 0;
+  m.data[1] = 0;
+  m.data[2] = 0;
+
   while (ros::ok() && count < 100)
   {
-    /**
-     * This is a message object. You stuff it with data, and then publish it.
-     */
-    std_msgs::Int16MultiArray msg;
+
+    std_msgs::Int16MultiArray msg = m;
     msg.data[1] = count;
 
     // ROS_INFO_STREAM is a replacement for cout
-    ROS_INFO_STREAM("% max angular velocity: " << msg.data[1]);
+    ROS_INFO_STREAM("Left motor PWM command: " << msg.data[1]);
     /**
      * The publish() function is how you send messages. The parameter
      * is the message object. The type of this object must agree with the type
      * given as a template parameter to the advertise<>() call, as was done
      * in the constructor above.
      */
-    servo_pub.publish(msg);
+    control_pub.publish(msg);
 
     /** 
      * Calling ros::spinOnce() here is not necessary for this simple program, 
@@ -115,11 +133,11 @@ int main(int argc, char **argv)
   while (ros::ok() && count > 0)   // count down
   {
 
-    std_msgs::Int16MultiArray msg;
+    std_msgs::Int16MultiArray msg = m;
     msg.data[1] = count;
 
-    ROS_INFO_STREAM("% max angular velocity: " << msg.data[1]);
-    servo_pub.publish(msg);
+    ROS_INFO_STREAM("Left motor PWM command: " << msg.data[1]);
+    control_pub.publish(msg);
 
     ros::spinOnce();
     loop_rate.sleep();
@@ -128,11 +146,11 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("SPEED!");
   while (ros::ok() && count < 100)   // count up again, but faster
   {
-    std_msgs::Int16MultiArray msg;
+    std_msgs::Int16MultiArray msg = m;
     msg.data[2] = count;
 
-    ROS_INFO_STREAM("% max angular velocity: " << msg.data[2]);
-    servo_pub.publish(msg);
+    ROS_INFO_STREAM("Right motor PWM command: " << msg.data[2]);
+    control_pub.publish(msg);
 
     ros::spinOnce();
     loop_rate.sleep();
@@ -141,11 +159,11 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("Slowing down again, but FASTER!");
   while (ros::ok() && count >= 0)   // count down again, but faster
   {
-    std_msgs::Int16MultiArray msg;
-    msg.data[2] = count;
+    std_msgs::Int16MultiArray msg = m;
+    m.sgdata[2] = count;
 
-    ROS_INFO_STREAM("% max angular velocity: " << msg.data[2]);
-    servo_pub.publish(msg);
+    ROS_INFO_STREAM("Right motor PWM command: " << msg.data[2]);
+    control_pub.publish(msg);
 
     ros::spinOnce();
     loop_rate.sleep();
