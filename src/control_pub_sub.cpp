@@ -38,17 +38,33 @@ public:
     pub_ = n_.advertise<std_msgs::UInt16MultiArray>("control", 1000);
 
     // odometry stuff - move eventually
-    ros::Subscriber osub_ = n_.subscribe("odo_val", 1000, &ControlPubSub::odoCommandCallback, this);
-
+    ros::Subscriber osub_ = n_.subscribe("odo_val", 1000, &ControlPubSub::odoCallback, this);
+    ros::Subscriber cmdsub_ = n_.subscribe("command", 1000, &ControlPubSub::cmdCallback, this);
   }
 
-  void odoCommandCallback(const std_msgs::UInt16MultiArray::ConstPtr& odomsg) 
+  void cmdCallback(const std_msgs::UInt16MultiArray::ConstPtr& cmdmsg) 
   {
 
     unsigned int servoPWM = odomsg->data[0];
+    unsigned int leftPWM  = odomsg->data[1];
+    unsigned int rightPWM = odomsg->data[2];
 
+    ROS_INFO_STREAM("/command: \tSPWM " << servoPWM);
+    ROS_INFO_STREAM("\tLRPM " << leftPWM);
+    ROS_INFO_STREAM("\tRRPM " << rightPWM << "\n");
+
+  }
+
+  void odoCallback(const std_msgs::UInt16MultiArray::ConstPtr& odomsg) 
+  {
+
+    unsigned int servoPWM = odomsg->data[0];
     unsigned int leftRPM  = odomsg->data[1];
     unsigned int rightRPM = odomsg->data[2];
+
+    ROS_INFO_STREAM("/odo_val \tSPWM " << servoPWM);
+    ROS_INFO_STREAM("\tLRPM " << leftRPM);
+    ROS_INFO_STREAM("\tRRPM " << rightRPM << "\n");
 
    // const int ZERO_STEERING_ANGLE_PWM = 128;
     const double STEERING_PWM_RANGE = 255.0;
@@ -59,11 +75,11 @@ public:
     const double ABS_MAX_STEERING_ANGLE = PI / 6; //$ [radians] TODO: fix
 
     double steeringAngle = STEERING_ANGLE_RANGE * (servoPWM / STEERING_PWM_RANGE) - ABS_MAX_STEERING_ANGLE;
+  
   }
 
   void velCommandCallback(const geometry_msgs::Twist::ConstPtr& msg) 
   {
-
     double desiredForwardVelocity = msg->linear.x;   // desired forward velocity 
                                               // ignore linear.y since car can't go sideways
     double desiredAngularVelocity = msg->angular.z;  // angular velocity
@@ -98,9 +114,9 @@ public:
     control.data.push_back(desiredRightMotorCommand);
     
     // ROS_INFO_STREAM is a replacement for cout
-    ROS_INFO_STREAM("Steering angle: " << control.data[0]);
-    ROS_INFO_STREAM(" Left wheel velocity: " << control.data[1]);
-    ROS_INFO_STREAM(" Right wheel velocity: " << control.data[2] << "\n");
+    ROS_INFO_STREAM("/control: \tSPWM " << control.data[0]);
+    ROS_INFO_STREAM("\tLPWM " << control.data[1]);
+    ROS_INFO_STREAM("\tRPWM " << control.data[2] << "\n");
 
     /**
      * The publish() function is how you send messages. The parameter
