@@ -26,6 +26,11 @@ const static double gearRatio = 11.0 / 60.0;  //$ gear ratio between motor and w
 
 const static double RPM_TO_M_S = (2 * PI * wheelRadius) / 60.0;   //$ conversion from RPM to meters per second
 
+const static double STEERING_PWM_RANGE = 255.0;
+const static double STEERING_ANGLE_RANGE = 50 * (PI / 180); //$ [radians] this is the correct steering range
+const static double ABS_MAX_STEERING_ANGLE = 25 * (PI / 180); //$ [radians]
+
+
 class OdometryComputer {
 public:
 

@@ -16,19 +16,21 @@
  * 2. Start control_pub_sub in a separate window to send controls
  *      rosrun gigatron control_pub_sub
  * 3. Start whatever node sends geometry_msgs/Twist messages. For testing, you can use 
- *      rosrun turtlesim turtle_teleop_key /turtle1/cmd_vel:=cmd_vel
-
- * TODO: verify the units of commands that the Arduino is listening for and adjust conversion
- * TODO: restrict range of angles used for steering
- 
+ *      rosrun turtlesim turtle_teleop_key /turtle1/cmd_vel:=cmd_vel 
  **/
 
 #include "ros/ros.h"
 #include "geometry_msgs/Twist.h"
-#include "std_msgs/MultiArrayLayout.h"
-#include "std_msgs/MultiArrayDimension.h"
-#include "std_msgs/Int16MultiArray.h"
 #include "geometry_msgs/Vector3.h"
+
+   // const int ZERO_STEERING_ANGLE_PWM = 128;
+    const double STEERING_PWM_RANGE = 255.0;
+
+    const double PI = 3.141592653589793238463;
+    const double ZERO_STEERING_ANGLE = 0.0; // [radians]
+    const double STEERING_ANGLE_RANGE = 50 * (PI / 180); //$ [radians] this is the correct steering range
+    const double ABS_MAX_STEERING_ANGLE = 25 * (PI / 180); //$ [radians]
+
 
 class ControlPubSub
 {
@@ -36,7 +38,7 @@ public:
   ControlPubSub()
   {
     sub_ = n_.subscribe("cmd_vel", 1000, &ControlPubSub::velCommandCallback, this);
-    pub_ = n_.advertise<std_msgs::Int16MultiArray>("control", 1000);
+    pub_ = n_.advertise<geometry_msgs::Vector3>("control", 1000);
 
     // odometry stuff - move eventually
     osub_ = n_.subscribe("odo_val", 1000, &ControlPubSub::odoCallback, this);
@@ -62,14 +64,6 @@ public:
     double rightRPM = odomsg->z;
 
     ROS_INFO_STREAM("/odo_val \tSPWM\t" << servoPWM << "\tLRPM\t" << leftRPM << "\tRRPM\t" << rightRPM);
-
-   // const int ZERO_STEERING_ANGLE_PWM = 128;
-    const double STEERING_PWM_RANGE = 255.0;
-
-    const double PI = 3.141592653589793238463;
-    const double ZERO_STEERING_ANGLE = 0.0; // [radians]
-    const double STEERING_ANGLE_RANGE = 50 * (PI / 180); //$ [radians] this is the correct steering range
-    const double ABS_MAX_STEERING_ANGLE = 25 * (PI / 180); //$ [radians]
 
     double steeringAngle = STEERING_ANGLE_RANGE * (servoPWM / STEERING_PWM_RANGE) - ABS_MAX_STEERING_ANGLE;
   
@@ -97,21 +91,15 @@ public:
     /**
      * This is a message object. You stuff it with data, and then publish it.
      */
-    std_msgs::Int16MultiArray control;
-    control.data.clear();   // clear message array
+    geometry_msgs::Vector3 control;
 
-    // conversion (does nothing right now)
-    unsigned int desiredSteeringCommand   = (unsigned int) (desiredSteeringAngle * 1); // TODO: CONVERT
-    unsigned int desiredLeftMotorCommand  = (unsigned int) (desiredLeftWheelVelocity * 50);
-    unsigned int desiredRightMotorCommand = (unsigned int) (desiredRightWheelVelocity * 50);
-
-    // add steering angle and motor commands to message
-    control.data.push_back(desiredSteeringCommand); // TODO: CONVERT
-    control.data.push_back(desiredLeftMotorCommand);
-    control.data.push_back(desiredRightMotorCommand);
+    // add steering angle and desired velocities to message
+    control.x = desiredSteeringAngle; // TODO: CONVERT
+    control.y = desiredLeftWheelVelocity;
+    control.z = desiredRightWheelVelocity;
     
     // ROS_INFO_STREAM is a replacement for cout
-    ROS_INFO_STREAM("/control: \tSPWM\t" << control.data[0] << "\tLPWM\t" << control.data[1] << "\tRPWM\t" << control.data[2]);
+    ROS_INFO_STREAM("/control: \tTheta\t" << control.data[0] << "\tLeftV\t" << control.data[1] << "\tRightV\t" << control.data[2]);
 
     /**
      * The publish() function is how you send messages. The parameter
