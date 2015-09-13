@@ -1,19 +1,38 @@
+ /**
+ * odom_to_tf.cpp
+ * Gigatron publisher for odometry and odometry transform.
+ * 
+ * @author  Chris Desnoyers   <cjdesno@mit.edu>
+ * @author  Syler Wagner      <syler@mit.edu>
+
+ * @date    2015-09-12  cjdesno   creation
+ * @date    2015-09-13  syler     added proper model dimensions 
+ *
+ * This node listens for odometry sensor readings from the Arduino, 
+ * then publishes Odometry messages and broadcasts associated transforms.
+ **/
+
 #include "ros/ros.h"
 #include "geometry_msgs/Vector3.h"
 #include "nav_msgs/Odometry.h"
 #include "tf/transform_broadcaster.h"
+
+const static double INCHES_TO_M = 0.0254; //$ conversion from inches to meters
+
+const static double wheelBaseWidth = 23.0 * INCHES_TO_M;  //$ [m]
+const static double wheelRadius = 4.90 * INCHES_TO_M;     //$ [m]
+const static double gearRatio = 11.0 / 60.0;  //$ gear ratio between motor and wheels
 
 class OdometryComputer {
 public:
 
   unsigned int leftWheelRPM;
   unsigned int rightWheelRPM;
-  double x;       //m/s
-  double y;       //m/s
-  double theta;   //rad, where 0 is forward
+  double x;       // [m/s]
+  double y;       // [m/s]
+  double theta;   // [rad] where 0 is forward
   ros::Time lastTime;
   ros::Time currentTime;
-  const static double wheelRadius = 0.5; //TODO actual value
 
   void rpmCallback(geometry_msgs::Vector3::ConstPtr& rpm) {
     leftWheelRPM = rpm->y;
@@ -49,12 +68,10 @@ int main(int argc, char** argv) {
 
   while(n.ok()) {
     currentTime = ros::Time::now();
-    double rightWheelVelocity = double(rightWheelRPM) * wheelRadius * 0.10472;
+    double rightWheelVelocity = double(rightWheelRPM) * wheelRadius * 0.10472; //$ ???
     double leftWheelVelocity = double(leftWheelRPM) * wheelRadius * 0.10472;
 
     double dt = (currentTime - lastTime).toSec();
-
-    double wheelBaseWidth = 0.5;
 
     double centerVelocity = (rightWheelVelocity + leftWheelVelocity) / 2;
 
