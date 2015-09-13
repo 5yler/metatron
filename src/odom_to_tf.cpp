@@ -24,7 +24,7 @@ const static double wheelBaseWidth = 23.0 * INCHES_TO_M;  //$ [m]
 const static double wheelRadius = 4.90 * INCHES_TO_M;     //$ [m]
 const static double gearRatio = 11.0 / 60.0;  //$ gear ratio between motor and wheels
 
-const static double RPM_TO_M_S = (2 * PI * wheelRadius) / 60.0   //$ conversion from RPM to meters per second
+const static double RPM_TO_M_S = (2 * PI * wheelRadius) / 60.0;   //$ conversion from RPM to meters per second
 
 class OdometryComputer {
 public:
