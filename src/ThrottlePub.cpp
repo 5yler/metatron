@@ -17,7 +17,7 @@
  **/
 
 #include "ros/ros.h"
-#include "std_msgs/UInt16MultiArray.h"
+#include "std_msgs/Int16MultiArray.h"
 #include "std_msgs/MultiArrayLayout.h"
 #include "std_msgs/MultiArrayDimension.h"
 
@@ -63,27 +63,27 @@ int main(int argc, char **argv)
    * than we can send them, the number here specifies how many messages to
    * buffer up before throwing some away.
    */
-  ros::Publisher control_pub = n.advertise<std_msgs::UInt16MultiArray>("control", 1000);
+  ros::Publisher control_pub = n.advertise<std_msgs::Int16MultiArray>("control", 1000);
 
   /**
    * A ros::Rate object allows you to specify a frequency that you would 
    * like to loop at. It will keep track of how long it has been since 
    * the last call to Rate::sleep(), and sleep for the correct amount of time.
    */
-  ros::Rate loop_rate(10);  // run at 10hz
+  ros::Rate loop_rate(5);  // run at 10hz
 
   /**
    * A count of how many messages we have sent. This is used to create
    * a unique string for each message.
    */
-  unsigned int count = 0;
+  int count = 0;
 
 
   const unsigned int data_sz = 3;
   /**
    * This is a message object. You stuff it with data, and then publish it.
    */
-  std_msgs::UInt16MultiArray m;
+  std_msgs::Int16MultiArray m;
 
   m.layout.dim.push_back(std_msgs::MultiArrayDimension());
   m.layout.dim[0].size = data_sz;
@@ -93,18 +93,19 @@ int main(int argc, char **argv)
   // only needed if you don't want to use push_back
   m.data.resize(data_sz);
 
-  m.data[0] = 0;
+  m.data[0] = 128;
   m.data[1] = 0;
   m.data[2] = 0;
 
-  while (ros::ok() && count < 100)
+  while (ros::ok() && count < 127)
   {
 
-    std_msgs::UInt16MultiArray msg = m;
+    std_msgs::Int16MultiArray msg = m;
     msg.data[1] = count;
+    msg.data[2] = 2*count;
 
     // ROS_INFO_STREAM is a replacement for cout
-    ROS_INFO_STREAM("Left motor PWM command: " << msg.data[1]);
+    ROS_INFO_STREAM("PWM command left: " << msg.data[1] << right: << msg.data[2]);
     /**
      * The publish() function is how you send messages. The parameter
      * is the message object. The type of this object must agree with the type
@@ -133,10 +134,11 @@ int main(int argc, char **argv)
   while (ros::ok() && count > 0)   // count down
   {
 
-    std_msgs::UInt16MultiArray msg = m;
-    msg.data[1] = count;
+    std_msgs::Int16MultiArray msg = m;
+    msg.data[1] = 2*count;
+    msg.data[2] = count;
 
-    ROS_INFO_STREAM("Left motor PWM command: " << msg.data[1]);
+    ROS_INFO_STREAM("PWM command left: " << msg.data[1] << right: << msg.data[2]);
     control_pub.publish(msg);
 
     ros::spinOnce();
@@ -146,10 +148,10 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("SPEED!");
   while (ros::ok() && count < 100)   // count up again, but faster
   {
-    std_msgs::UInt16MultiArray msg = m;
+    std_msgs::Int16MultiArray msg = m;
     msg.data[2] = count;
 
-    ROS_INFO_STREAM("Right motor PWM command: " << msg.data[2]);
+    ROS_INFO_STREAM("PWM command left: " << msg.data[1] << right: << msg.data[2]);
     control_pub.publish(msg);
 
     ros::spinOnce();
@@ -159,10 +161,10 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("Slowing down again, but FASTER!");
   while (ros::ok() && count >= 0)   // count down again, but faster
   {
-    std_msgs::UInt16MultiArray msg = m;
+    std_msgs::Int16MultiArray msg = m;
     msg.data[2] = count;
 
-    ROS_INFO_STREAM("Right motor PWM command: " << msg.data[2]);
+    ROS_INFO_STREAM("PWM command left: " << msg.data[1] << right: << msg.data[2]);
     control_pub.publish(msg);
 
     ros::spinOnce();

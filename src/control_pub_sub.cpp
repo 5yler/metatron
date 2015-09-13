@@ -50,9 +50,7 @@ public:
     unsigned int leftPWM  = (unsigned int) cmdmsg->y;
     unsigned int rightPWM = (unsigned int) cmdmsg->z;
 
-    ROS_INFO_STREAM("/command: \tSPWM " << servoPWM);
-    ROS_INFO_STREAM("\tLRPM " << leftPWM);
-    ROS_INFO_STREAM("\tRRPM " << rightPWM << "\n");
+    ROS_INFO_STREAM("/command: \tSPWM\t" << servoPWM << "\tLRPM\t" << leftPWM << "\tRRPM\t" << rightPWM);
 
   }
 
@@ -63,17 +61,15 @@ public:
     double leftRPM  = odomsg->y;
     double rightRPM = odomsg->z;
 
-    ROS_INFO_STREAM("/odo_val \tSPWM " << servoPWM);
-    ROS_INFO_STREAM("\tLRPM " << leftRPM);
-    ROS_INFO_STREAM("\tRRPM " << rightRPM << "\n");
+    ROS_INFO_STREAM("/odo_val \tSPWM\t" << servoPWM << "\tLRPM\t" << leftRPM << "\tRRPM\t" << rightRPM);
 
    // const int ZERO_STEERING_ANGLE_PWM = 128;
     const double STEERING_PWM_RANGE = 255.0;
 
     const double PI = 3.141592653589793238463;
     const double ZERO_STEERING_ANGLE = 0.0; // [radians]
-    const double STEERING_ANGLE_RANGE = PI / 3; //$ [radians] TODO: fix
-    const double ABS_MAX_STEERING_ANGLE = PI / 6; //$ [radians] TODO: fix
+    const double STEERING_ANGLE_RANGE = 50 * (PI / 180); //$ [radians] this is the correct steering range
+    const double ABS_MAX_STEERING_ANGLE = 25 * (PI / 180); //$ [radians]
 
     double steeringAngle = STEERING_ANGLE_RANGE * (servoPWM / STEERING_PWM_RANGE) - ABS_MAX_STEERING_ANGLE;
   
@@ -106,8 +102,8 @@ public:
 
     // conversion (does nothing right now)
     unsigned int desiredSteeringCommand   = (unsigned int) (desiredSteeringAngle * 1); // TODO: CONVERT
-    unsigned int desiredLeftMotorCommand  = (unsigned int) (desiredLeftWheelVelocity * 1);
-    unsigned int desiredRightMotorCommand = (unsigned int) (desiredRightWheelVelocity * 1);
+    unsigned int desiredLeftMotorCommand  = (unsigned int) (desiredLeftWheelVelocity * 50);
+    unsigned int desiredRightMotorCommand = (unsigned int) (desiredRightWheelVelocity * 50);
 
     // add steering angle and motor commands to message
     control.data.push_back(desiredSteeringCommand); // TODO: CONVERT
@@ -115,9 +111,7 @@ public:
     control.data.push_back(desiredRightMotorCommand);
     
     // ROS_INFO_STREAM is a replacement for cout
-    ROS_INFO_STREAM("/control: \tSPWM " << control.data[0]);
-    ROS_INFO_STREAM("\tLPWM " << control.data[1]);
-    ROS_INFO_STREAM("\tRPWM " << control.data[2] << "\n");
+    ROS_INFO_STREAM("/control: \tSPWM\t" << control.data[0] << "\tLPWM\t" << control.data[1] << "\tRPWM\t" << control.data[2]);
 
     /**
      * The publish() function is how you send messages. The parameter
