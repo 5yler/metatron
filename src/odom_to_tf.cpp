@@ -27,7 +27,7 @@ const static double gearRatio = 11.0 / 60.0;  //$ gear ratio between motor and w
 double leftWheelVelocity = 0.0;
 double rightWheelVelocity = 0.0;
 
-void velocityCallback(geometry_msgs::Vector3::ConstPtr& vel) {
+void velocityCallback(const geometry_msgs::Vector3::ConstPtr& vel) {
   leftWheelVelocity = vel->y;
   rightWheelVelocity = vel->z;
 }
