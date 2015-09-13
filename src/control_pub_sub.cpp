@@ -27,7 +27,8 @@
 #include "geometry_msgs/Twist.h"
 #include "std_msgs/MultiArrayLayout.h"
 #include "std_msgs/MultiArrayDimension.h"
-#include "std_msgs/UInt16MultiArray.h"
+#include "std_msgs/Int16MultiArray.h"
+#include "geometry_msgs/Vector3.h"
 
 class ControlPubSub
 {
@@ -35,19 +36,19 @@ public:
   ControlPubSub()
   {
     sub_ = n_.subscribe("cmd_vel", 1000, &ControlPubSub::velCommandCallback, this);
-    pub_ = n_.advertise<std_msgs::UInt16MultiArray>("control", 1000);
+    pub_ = n_.advertise<std_msgs::Int16MultiArray>("control", 1000);
 
     // odometry stuff - move eventually
-    ros::Subscriber osub_ = n_.subscribe("odo_val", 1000, &ControlPubSub::odoCallback, this);
-    ros::Subscriber cmdsub_ = n_.subscribe("command", 1000, &ControlPubSub::cmdCallback, this);
+    osub_ = n_.subscribe("odo_val", 1000, &ControlPubSub::odoCallback, this);
+    cmdsub_ = n_.subscribe("command", 1000, &ControlPubSub::cmdCallback, this);
   }
 
-  void cmdCallback(const std_msgs::UInt16MultiArray::ConstPtr& cmdmsg) 
+  void cmdCallback(const geometry_msgs::Vector3::ConstPtr& cmdmsg) 
   {
 
-    unsigned int servoPWM = odomsg->data[0];
-    unsigned int leftPWM  = odomsg->data[1];
-    unsigned int rightPWM = odomsg->data[2];
+    unsigned int servoPWM = (unsigned int) cmdmsg->x;
+    unsigned int leftPWM  = (unsigned int) cmdmsg->y;
+    unsigned int rightPWM = (unsigned int) cmdmsg->z;
 
     ROS_INFO_STREAM("/command: \tSPWM " << servoPWM);
     ROS_INFO_STREAM("\tLRPM " << leftPWM);
@@ -55,12 +56,12 @@ public:
 
   }
 
-  void odoCallback(const std_msgs::UInt16MultiArray::ConstPtr& odomsg) 
+  void odoCallback(const geometry_msgs::Vector3::ConstPtr& odomsg) 
   {
 
-    unsigned int servoPWM = odomsg->data[0];
-    unsigned int leftRPM  = odomsg->data[1];
-    unsigned int rightRPM = odomsg->data[2];
+    double servoPWM = odomsg->x;
+    double leftRPM  = odomsg->y;
+    double rightRPM = odomsg->z;
 
     ROS_INFO_STREAM("/odo_val \tSPWM " << servoPWM);
     ROS_INFO_STREAM("\tLRPM " << leftRPM);
@@ -100,16 +101,16 @@ public:
     /**
      * This is a message object. You stuff it with data, and then publish it.
      */
-    std_msgs::UInt16MultiArray control;
+    std_msgs::Int16MultiArray control;
     control.data.clear();   // clear message array
 
     // conversion (does nothing right now)
-    unsigned int desiredSteeringCommand   = (unsigned int) (desiredSteeringAngle * 1);
+    unsigned int desiredSteeringCommand   = (unsigned int) (desiredSteeringAngle * 1); // TODO: CONVERT
     unsigned int desiredLeftMotorCommand  = (unsigned int) (desiredLeftWheelVelocity * 1);
     unsigned int desiredRightMotorCommand = (unsigned int) (desiredRightWheelVelocity * 1);
 
     // add steering angle and motor commands to message
-    control.data.push_back(desiredSteeringCommand);
+    control.data.push_back(desiredSteeringCommand); // TODO: CONVERT
     control.data.push_back(desiredLeftMotorCommand);
     control.data.push_back(desiredRightMotorCommand);
     
@@ -131,6 +132,8 @@ private:
   ros::NodeHandle n_; 
   ros::Publisher pub_;
   ros::Subscriber sub_;
+  ros::Subscriber osub_;
+  ros::Subscriber cmdsub_;
 
 }; // end of class ControlPubSub
 
