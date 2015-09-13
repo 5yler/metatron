@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
   tf::TransformBroadcaster odom_broadcaster;
 
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
-  ros::Subscriber rpm_sub = n.subscribe("odo_val", 1000, OdometryComputer::rpmCallback);
+  ros::Subscriber rpm_sub = n.subscribe("odo_val", 1000, rpmCallback);
 
   ros::Rate r(1000.0);
 
@@ -68,7 +68,7 @@ int main(int argc, char** argv) {
     odom_trans.transform.translation.x = x;
     odom_trans.transform.translation.y = y;
     odom_trans.transform.translation.z = 0.0;
-    odom_trans.transform.translation.rotation = odom_quat;
+    odom_trans.transform.rotation = odom_quat;
 
     odom_broadcaster.sendTransform(odom_trans);
 
