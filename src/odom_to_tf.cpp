@@ -24,35 +24,12 @@ const static double wheelBaseWidth = 23.0 * INCHES_TO_M;  //$ [m]
 const static double wheelRadius = 4.90 * INCHES_TO_M;     //$ [m]
 const static double gearRatio = 11.0 / 60.0;  //$ gear ratio between motor and wheels
 
-const static double RPM_TO_M_S = (2 * PI * wheelRadius) / 60.0;   //$ conversion from RPM to meters per second
+double leftWheelVelocity = 0.0;
+double rightWheelVelocity = 0.0;
 
-const static double STEERING_PWM_RANGE = 255.0;
-const static double STEERING_ANGLE_RANGE = 50 * (PI / 180); //$ [radians] this is the correct steering range
-const static double ABS_MAX_STEERING_ANGLE = 25 * (PI / 180); //$ [radians]
-
-
-class OdometryComputer {
-public:
-
-  unsigned int leftWheelRPM;
-  unsigned int rightWheelRPM;
-  double x;       // [m/s]
-  double y;       // [m/s]
-  double theta;   // [rad] where 0 is forward
-  ros::Time lastTime;
-  ros::Time currentTime;
-
-  void rpmCallback(geometry_msgs::Vector3::ConstPtr& rpm) {
-    leftWheelRPM = rpm->y;
-    rightWheelRPM = rpm->z;
-  }
-
-private:
-
-  //ros::NodeHandle n;
-  //tf::TransformBroadcaster odom_broadcaster;
-  //ros::Publisher odom_pub;
-  //ros::Subscriber rpm_sub;
+void velocityCallback(const geometry_msgs::Vector3::ConstPtr& vel) {
+  leftWheelVelocity = vel->y;
+  rightWheelVelocity = vel->z;
 }
 
 int main(int argc, char** argv) {
@@ -62,23 +39,18 @@ int main(int argc, char** argv) {
   tf::TransformBroadcaster odom_broadcaster;
 
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
-  ros::Subscriber rpm_sub = n.subscribe("odo_val", 1000, OdometryComputer::rpmCallback);
+  ros::Subscriber rpm_sub = n.subscribe("odo_val", 1000, velocityCallback);
 
   ros::Rate r(1000.0);
 
-  leftWheelRPM = 0;
-  rightWheelRPM = 0;
-  x = 0.0;
-  y = 0.0;
-  theta = 0.0;
-  lastTime = ros::Time::now();
-  currentTime = ros::Time::now();
+  double x = 0.0;       // [m/s]
+  double y = 0.0;       // [m/s]
+  double theta = 0.0;   // [rad] where 0 is forward
+  ros::Time lastTime = ros::Time::now();
+  ros::Time currentTime = ros::Time::now();
 
   while(n.ok()) {
     currentTime = ros::Time::now();
-    double rightWheelVelocity = double(rightWheelRPM) * RPM_TO_M_S;
-    double leftWheelVelocity = double(leftWheelRPM) * RPM_TO_M_S;
-
     double dt = (currentTime - lastTime).toSec();
 
     double centerVelocity = (rightWheelVelocity + leftWheelVelocity) / 2;
@@ -96,7 +68,7 @@ int main(int argc, char** argv) {
     odom_trans.transform.translation.x = x;
     odom_trans.transform.translation.y = y;
     odom_trans.transform.translation.z = 0.0;
-    odom_trans.translation.rotation = odom_quat;
+    odom_trans.transform.rotation = odom_quat;
 
     odom_broadcaster.sendTransform(odom_trans);
 
