@@ -105,7 +105,7 @@ int main(int argc, char **argv)
     msg.data[2] = 2*count;
 
     // ROS_INFO_STREAM is a replacement for cout
-    ROS_INFO_STREAM("PWM command left: " << msg.data[1] << right: << msg.data[2]);
+    ROS_INFO_STREAM("PWM command left: " << msg.data[1] << "right:" << msg.data[2]);
     /**
      * The publish() function is how you send messages. The parameter
      * is the message object. The type of this object must agree with the type
@@ -138,7 +138,7 @@ int main(int argc, char **argv)
     msg.data[1] = 2*count;
     msg.data[2] = count;
 
-    ROS_INFO_STREAM("PWM command left: " << msg.data[1] << right: << msg.data[2]);
+    ROS_INFO_STREAM("PWM command left: " << msg.data[1] << "right:" << msg.data[2]);
     control_pub.publish(msg);
 
     ros::spinOnce();
@@ -151,7 +151,7 @@ int main(int argc, char **argv)
     std_msgs::Int16MultiArray msg = m;
     msg.data[2] = count;
 
-    ROS_INFO_STREAM("PWM command left: " << msg.data[1] << right: << msg.data[2]);
+    ROS_INFO_STREAM("PWM command left: " << msg.data[1] << "right:" << msg.data[2]);
     control_pub.publish(msg);
 
     ros::spinOnce();
@@ -164,7 +164,7 @@ int main(int argc, char **argv)
     std_msgs::Int16MultiArray msg = m;
     msg.data[2] = count;
 
-    ROS_INFO_STREAM("PWM command left: " << msg.data[1] << right: << msg.data[2]);
+    ROS_INFO_STREAM("PWM command left: " << msg.data[1] << "right:" << msg.data[2]);
     control_pub.publish(msg);
 
     ros::spinOnce();

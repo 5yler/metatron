@@ -6,14 +6,14 @@
 class OdometryComputer {
 public:
 
-  unsigned int leftWheelRPM = 0;
-  unsigned int rightWheelRPM = 0;
-  double x = 0.0;       //m/s
-  double y = 0.0;       //m/s
-  double theta = 0.0;   //rad, where 0 is forward
-  ros::Time lastTime = ros::Time::now();
-  ros::Time currentTime = ros::Time::now();
-  double wheelRadius = 0.5; //TODO actual value
+  unsigned int leftWheelRPM;
+  unsigned int rightWheelRPM;
+  double x;       //m/s
+  double y;       //m/s
+  double theta;   //rad, where 0 is forward
+  ros::Time lastTime;
+  ros::Time currentTime;
+  const static double wheelRadius = 0.5; //TODO actual value
 
   void rpmCallback(geometry_msgs::Vector3::ConstPtr& rpm) {
     leftWheelRPM = rpm->y;
@@ -22,19 +22,30 @@ public:
 
 private:
 
-  ros::NodeHandle n;
-  tf::TransformBroadcaster odom_broadcaster;
-  ros::Publisher odom_pub;
-  ros::Subscriber rpm_sub;
+  //ros::NodeHandle n;
+  //tf::TransformBroadcaster odom_broadcaster;
+  //ros::Publisher odom_pub;
+  //ros::Subscriber rpm_sub;
 }
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "odometry_publisher");
 
-  odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
-  rpm_sub = n.subscribe("odo_val", 1000, OdometryComputer::rpmCallback);
+  ros::NodeHandle n;
+  tf::TransformBroadcaster odom_broadcaster;
+
+  ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
+  ros::Subscriber rpm_sub = n.subscribe("odo_val", 1000, OdometryComputer::rpmCallback);
 
   ros::Rate r(1000.0);
+
+  leftWheelRPM = 0;
+  rightWheelRPM = 0;
+  x = 0.0;
+  y = 0.0;
+  theta = 0.0;
+  lastTime = ros::Time::now();
+  currentTime = ros::Time::now();
 
   while(n.ok()) {
     currentTime = ros::Time::now();
@@ -53,8 +64,8 @@ int main(int argc, char** argv) {
 
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
 
-    geometry_messages::TransformStamped odom_trans;
-    odom_trans.header.stamp = current_time;
+    geometry_msgs::TransformStamped odom_trans;
+    odom_trans.header.stamp = currentTime;
     odom_trans.header.frame_id = "odom";
 
     odom_trans.transform.translation.x = x;
@@ -65,7 +76,7 @@ int main(int argc, char** argv) {
     odom_broadcaster.sendTransform(odom_trans);
 
     nav_msgs::Odometry odom;
-    odom.header.stamp = current_time;
+    odom.header.stamp = currentTime;
     odom.header.frame_id = "odom";
 
     odom.pose.pose.position.x = x;
