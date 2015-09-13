@@ -18,10 +18,13 @@
 #include "tf/transform_broadcaster.h"
 
 const static double INCHES_TO_M = 0.0254; //$ conversion from inches to meters
+const static double PI = 3.141592653589793238463;
 
 const static double wheelBaseWidth = 23.0 * INCHES_TO_M;  //$ [m]
 const static double wheelRadius = 4.90 * INCHES_TO_M;     //$ [m]
 const static double gearRatio = 11.0 / 60.0;  //$ gear ratio between motor and wheels
+
+const static double RPM_TO_M_S = (2 * PI * wheelRadius) / 60.0   //$ conversion from RPM to meters per second
 
 class OdometryComputer {
 public:
@@ -68,8 +71,8 @@ int main(int argc, char** argv) {
 
   while(n.ok()) {
     currentTime = ros::Time::now();
-    double rightWheelVelocity = double(rightWheelRPM) * wheelRadius * 0.10472; //$ ???
-    double leftWheelVelocity = double(leftWheelRPM) * wheelRadius * 0.10472;
+    double rightWheelVelocity = double(rightWheelRPM) * RPM_TO_M_S;
+    double leftWheelVelocity = double(leftWheelRPM) * RPM_TO_M_S;
 
     double dt = (currentTime - lastTime).toSec();
 
