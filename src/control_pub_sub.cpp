@@ -52,7 +52,7 @@ public:
     unsigned int leftPWM  = (unsigned int) cmdmsg->y;
     unsigned int rightPWM = (unsigned int) cmdmsg->z;
 
-    ROS_INFO_STREAM("/command: \tSPWM\t" << servoPWM << "\tLRPM\t" << leftPWM << "\tRRPM\t" << rightPWM);
+    ROS_INFO_STREAM("/command: SPWM\t" << servoPWM << "\tLRPM\t" << leftPWM << "\tRRPM\t" << rightPWM);
 
   }
 
@@ -63,7 +63,7 @@ public:
     double leftRPM  = odomsg->y;
     double rightRPM = odomsg->z;
 
-    ROS_INFO_STREAM("/odo_val \tSPWM\t" << servoPWM << "\tLRPM\t" << leftRPM << "\tRRPM\t" << rightRPM);
+    ROS_INFO_STREAM("\t\t\t\t\t\t\t\t/odo_val: theta\t" << servoPWM << "\tL [m/s] \t" << leftRPM << "\tR [m/s]\t" << rightRPM);
 
     double steeringAngle = STEERING_ANGLE_RANGE * (servoPWM / STEERING_PWM_RANGE) - ABS_MAX_STEERING_ANGLE;
   
