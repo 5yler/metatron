@@ -99,7 +99,7 @@ public:
     control.z = desiredRightWheelVelocity;
     
     // ROS_INFO_STREAM is a replacement for cout
-    ROS_INFO_STREAM("/control: \tTheta\t" << control.data[0] << "\tLeftV\t" << control.data[1] << "\tRightV\t" << control.data[2]);
+    ROS_INFO_STREAM("/control: \tTheta\t" << control.x << "\tLeftV\t" << control.y << "\tRightV\t" << control.z);
 
     /**
      * The publish() function is how you send messages. The parameter
