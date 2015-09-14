@@ -1,19 +1,10 @@
 /**
- * ThrottlePub.cpp
- * Gigatron publisher for servo control using rosserial and Arduino to emulate throttle
+ * vector_pub.cpp
+ * Gigatron publisher for motor control and steering tests.
  * 
  * @author  Syler Wagner  <syler@mit.edu>
- * @date    2015-07-04    creation
+ * @date    2015-09-13    creation
  *
- * This node publishes ROS msgs subscribed to by the listener sketch on the Arduino
- * in order to control the servo.
- * 
- * Usage Instructions:
- * 1. Startup your roscore and the rosserial python node in their own terminal windows.
- *  roscore
- *  rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0
- * 2. Start ThrottlePub in a separate window to control the servo.
- *  rosrun gigatron ThrottlePub
  **/
 
 #include "ros/ros.h"
@@ -35,7 +26,7 @@ int main(int argc, char **argv)
    * You must call one of the versions of ros::init() before using any other
    * part of the ROS system.
    */
-  ros::init(argc, argv, "ThrottlePub");
+  ros::init(argc, argv, "vector_pub");
 
   /**
    * NodeHandle is the main access point to communications with the ROS system.
@@ -68,7 +59,7 @@ int main(int argc, char **argv)
    * like to loop at. It will keep track of how long it has been since 
    * the last call to Rate::sleep(), and sleep for the correct amount of time.
    */
-  ros::Rate loop_rate(5);  // run at 10hz
+  ros::Rate loop_rate(5);  // run at 5hz
 
   /**
    * A count of how many messages we have sent. This is used to create
@@ -84,11 +75,11 @@ int main(int argc, char **argv)
 
 
 
-  msg.x = 128;
+  msg.x = 0;
   msg.y = 0;
   msg.z = 0;
 
-  while (ros::ok() && count < 30)
+  while (ros::ok() && count < 15)
   {
 
     
@@ -124,7 +115,7 @@ int main(int argc, char **argv)
   while (ros::ok() && count > 0)   // count down
   {
 
-    
+    msg.x = 10.0 * (3.14159 / 180.0); 
     msg.y = count;
     msg.z = count;
 
@@ -135,9 +126,25 @@ int main(int argc, char **argv)
     loop_rate.sleep();
     --count;
   }
-  ROS_INFO_STREAM("SPEED!");
-  while (ros::ok() && count < 30)   // count up again, but faster
+  count = 50;
+  ROS_INFO_STREAM("Going at a constant 5 m/s!");
+  while (ros::ok() && count > 0)   // count down
   {
+    msg.x = 20.0 * (3.14159 / 180.0); 
+    msg.y = 5;
+    msg.z = 5;
+
+    ROS_INFO_STREAM("Motor velocity command: " << msg.y << " [m/s]");
+    control_pub.publish(msg);
+
+    ros::spinOnce();
+    loop_rate.sleep();
+    --count;
+  }
+  ROS_INFO_STREAM("SPEED!");
+  while (ros::ok() && count < 15)   // count up again, but faster
+  {
+    msg.x = 0.0; 
     msg.y = count;
     msg.z = count;
 
@@ -151,7 +158,7 @@ int main(int argc, char **argv)
   ROS_INFO_STREAM("Slowing down again, but FASTER!");
   while (ros::ok() && count >= 0)   // count down again, but faster
   {
-    
+    msg.x = -10.0 * (3.14159 / 180.0); 
     msg.y = count;
     msg.z = count;
 
