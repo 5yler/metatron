@@ -50,6 +50,7 @@ int main(int argc, char** argv) {
   ros::Time currentTime = ros::Time::now();
 
   while(n.ok()) {
+    ros::spinOnce();
     currentTime = ros::Time::now();
     double dt = (currentTime - lastTime).toSec();
 
