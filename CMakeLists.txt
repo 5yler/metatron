@@ -117,6 +117,7 @@ add_executable(ThrottlePub src/ThrottlePub.cpp)
 add_executable(control_pub_sub src/control_pub_sub.cpp)
 add_executable(odom_to_tf src/odom_to_tf.cpp)
 add_executable(vector_pub src/vector_pub.cpp)
+add_executable(teleop_key src/teleop_key.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -126,6 +127,7 @@ add_dependencies(ThrottlePub gigatron_generate_messages_cpp)
 add_dependencies(control_pub_sub gigatron_generate_messages_cpp)
 add_dependencies(odom_to_tf gigatron_generate_messages_cpp)
 add_dependencies(vector_pub gigatron_generate_messages_cpp)
+add_dependencies(teleop_key gigatron_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(gigatron_node
@@ -136,6 +138,7 @@ target_link_libraries(ThrottlePub ${catkin_LIBRARIES})
 target_link_libraries(control_pub_sub ${catkin_LIBRARIES})
 target_link_libraries(odom_to_tf ${catkin_LIBRARIES})
 target_link_libraries(vector_pub ${catkin_LIBRARIES})
+target_link_libraries(teleop_key ${catkin_LIBRARIES})
 
 #############
 ## Install ##
