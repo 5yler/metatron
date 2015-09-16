@@ -2,7 +2,7 @@
 <arg name="map_file" default="$(find gigatron)/miters.yaml"/>
 <node pkg="map_server" type="map_server" name="map_server" args="$(arg map_file)"/>
 <!-- Transform from robot center to LIDAR -->
-<node pkg="tf" type="static_transform_publisher" name="laser_broadcaster" args="-0.1 0 0 0 0 0 base_link laser 100" />
+<node pkg="tf" type="static_transform_publisher" name="laser_broadcaster" args="0.9 -0.1 0 0 0 0 base_link laser 100" />
 <node pkg="amcl" type="amcl" name="amcl" output="screen">
   <!-- Publish scans from best pose at a max of 10 Hz -->
   <param name="odom_model_type" value="diff"/>
