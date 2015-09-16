@@ -26,10 +26,9 @@
   <node pkg="gigatron" type="control_pub_sub" name="control_pub_sub" output="screen">
   </node>
 
-<!-- turtle sim keyboard remote -->
-  <node pkg="turtlesim" type="turtle_teleop_key" name="turtle_teleop_key" output="screen">
-    <remap from="/turtle1/cmd_vel" to="cmd_vel"/>
-  </node>
+<!-- turtle sim keyboard remote 
+  <node pkg="gigatron" type="gigaturtle" name="gigaturtle" output="screen">
+  </node>-->
 
     
 </launch>
