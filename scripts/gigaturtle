@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import rospy
-from geometry_msgs.msg import Vector3
+from geometry_msgs.msg import Vector3   # for sending controls
+from std_msgs.msg import String   # for switching Jetson/RC mode
 import sys, select, termios, tty, math
 
 ABS_MAX_STEERING_ANGLE = 25.0 * (math.pi / 180.0)
@@ -66,7 +67,12 @@ if __name__=="__main__":
     settings = termios.tcgetattr(sys.stdin)
     
     rospy.init_node('gigaturtle')
+
+    # control publisher
     pub = rospy.Publisher('control', Vector3, queue_size=5)
+
+    # mode switching publisher
+    switch_pub = rospy.Publisher('switch', String, queue_size=5)
 
     x = 0.0
     th = 0.0
@@ -99,6 +105,16 @@ if __name__=="__main__":
                 th = 0.0
                 control_speed = 0.0
                 control_turn = 0.0
+            elif key == 'r' :
+                # switch to RC mode
+                mode = String()
+                mode.data = "RC"
+                switch_pub.publish(mode)
+            elif key == 'a' :
+                # switch to autonomous mode
+                mode = String()
+                mode.data = "Autonomous"
+                switch_pub.publish(mode)
             else:
                 count = count + 1
                 if count > 4:
