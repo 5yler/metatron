@@ -98,7 +98,7 @@ if __name__=="__main__":
     settings = termios.tcgetattr(sys.stdin)
     
     rospy.init_node('gigaturtle')
-    pub = rospy.Publisher('cmd_vel', Twist, queue_size=5)
+    pub = rospy.Publisher('cmd_vel', Vector3, queue_size=5)
 
     x = 0.0
     th = 0.0
