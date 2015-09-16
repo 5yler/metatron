@@ -1,5 +1,16 @@
 #!/usr/bin/env python
 
+##
+# hare
+# Python script for remote controlling Gigatron 
+# via keyboard input to the Jetson, and switching
+# between radio-controlled RC and Jetson mode.
+# 
+# @author  Syler Wagner  <syler@mit.edu>
+#
+# @date    2015-09-16    syler   creation
+##
+
 import rospy
 from geometry_msgs.msg import Vector3   # for sending controls
 from std_msgs.msg import String   # for switching Jetson/RC mode
@@ -10,47 +21,45 @@ INCHES_TO_M = 0.0254
 wheelbase_width = 23.0 * INCHES_TO_M
 
 msg = """
-Control Your Turtlebot!
+Control Your Hare!
 ---------------------------
 Moving around:
    u    i    o
    j    k    l
-   m    ,    .
 
-q/z : increase/decrease max speeds by 10%
-w/x : increase/decrease only linear speed by 10%
-e/c : increase/decrease only angular speed by 10%
+Set speed in m/s
+z : 1
+x : 2
+c : 3
+q : 4
+w : 5
+e : 6
 space key, k : force stop
-anything else : stop smoothly
 
-CTRL-C to quit
+r : switch to RC mode
+a : switch to Jetson mode
+CTRL-C : quit
 """
 
 moveBindings = {
         'i':(1.0, 0.0),
-        'o':(1, -0.5),
-        'u':(1, 0.5),
-        'j':(1, 1.0),
-        'l':(1, -1.0),
+        'o':(0.8, -0.5),
+        'u':(0.8, 0.5),
+        'j':(0.6, 1.0),
+        'l':(0.6, -1.0),
+#        ',':(-1,0),
+#        '.':(-1,1),
+#        'm':(-1,-1),
            }
-
-# speedBindings={
-#         # 'q':(1.1, 1.1),
-#         # 'z':(0.9, 0.9),
-#         # 'w':(1.1, 1.0),
-#         # 'x':(0.9, 1.0),
-#         # 'e':(1.0, 1.1),
-#         # 'c':(1.0, 0.9),
-#         #   }
 
 speedBindings={
-        'q':(1.0, 1.0),
-        'w':(2.0, 1.0),
-        'e':(3.0, 1.0),
-        'r':(4.0, 1.0),
-        't':(5.0, 1.0),
-        'y':(6.0, 1.0),
-           }
+        'q':(3.0, 1.0),
+        'z':(1.0, 1.0),
+        'w':(4.0, 1.0),
+        'x':(2.0, 1.0),
+        'e':(6.0, 1.0),
+        'c':(5.0, 1.0),
+          }
 
 def getKey():
     tty.setraw(sys.stdin.fileno())
@@ -102,13 +111,16 @@ if __name__=="__main__":
                 speed = speedBindings[key][0]
                 turn = turn * speedBindings[key][1]
                 count = 0
-                print " [ >>] Speed set to " + speed + " m/s!"
+
+                if (status == 14):
+                    print msg
+                status = (status + 1) % 15
             elif key == ' ' or key == 'k' :
                 x = 0.0
                 th = 0.0
                 control_speed = 0.0
                 control_turn = 0.0
-            elif key == 'c' :
+            elif key == 'r' :
                 # switch to RC mode
                 mode = String()
                 mode.data = "RC"
@@ -129,17 +141,12 @@ if __name__=="__main__":
             target_speed = speed * x
             target_turn = turn * th
 
-            # if target_speed > control_speed:
-            #     control_speed = min( target_speed, control_speed + 0.02 )
-            # elif target_speed < control_speed:
-            #     control_speed = max( target_speed, control_speed - 0.02 )
-            # else:
             control_speed = target_speed
 
             # if target_turn > control_turn:
-            #     control_turn = min( target_turn, control_turn + 0.25 )
-            # # elif target_turn < control_turn:
-            #     # control_turn = max( target_turn, control_turn - 0.2 )
+            #     control_turn = min( target_turn, control_turn + 0.1 )
+            # elif target_turn < control_turn:
+            #     control_turn = max( target_turn, control_turn - 0.1 )
             # else:
             control_turn = target_turn
 
