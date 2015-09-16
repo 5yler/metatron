@@ -132,9 +132,9 @@ if __name__=="__main__":
             v_right = v + (omega / wheelbase_width)   # right wheel velocity
             
             control.x = th  # steering angle 
-            control.y = min(v_left, 0)  # left wheel velocity
-            control.z = min(v_right, 0) # right wheel velocity
-            
+            control.y = max(v_left, 0)  # left wheel velocity
+            control.z = max(v_right, 0) # right wheel velocity
+
             print " [ > ] angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s" % (control.x, control.y, control.z)
             pub.publish(control)
 
