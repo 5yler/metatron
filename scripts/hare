@@ -111,7 +111,7 @@ if __name__=="__main__":
                 speed = speedBindings[key][0]
                 turn = turn * speedBindings[key][1]
                 count = 0
-
+                print " [ >>] Set speed to %2.1f m/s" % (speed) 
                 if (status == 14):
                     print msg
                 status = (status + 1) % 15
@@ -120,16 +120,19 @@ if __name__=="__main__":
                 th = 0.0
                 control_speed = 0.0
                 control_turn = 0.0
+                print " [>>>] STOP!"
             elif key == 'r' :
                 # switch to RC mode
                 mode = String()
                 mode.data = "RC"
                 switch_pub.publish(mode)
+                print " [>>>] Switched to RC mode!"
             elif key == 'a' :
                 # switch to autonomous mode
                 mode = String()
                 mode.data = "Autonomous"
                 switch_pub.publish(mode)
+                print " [>>>] Switched to Jetson mode!"
             else:
                 count = count + 1
                 if count > 4:
