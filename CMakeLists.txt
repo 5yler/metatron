@@ -148,6 +148,7 @@ target_link_libraries(vector_pub ${catkin_LIBRARIES})
 ## in contrast to setup.py, you can choose the destination
 install(PROGRAMS
   scripts/gigaturtle
+  scripts/hare
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

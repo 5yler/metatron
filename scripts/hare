@@ -32,28 +32,25 @@ moveBindings = {
         'u':(1, 0.5),
         'j':(1, 1.0),
         'l':(1, -1.0),
-#        ',':(-1,0),
-#        '.':(-1,1),
-#        'm':(-1,-1),
            }
 
-speedBindings={
-        # 'q':(1.1, 1.1),
-        # 'z':(0.9, 0.9),
-        # 'w':(1.1, 1.0),
-        # 'x':(0.9, 1.0),
-        # 'e':(1.0, 1.1),
-        # 'c':(1.0, 0.9),
-        #   }
+# speedBindings={
+#         # 'q':(1.1, 1.1),
+#         # 'z':(0.9, 0.9),
+#         # 'w':(1.1, 1.0),
+#         # 'x':(0.9, 1.0),
+#         # 'e':(1.0, 1.1),
+#         # 'c':(1.0, 0.9),
+#         #   }
 
-speedSettings={
+speedBindings={
         'q':(1.0, 1.0),
         'w':(2.0, 1.0),
         'e':(3.0, 1.0),
         'r':(4.0, 1.0),
         't':(5.0, 1.0),
         'y':(6.0, 1.0),
-          }
+           }
 
 def getKey():
     tty.setraw(sys.stdin.fileno())
@@ -101,24 +98,17 @@ if __name__=="__main__":
                 x = moveBindings[key][0]
                 th = moveBindings[key][1] * ABS_MAX_STEERING_ANGLE
                 count = 0
-            elif key in speedSettings.keys():
-                speed = speedSettings[key][0]
-                turn = turn * speedSettings[key][1]
-                count = 0
-                print " [ >>] Speed set to " + speed + " m/s!"
             elif key in speedBindings.keys():
-                speed = speed * speedBindings[key][0]
+                speed = speedBindings[key][0]
                 turn = turn * speedBindings[key][1]
                 count = 0
-                if (status == 14):
-                    print msg
-                status = (status + 1) % 15
+                print " [ >>] Speed set to " + speed + " m/s!"
             elif key == ' ' or key == 'k' :
                 x = 0.0
                 th = 0.0
                 control_speed = 0.0
                 control_turn = 0.0
-            elif key == 'r' :
+            elif key == 'c' :
                 # switch to RC mode
                 mode = String()
                 mode.data = "RC"
@@ -146,12 +136,12 @@ if __name__=="__main__":
             # else:
             control_speed = target_speed
 
-            if target_turn > control_turn:
-                control_turn = min( target_turn, control_turn + 0.25 )
-            # elif target_turn < control_turn:
-                # control_turn = max( target_turn, control_turn - 0.2 )
-            else:
-                control_turn = target_turn
+            # if target_turn > control_turn:
+            #     control_turn = min( target_turn, control_turn + 0.25 )
+            # # elif target_turn < control_turn:
+            #     # control_turn = max( target_turn, control_turn - 0.2 )
+            # else:
+            control_turn = target_turn
 
             control = Vector3()
             
