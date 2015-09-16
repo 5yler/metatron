@@ -27,10 +27,10 @@ CTRL-C to quit
 
 moveBindings = {
         'i':(1.0, 0.0),
-        'o':(0.7, -0.5),
-        'u':(0.7, 0.5),
-        'j':(0.4, 1.0),
-        'l':(0.4, -1.0),
+        'o':(0.8, -0.5),
+        'u':(0.8, 0.5),
+        'j':(0.6, 1.0),
+        'l':(0.6, -1.0),
 #        ',':(-1,0),
 #        '.':(-1,1),
 #        'm':(-1,-1),
@@ -129,7 +129,7 @@ if __name__=="__main__":
             omega = (control_speed * math.tan(th)) / wheelbase_width
             control.y = control_speed - (omega / wheelbase_width)   # left wheel velocity
             control.z = control_speed + (omega / wheelbase_width)   # right wheel velocity
-            print " [ > ] [steering angle: %4.1f rad]  [left vel: %4.1f m/s]  [right vel: %4.1f m/s]" % (control.x, control.y, control.z)
+            print " [ > ] angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s" % (control.x, control.y, control.z)
             pub.publish(control)
 
     except:
