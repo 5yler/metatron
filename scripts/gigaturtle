@@ -129,7 +129,7 @@ if __name__=="__main__":
             omega = (control_speed * math.tan(th)) / wheelbase_width
             control.y = control_speed - (omega / wheelbase_width)   # left wheel velocity
             control.z = control_speed + (omega / wheelbase_width)   # right wheel velocity
-            print " [ > ] %3.2d %3.2d %3.2d" % (control.x, control.y, control.z)
+            print " [ > ] %4.2f %4.2f %4.2f" % (control.x, control.y, control.z)
             pub.publish(control)
 
     except:
