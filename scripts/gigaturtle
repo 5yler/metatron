@@ -125,10 +125,16 @@ if __name__=="__main__":
                 control_turn = target_turn
 
             control = Vector3()
+            
+            v = control_speed
+            omega = (v * math.tan(th)) / wheelbase_width
+            v_left = v - (omega / wheelbase_width)   # left wheel velocity
+            v_right = v + (omega / wheelbase_width)   # right wheel velocity
+            
             control.x = th  # steering angle 
-            omega = (control_speed * math.tan(th)) / wheelbase_width
-            control.y = control_speed - (omega / wheelbase_width)   # left wheel velocity
-            control.z = control_speed + (omega / wheelbase_width)   # right wheel velocity
+            control.y = min(v_left, 0)  # left wheel velocity
+            control.z = min(v_right, 0) # right wheel velocity
+            
             print " [ > ] angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s" % (control.x, control.y, control.z)
             pub.publish(control)
 
