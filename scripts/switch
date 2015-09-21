@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+
+##
+# switch
+# Python script for switching
+# between radio-controlled RC and Jetson mode.
+# 
+# @author  Syler Wagner  <syler@mit.edu>
+#
+# @date    2015-09-20    syler   creation
+##
+
+import rospy
+from std_msgs.msg import String   # for switching Jetson/RC mode
+import sys, select, termios, tty
+
+ABS_MAX_STEERING_ANGLE = 25.0 * (math.pi / 180.0)
+INCHES_TO_M = 0.0254
+wheelbase_width = 23.0 * INCHES_TO_M
+
+msg = """
+r : switch to RC mode
+a : switch to Jetson mode
+CTRL-C : quit
+"""
+
+def getKey():
+    tty.setraw(sys.stdin.fileno())
+    rlist, _, _ = select.select([sys.stdin], [], [], 0.1)
+    if rlist:
+        key = sys.stdin.read(1)
+    else:
+        key = ''
+
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+    return key
+
+
+if __name__=="__main__":
+    settings = termios.tcgetattr(sys.stdin)
+    
+    rospy.init_node('switch')
+
+    # mode switching publisher
+    switch_pub = rospy.Publisher('switch', String, queue_size=5)
+
+    try:
+        while(1):
+            key = getKey()
+            if key == 'r' :
+                # switch to RC mode
+                mode = String()
+                mode.data = "RC"
+                switch_pub.publish(mode)
+                print " [>>>] Switched to RC mode!"
+            elif key == 'a' :
+                # switch to autonomous mode
+                mode = String()
+                mode.data = "Autonomous"
+                switch_pub.publish(mode)
+                print " [>>>] Switched to Jetson mode!"
+            else:
+                if (key == '\x03'):
+                    break
+
+    except:
+        print e
+
+    finally:
+        
+
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+
+
