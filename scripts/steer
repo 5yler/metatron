@@ -104,6 +104,9 @@ def callback(scan):
     
     control = Vector3()
 
+    if abs(steer_angle) > ABS_MAX_STEERING_ANGLE:
+        steer_angle = steer_angle * (ABS_MAX_STEERING_ANGLE / abs(steer_angle))
+
     # set velocity commands
     control.x = steer_angle  # steering angle 
     control.y = 0  # left wheel velocity
