@@ -9,11 +9,12 @@
 # @date    2015-09-21    syler   creation
 ##
 
+from __future__ import division
+
 import rospy
 from std_msgs.msg import String   # for switching Jetson/RC mode
 import sys, select, termios, tty
 
-from __future__ import division
 from matplotlib import pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
@@ -101,6 +102,9 @@ def callback(scan):
     # control.y = max(v_left, 0)  # left wheel velocity
     # control.z = max(v_right, 0) # right wheel velocity
     
+    control = Vector3()
+
+    # set velocity commands
     control.x = steer_angle  # steering angle 
     control.y = 0  # left wheel velocity
     control.z = 0 # right wheel velocity
@@ -108,7 +112,6 @@ def callback(scan):
     print " [ > ] angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s" % (control.x, control.y, control.z)
     pub.publish(control)
 
-    # set velocity commands
 
 
 
