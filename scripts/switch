@@ -2,25 +2,23 @@
 
 ##
 # switch
-# Python script for switching
-# between radio-controlled RC and Jetson mode.
+# Python script for switching between radio-controlled RC mode, 
+# Jetson mode, mixed mode.
 # 
 # @author  Syler Wagner  <syler@mit.edu>
 #
 # @date    2015-09-20    syler   creation
+# @date    2015-09-21    syler   added mixed mode
 ##
 
 import rospy
 from std_msgs.msg import String   # for switching Jetson/RC mode
 import sys, select, termios, tty
 
-ABS_MAX_STEERING_ANGLE = 25.0 * (math.pi / 180.0)
-INCHES_TO_M = 0.0254
-wheelbase_width = 23.0 * INCHES_TO_M
-
 msg = """
 r : switch to RC mode
 a : switch to Jetson mode
+m : switch to mixed mode (manual throttle, autonomous steering)
 CTRL-C : quit
 """
 
