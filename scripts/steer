@@ -22,7 +22,7 @@ import math
 from sensor_msgs.msg import LaserScan   # for switching Jetson/RC mode
 from geometry_msgs.msg import Vector3   # for sending controls
 
-
+follow_syler = false
 
 ABS_MAX_STEERING_ANGLE = 25.0 * (math.pi / 180.0)
 INCHES_TO_M = 0.0254
@@ -65,7 +65,10 @@ def narrow_fov(points, theta_min, theta_max):
 def generate_narrow_fov_points(ranges, intensities, theta_min=-math.pi/2, theta_max=math.pi/2):
     theta = []
     for i in xrange(360):
-        theta.append(angle_max - i*angle_increment)
+        if (follow_syler):
+            theta.append(angle_min + i*angle_increment)
+        else:
+            theta.append(angle_max - i*angle_increment)
     points = [ranges, theta, intensities]
     return narrow_fov(points, theta_min, theta_max)
 
