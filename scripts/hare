@@ -133,6 +133,13 @@ if __name__=="__main__":
                 mode.data = "Autonomous"
                 switch_pub.publish(mode)
                 print " [>>>] Switched to Jetson mode!"
+            elif key == 's' :
+                # switch to autonomous mode
+                mode = String()
+                mode.data = "Semiautomatic"
+                switch_pub.publish(mode)
+                print " [>>>] SEMIAUTOMATIC!"
+
             else:
                 count = count + 1
                 if count > 4:
