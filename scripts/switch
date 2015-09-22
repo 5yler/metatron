@@ -73,8 +73,6 @@ if __name__=="__main__":
         print e
 
     finally:
-        
-
-    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
 
 
