@@ -59,6 +59,12 @@ if __name__=="__main__":
                 mode.data = "Autonomous"
                 switch_pub.publish(mode)
                 print " [>>>] Switched to Jetson mode!"
+            elif key == 'm' :
+                # switch to autonomous mode
+                mode = String()
+                mode.data = "Mixed"
+                switch_pub.publish(mode)
+                print " [>>>] Switched to mixed mode!"
             else:
                 if (key == '\x03'):
                     break
