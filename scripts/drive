@@ -22,8 +22,9 @@ import math
 from sensor_msgs.msg import LaserScan   # for switching Jetson/RC mode
 from geometry_msgs.msg import Vector3   # for sending controls
 
-follow_syler = false
+follow_syler = False
 
+v_forward = 5
 ABS_MAX_STEERING_ANGLE = 25.0 * (math.pi / 180.0)
 INCHES_TO_M = 0.0254
 wheelbase_width = 23.0 * INCHES_TO_M
@@ -94,7 +95,7 @@ def steer(ranges, intensities, theta_min=-math.pi/2, theta_max=math.pi/2):
 
 def throttle(steer_angle):
     v = v_forward * (ABS_MAX_STEERING_ANGLE - abs(steer_angle)) / ABS_MAX_STEERING_ANGLE
-    v = min(v, 0.5) # so it doesn't stop at the extremes of turning range
+    v = min(v, 2) # so it doesn't stop at the extremes of turning range
     return v
 
 def split_throttle(steer_angle, v):
@@ -114,7 +115,7 @@ def callback(scan):
     v_left, v_right = split_throttle(drive_angle, v)
     
     # v = control_speed
-    omega = (v * math.tan(steer_angle)) / wheelbase_width
+    omega = (v * math.tan(drive_angle)) / wheelbase_width
     v_left = v - (omega / wheelbase_width)   # left wheel velocity
     v_right = v + (omega / wheelbase_width)   # right wheel velocity
     
