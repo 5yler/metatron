@@ -63,11 +63,6 @@ def point_ok2(point):
 def narrow_fov(points, theta_min, theta_max):
     # return points with theta in specified range
     #narrow = [p for p in zip(points[0], points[1], points[2]) if theta_min < p[1] < theta_max]
-
-    #TODO won't this mess up if it has enough invalid points by offsetting by their angles?
-    #I would expect to need to insert some placeholder point at min or max range, or 
-    #somehow otherwise indicate that their spot has unknown value, but maybe since they 
-    #all have an associated theta value this is unnecessary?
     narrow = [p for p in zip(points[0], points[1], points[2]) if theta_min < p[1] < theta_max and point_ok(p)]
     return [list(n) for n in zip(*narrow)]
 
@@ -99,7 +94,7 @@ def polar_integrate(narrow):
 def steer(ranges, intensities, theta_min=-math.pi/2, theta_max=math.pi/2):
     narrow = generate_narrow_fov_points(ranges, intensities, theta_min, theta_max)
     drive_angle = polar_integrate(narrow)
-    return drive_angle          #TODO did you mean to say drive_angle here?
+    return drive_angle
 
 def throttle(steer_angle):
     v = v_forward * (ABS_MAX_STEERING_ANGLE - abs(steer_angle)) / ABS_MAX_STEERING_ANGLE
@@ -116,7 +111,10 @@ def split_throttle(steer_angle, v):
 def proportional_throttle(steer_angle, ranges, intensities):
     v = throttle(steer_angle)
     points_ahead = generate_narrow_fov_points(ranges, intensities, (steer_angle - math.pi/8), (steer_angle + math.pi/8))
-    min_dist = min(points_ahead)
+    ranges_ahead = []
+    for p in zip(points_ahead[0], points_ahead[1], points_ahead[2])
+        ranges_ahead.append(p[0])
+    min_dist = min(ranges_ahead)
     v *= (v_faster / v_forward) * (min_dist / fast_dist)
     v = max(v, v_slowest)
     v_left, v_right = split_throttle(steer_angle, v)
