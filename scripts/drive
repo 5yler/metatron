@@ -99,15 +99,11 @@ def polar_integrate(narrow):
 def steer(ranges, intensities, theta_min=-math.pi/2, theta_max=math.pi/2):
     narrow = generate_narrow_fov_points(ranges, intensities, theta_min, theta_max)
     drive_angle = polar_integrate(narrow)
-    return steer_angle          #TODO did you mean to say drive_angle here?
+    return drive_angle          #TODO did you mean to say drive_angle here?
 
 def throttle(steer_angle):
     v = v_forward * (ABS_MAX_STEERING_ANGLE - abs(steer_angle)) / ABS_MAX_STEERING_ANGLE
-    #TODO 2 m/s may be too low, judging by the video; below a certain pwm value it will likely stall, 
-    #looked like that may have been happening sometimes
-    #TODO you probably meant to say max(v, 2), not min(v, 2), which would explain the stopping actually
-    #Also I made 2 into v_slowest for reusability
-    v = min(v, v_slowest) # so it doesn't stop at the extremes of turning range
+    v = max(v, v_slowest) # so it doesn't stop at the extremes of turning range
     return v
 
 def split_throttle(steer_angle, v):
@@ -135,12 +131,6 @@ def callback(scan):
     v = throttle(drive_angle)
     v_left, v_right = split_throttle(drive_angle, v)
 
-    #TODO the below is made redundant by the call to split_throttle    
-    # v = control_speed
-    omega = (v * math.tan(drive_angle)) / wheelbase_width
-    v_left = v - (omega / wheelbase_width)   # left wheel velocity
-    v_right = v + (omega / wheelbase_width)   # right wheel velocity
-    
     control = Vector3()
 
     if abs(drive_angle) > ABS_MAX_STEERING_ANGLE:
@@ -154,8 +144,6 @@ def callback(scan):
 
     print " [ > ] angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s" % (control.x, control.y, control.z)
     pub.publish(control)
-
-
 
 
 if __name__=="__main__":
