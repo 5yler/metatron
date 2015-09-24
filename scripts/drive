@@ -112,7 +112,7 @@ def proportional_throttle(steer_angle, ranges, intensities):
     v = throttle(steer_angle)
     points_ahead = generate_narrow_fov_points(ranges, intensities, (steer_angle - math.pi/8), (steer_angle + math.pi/8))
     ranges_ahead = []
-    for p in zip(points_ahead[0], points_ahead[1], points_ahead[2])
+    for p in zip(points_ahead[0], points_ahead[1], points_ahead[2]):
         ranges_ahead.append(p[0])
     min_dist = min(ranges_ahead)
     v *= (v_faster / v_forward) * (min_dist / fast_dist)
