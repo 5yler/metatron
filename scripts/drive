@@ -109,7 +109,6 @@ def split_throttle(steer_angle, v):
     return v_left, v_right
 
 def proportional_throttle(ranges, intensities):
-    v = throttle(steer_angle)
     points_ahead = generate_narrow_fov_points(ranges, intensities, (steer_angle - math.pi/8), (steer_angle + math.pi/8))
     ranges_ahead = []
     for p in zip(points_ahead[0], points_ahead[1], points_ahead[2]):
@@ -119,6 +118,7 @@ def proportional_throttle(ranges, intensities):
         angle = steer(ranges, intensities)
     else:
         angle = 0
+    v = throttle(angle)
     v *= (v_faster / v_forward) * (min_dist / fast_dist)
     v = max(v, v_slowest)
     v_left, v_right = split_throttle(angle, v)
