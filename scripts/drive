@@ -108,26 +108,31 @@ def split_throttle(steer_angle, v):
     v_right = v + (omega / wheelbase_width)   # right wheel velocity
     return v_left, v_right
 
-def proportional_throttle(steer_angle, ranges, intensities):
+def proportional_throttle(ranges, intensities):
     v = throttle(steer_angle)
     points_ahead = generate_narrow_fov_points(ranges, intensities, (steer_angle - math.pi/8), (steer_angle + math.pi/8))
     ranges_ahead = []
     for p in zip(points_ahead[0], points_ahead[1], points_ahead[2]):
         ranges_ahead.append(p[0])
     min_dist = min(ranges_ahead)
+    if (min_dist < 5):
+        angle = steer(ranges, intensities)
+    else:
+        angle = 0
     v *= (v_faster / v_forward) * (min_dist / fast_dist)
     v = max(v, v_slowest)
-    v_left, v_right = split_throttle(steer_angle, v)
-    return v_left, v_right
+    v_left, v_right = split_throttle(angle, v)
+    return angle, v_left, v_right
 
 
 # laser scan callback method
 def callback(scan):
     ranges = scan.ranges
     intensities = scan.intensities
-    drive_angle = steer(ranges, intensities)
-    v = throttle(drive_angle)
-    v_left, v_right = split_throttle(drive_angle, v)
+    # drive_angle = steer(ranges, intensities)
+    # v = throttle(drive_angle)
+    # v_left, v_right = split_throttle(drive_angle, v)
+    drive_angle, v_left, v_right = proportional_throttle(ranges, intensities)
 
     control = Vector3()
 
