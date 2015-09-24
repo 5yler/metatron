@@ -12,13 +12,13 @@
 ##
 
 import rospy
-from std_msgs.msg import String   # for switching Jetson/RC mode
+from std_msgs.msg import UInt16   # for switching Jetson/RC mode
 import sys, select, termios, tty
 
 msg = """
 r : switch to RC mode
-a : switch to Jetson mode
-m : switch to mixed mode (manual throttle, autonomous steering)
+a : switch to autonomous mode
+s : switch to semiautomatic mode (manual throttle, autonomous steering)
 CTRL-C : quit
 """
 
@@ -40,29 +40,29 @@ if __name__=="__main__":
     rospy.init_node('switch')
 
     # mode switching publisher
-    switch_pub = rospy.Publisher('switch', String, queue_size=5)
+    switch_pub = rospy.Publisher('switch', UInt16, queue_size=5)
 
     try:
         while(1):
             key = getKey()
             if key == 'r' :
                 # switch to RC mode
-                mode = String()
-                mode.data = "RC"
+                mode = UInt16()
+                mode.data = 0
                 switch_pub.publish(mode)
                 print " [>>>] Switched to RC mode!"
             elif key == 'a' :
                 # switch to autonomous mode
-                mode = String()
-                mode.data = "Autonomous"
+                mode = UInt16()
+                mode.data = 2
                 switch_pub.publish(mode)
                 print " [>>>] Switched to Jetson mode!"
-            elif key == 'm' :
-                # switch to autonomous mode
-                mode = String()
-                mode.data = "Mixed"
+            elif key == 's' :
+                # switch to semiautomatic mode
+                mode = UInt16()
+                mode.data = 1
                 switch_pub.publish(mode)
-                print " [>>>] Switched to mixed mode!"
+                print " [>>>] Switched to semiautomatic mode!"
             else:
                 if (key == '\x03'):
                     break
