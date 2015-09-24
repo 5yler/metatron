@@ -36,6 +36,8 @@ def getKey():
 
 if __name__=="__main__":
     settings = termios.tcgetattr(sys.stdin)
+
+    print msg
     
     rospy.init_node('switch')
 
