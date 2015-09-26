@@ -129,10 +129,10 @@ def proportional_throttle(steer_angle, ranges, intensities):
 def callback(scan):
     ranges = scan.ranges
     intensities = scan.intensities
-    steer_angle = steer(ranges, intensities)
-    # v = throttle(drive_angle)
-    # v_left, v_right = split_throttle(drive_angle, v)
-    drive_angle, v_left, v_right = proportional_throttle(steer_angle, ranges, intensities)
+    drive_angle = steer(ranges, intensities)
+     v = throttle(drive_angle)
+     v_left, v_right = split_throttle(drive_angle, v)
+    #drive_angle, v_left, v_right = proportional_throttle(steer_angle, ranges, intensities)
 
     control = Vector3()
 
