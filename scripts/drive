@@ -25,8 +25,8 @@ from geometry_msgs.msg import Vector3   # for sending controls
 follow_syler = False
 
 v_forward = 5
-v_slowest = 3
-v_faster = 10
+v_slowest = 2
+v_faster = 6
 fast_dist = 5   #Assumes with 5m of clearance ahead we can go as fast as possible
 ABS_MAX_STEERING_ANGLE = 25.0 * (math.pi / 180.0)
 INCHES_TO_M = 0.0254
