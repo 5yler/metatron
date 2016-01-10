@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<!-- arduino_control.launch
+     Gigatron Arduino control launch file
+
+     @author  Syler Wagner  <syler@mit.edu>
+     
+     @date    2015-09-11    syler   creation
+ 
+     This launch file runs rosserial_python and control_pub_sub.
+
+     Usage Instructions:
+     1. In a terminal window, run:
+        roslaunch gigatron arduino_control.launch
+-->
+
+<launch>
+
+<!-- rosserial_python -->
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
+    <param name="port" value="/dev/ttyACM0"/>
+    <param name="baud" value="38400"/>
+  </node>
+
+<!-- control_pub_sub -->
+  <node pkg="gigatron" type="control_pub_sub" name="control_pub_sub" output="screen">
+  </node>
+
+<!-- turtle sim keyboard remote 
+  <node pkg="gigatron" type="gigaturtle" name="gigaturtle" output="screen">
+  </node>-->
+
+    
+</launch>
+  
+  

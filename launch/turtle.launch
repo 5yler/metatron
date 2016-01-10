@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+
+<!-- turtle.launch
+     Gigatron turtle control launch file
+
+     @author  Syler Wagner  <syler@mit.edu>
+     
+     @date    2015-09-12    syler   creation
+ 
+     This launch file runs turtles
+
+     Usage Instructions:
+     1. In a terminal window, run:
+        roslaunch gigatron turtle.launch
+-->
+
+<launch>
+
+<!-- rosserial_python 
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
+    <param name="port" value="/dev/ttyACM0"/>
+    <param name="baud" value="38400"/>
+  </node>-->
+
+<!-- control_pub_sub -->
+  <node pkg="gigatron" type="control_pub_sub" name="control_pub_sub" output="screen">
+  </node>
+
+<!-- turtle sim keyboard remote -->
+  <node pkg="turtlesim" type="turtlesim_node" name="turtlesim_node" output="screen">
+    <remap from="cmd_vel" to="/turtle1/cmd_vel"/>
+  </node>
+
+<!-- turtle sim keyboard remote -->
+  <node pkg="turtlesim" type="turtle_teleop_key" name="turtle_teleop_key" output="screen">
+    <remap from="/turtle1/cmd_vel" to="cmd_vel"/>
+  </node>
+
+    
+</launch>
+  
+  

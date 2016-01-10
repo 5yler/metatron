@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<!-- arduino_control.launch
+     Gigatron Arduino control launch file
+
+     @author  Syler Wagner  <syler@mit.edu>
+     
+     @date    2015-09-11    syler   creation
+ 
+     This launch file runs rosserial_python and control_pub_sub.
+
+     Usage Instructions:
+     1. In a terminal window, run:
+        roslaunch gigatron arduino_control.launch
+-->
+
+<launch>
+
+
+<!-- RPLIDAR -->
+  <node pkg="rplidar_ros" type="rplidarNode" name="rplidarNode" output="screen">
+    <!-- set serial port parameter to /dev/ttyUSB1 because ZED has /dev/ttyUSB0 -->
+    <param name="serial_port" value="/dev/ttyUSB0"/>
+  </node>
+
+
+<!-- steering -->
+  <node pkg="gigatron" type="steer" name="steer" output="screen">
+  </node>
+
+    
+</launch>
+  
+  

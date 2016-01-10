@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+
+##
+# switch
+# Python script for switching between radio-controlled RC mode, 
+# Jetson mode, mixed mode.
+# 
+# @author  Syler Wagner  <syler@mit.edu>
+#
+# @date    2015-09-20    syler   creation
+# @date    2015-09-21    syler   added mixed mode
+##
+
+import rospy
+from std_msgs.msg import UInt16   # for switching Jetson/RC mode
+import sys, select, termios, tty
+
+msg = """
+r : switch to RC mode
+a : switch to autonomous mode
+s : switch to semiautomatic mode (manual throttle, autonomous steering)
+CTRL-C : quit
+"""
+
+def getKey():
+    tty.setraw(sys.stdin.fileno())
+    rlist, _, _ = select.select([sys.stdin], [], [], 0.1)
+    if rlist:
+        key = sys.stdin.read(1)
+    else:
+        key = ''
+
+    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+    return key
+
+
+if __name__=="__main__":
+    settings = termios.tcgetattr(sys.stdin)
+
+    print msg
+    
+    rospy.init_node('switch')
+
+    # mode switching publisher
+    switch_pub = rospy.Publisher('switch', UInt16, queue_size=5)
+
+    try:
+        while(1):
+            key = getKey()
+            if key == 'r' :
+                # switch to RC mode
+                mode = UInt16()
+                mode.data = 0
+                switch_pub.publish(mode)
+                print " [>>>] Switched to RC mode!"
+            elif key == 'a' :
+                # switch to autonomous mode
+                mode = UInt16()
+                mode.data = 2
+                switch_pub.publish(mode)
+                print " [>>>] Switched to Jetson mode!"
+            elif key == 's' :
+                # switch to semiautomatic mode
+                mode = UInt16()
+                mode.data = 1
+                switch_pub.publish(mode)
+                print " [>>>] Switched to semiautomatic mode!"
+            else:
+                if (key == '\x03'):
+                    break
+
+    except:
+        print e
+
+    finally:
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+
+
