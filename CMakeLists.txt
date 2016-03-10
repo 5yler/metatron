@@ -52,6 +52,9 @@ add_message_files(
   FILES
   Num.msg
   Angle.msg
+  ArduinoInput.msg
+  ArduinoOutput.msg
+  RadioInput.msg
 )
 
 ## Generate services in the 'srv' folder
