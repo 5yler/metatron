@@ -1,5 +1,5 @@
 Header header
-int32 usec_left
-int32 usec_right
-float32 rpm_left
-float32 rpm_right
+uint16 usec_left
+uint16 usec_right
+int16 rpm_left
+int16 rpm_right

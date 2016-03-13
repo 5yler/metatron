@@ -1,7 +1,7 @@
 Header header
-int8 speed_left
-int8 speed_right
-int8 dir_left
-int8 dir_right
-int8 angle
-int8 kill
+uint8 speed_left
+uint8 speed_right
+uint8 dir_left
+uint8 dir_right
+uint8 angle
+uint8 kill
