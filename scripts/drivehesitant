@@ -23,10 +23,12 @@ from sensor_msgs.msg import LaserScan   # for switching Jetson/RC mode
 from geometry_msgs.msg import Vector3   # for sending controls
 
 follow_syler = False
+cautious = True
+reverse = False
 
 v_forward = 5
 v_slowest = 2
-v_faster = 8
+v_faster = 6
 fast_dist = 5   #Assumes with 5m of clearance ahead we can go as fast as possible
 ABS_MAX_STEERING_ANGLE = 25.0 * (math.pi / 180.0)
 INCHES_TO_M = 0.0254
@@ -63,12 +65,6 @@ def point_ok2(point):
 def narrow_fov(points, theta_min, theta_max):
     # return points with theta in specified range
     #narrow = [p for p in zip(points[0], points[1], points[2]) if theta_min < p[1] < theta_max]
-
-    #TODO won't this mess up if it has enough invalid points by offsetting by their angles?
-    #I would expect to need to insert some placeholder point at min or max range, or 
-    #somehow otherwise indicate that their spot has unknown value, but maybe since they 
-    #all have an associated theta value this is unnecessary?
-
     narrow = [p for p in zip(points[0], points[1], points[2]) if theta_min < p[1] < theta_max and point_ok(p)]
     return [list(n) for n in zip(*narrow)]
 
@@ -83,8 +79,8 @@ def generate_narrow_fov_points(ranges, intensities, theta_min=-math.pi/2, theta_
     return narrow_fov(points, theta_min, theta_max)
 
 def polar_integrate(narrow):
-    integral = 0;
-    dirintegral = 0;
+    integral = 0
+    dirintegral = 0
     for p in zip(narrow[0], narrow[1], narrow[2]):
         r = p[0]
         theta = p[1]
@@ -97,10 +93,30 @@ def polar_integrate(narrow):
     #print integral, dirintegral, dirintegral/integral
     return dirintegral/integral
 
+def polar_integrate_with_stop(narrow):
+    integral = 0
+    dirintegral = 0
+    stop = False
+    for p in zip(narrow[0], narrow[1], narrow[2]):
+        r = p[0]
+        theta = p[1]
+        if r < 1:
+            stop = True
+        if theta >= 0:
+            dirintegral -= (1/r) * math.cos(theta)
+        elif theta < 0:
+            dirintegral += (1/r) * math.cos(theta)
+        integral += (1/r) * math.cos(theta)
+    return dirintegral/integral, stop
+
+   
+
 def steer(ranges, intensities, theta_min=-math.pi/2, theta_max=math.pi/2):
     narrow = generate_narrow_fov_points(ranges, intensities, theta_min, theta_max)
-    drive_angle = polar_integrate(narrow)
-    return drive_angle
+    if cautious:
+        return polar_integrate_with_stop(narrow)
+    else:
+        return polar_integrate(narrow), False
 
 def throttle(steer_angle):
     v = v_forward * (ABS_MAX_STEERING_ANGLE - abs(steer_angle)) / ABS_MAX_STEERING_ANGLE
@@ -130,13 +146,19 @@ def proportional_throttle(steer_angle, ranges, intensities):
     v_left, v_right = split_throttle(angle, v)
     return angle, v_left, v_right
 
+
 # laser scan callback method
 def callback(scan):
     ranges = scan.ranges
     intensities = scan.intensities
-    drive_angle = steer(ranges, intensities)
-     v = throttle(drive_angle)
-     v_left, v_right = split_throttle(drive_angle, v)
+    drive_angle, stop = steer(ranges, intensities)
+    v = throttle(drive_angle)
+    v_left, v_right = split_throttle(drive_angle, v)
+    if stop:
+        if reverse:
+            v, v_left, v_right = -2, -2, -2
+        else:
+            v, v_left, v_right = 0, 0, 0
     #drive_angle, v_left, v_right = proportional_throttle(steer_angle, ranges, intensities)
 
     control = Vector3()
@@ -148,6 +170,7 @@ def callback(scan):
     control.x = drive_angle  # driveing angle 
     control.y = max(v_left, 0)  # left wheel velocity
     control.z = max(v_right, 0) # right wheel velocity
+    
 
     print " [ > ] angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s" % (control.x, control.y, control.z)
     pub.publish(control)

@@ -1,0 +1,22 @@
+<!-- laser_range_filter.launch
+     Gigatron laser range filter launch file
+
+     @author  Syler Wagner  <syler@mit.edu>
+
+     @date    2016-03-04    syler   creation
+
+     This launch file filters laser scans and removes all points above a threshold distance.
+     Config file is located in gigatron/laser_range_filter_config.yaml
+
+     Usage Instructions:
+     1. In a terminal window, run:
+        roslaunch gigatron laser_range_filter.launch
+-->
+
+<launch>
+  <node pkg="laser_filters" type="scan_to_scan_filter_chain"
+      name="laser_filter">
+    <rosparam command="load" file="$(find gigatron)/laser_range_filter_config.yaml" />
+    <remap from="scan" to="base_scan" />
+  </node>
+</launch>
