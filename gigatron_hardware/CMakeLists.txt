@@ -6,10 +6,8 @@ project(gigatron_hardware)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  rospy
   std_msgs
   geometry_msgs
-  nav_msgs
   tf
   message_generation
   gigatron
@@ -49,11 +47,12 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  Radio.msg
+  Steering.msg
+  Motors.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -70,10 +69,12 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  geometry_msgs
+  nav_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -107,7 +108,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES gigatron_hardware
-#  CATKIN_DEPENDS other_catkin_pkg
+  CATKIN_DEPENDS message_runtime roscpp std_msgs geometry_msgs 
 #  DEPENDS system_lib
 )
 
@@ -141,7 +142,7 @@ add_executable(encoder_debug src/encoder_debug.cpp)
 # add_dependencies(gigatron_hardware_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(encoder_debug 
   ${catkin_EXPORTED_TARGETS}
-  ${${gigatron}_EXPORTED_TARGETS}
+  ${${gigatron_hardware}_EXPORTED_TARGETS}
 )
 
 

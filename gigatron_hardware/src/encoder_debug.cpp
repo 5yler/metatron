@@ -24,7 +24,7 @@
 #include <boost/thread/thread.hpp>
 
 //$ debugging messages
-#include <gigatron/Motors.h>
+#include <gigatron_hardware/Motors.h>
 
 #define PI 3.141592653589793238463
 #define INCHES_TO_M 0.0254 //$ conversion from inches to meters
@@ -51,7 +51,7 @@ public:
   }
 
 
-  void motorCallback(const gigatron::Motors::ConstPtr& mot_msg) 
+  void motorCallback(const gigatron_hardware::Motors::ConstPtr& mot_msg) 
   {
 
     int cmd_left = mot_msg->usec_left - 1500;

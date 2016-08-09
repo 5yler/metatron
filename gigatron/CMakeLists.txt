@@ -48,12 +48,11 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  Radio.msg
-  Steering.msg
-  Motors.msg
-)
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -70,12 +69,11 @@ add_message_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  geometry_msgs
-  nav_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+# )
+
 
 ###################################
 ## catkin specific configuration ##
@@ -122,11 +120,11 @@ add_executable(vector_pub src/vector_pub.cpp)
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(gigatron_node gigatron_generate_messages_cpp)
-add_dependencies(SteeringPub gigatron_generate_messages_cpp)
-add_dependencies(ThrottlePub gigatron_generate_messages_cpp)
-add_dependencies(control_pub_sub gigatron_generate_messages_cpp)
-add_dependencies(odom_to_tf gigatron_generate_messages_cpp)
-add_dependencies(vector_pub gigatron_generate_messages_cpp)
+# add_dependencies(SteeringPub gigatron_generate_messages_cpp)
+# add_dependencies(ThrottlePub gigatron_generate_messages_cpp)
+# add_dependencies(control_pub_sub gigatron_generate_messages_cpp)
+# add_dependencies(odom_to_tf gigatron_generate_messages_cpp)
+# add_dependencies(vector_pub gigatron_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(gigatron_node
