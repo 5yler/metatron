@@ -32,6 +32,8 @@
 #include <gigatron_hardware/Radio.h>
 #include <gigatron_hardware/Steering.h>
 #include <gigatron_hardware/Motors.h>
+#include <std_msgs/UInt8.h>
+
 
 #define PI 3.141592653589793238463
 #define INCHES_TO_M 0.0254 //$ conversion from inches to meters
@@ -53,71 +55,110 @@ class ArduinoDriveController
 public:
   ArduinoDriveController()
   {
+    //$ set up ROS subscribers
     drive_sub_ = n_.subscribe("command/drive", 1000, &ArduinoDriveController::driveCallback, this);
-
     motor_sub_ = n_.subscribe("arduino/motors", 1000, &ArduinoDriveController::motorCallback, this);
     steer_sub_ = n_.subscribe("arduino/steering", 1000, &ArduinoDriveController::steerCallback, this);
+    mode_sub_ = n_.subscribe("arduino/mode", 1000, &ArduinoDriveController::modeCallback, this);
 
+    //$ set up ROS publishers
     control_pub_ = n_.advertise<gigatron_hardware::MotorCommand>("arduino/command/motors", 1000);
     state_pub_ = n_.advertise<gigatron::State>("state", 1000);
 
+    mode_ = 0;
     angle_pwm_ = 128;
     motor_rpm_right_ = motor_rpm_left_ = 0;
-
   }
 
-
+/*$
+  Callback method for Drive messages. The desired steering angle and wheel velocities get translated to servo PWM for steering motor and motor RPM for drive motors. 
+ */
   void driveCallback(const gigatron::Drive::ConstPtr& msg) 
   {
+    cmd_msg_.angle_command = (msg->angle + ABS_MAX_STEERING_ANGLE) * (STEERING_PWM_RANGE / STEERING_ANGLE_RANGE);
 
-
+    cmd_msg_.rpm_left = msg->vel_left / (RPM_TO_M_S * gearRatio);
+    cmd_msg_.rpm_right = msg->vel_right / (RPM_TO_M_S * gearRatio);
+    control_pub_.publish(cmd_msg_);
   }
 
+/*$
+  Callback method for Steering messages from the Arduino. 
+ */
   void steerCallback(const gigatron_hardware::Steering::ConstPtr& msg) 
   {
     angle_pwm_ = msg->angle;
-    //steeringAngle = STEERING_ANGLE_RANGE * (servoPWM / STEERING_PWM_RANGE) - ABS_MAX_STEERING_ANGLE;
-
   }
 
+/*$
+  Callback method for Motors messages from the Arduino. 
+ */
   void motorCallback(const gigatron_hardware::Motors::ConstPtr& msg) 
   {
     motor_rpm_left_ = msg->rpm_left;
     motor_rpm_right_ = msg->rpm_right;
-    publishState();
   }
 
+/*$
+  Callback method for mode messages from the Arduino. 
+ */
+  void modeCallback(const std_msgs::UInt8::ConstPtr& msg) 
+  {
+    mode_ = msg->data;
+  }
+
+/*$
+  Publish the current mode, steering angle and wheel velocities based on information coming in from the Arduino. 
+ */
   void publishState()
   {
-    // state_msg_.mode = ?
     state_msg_.header.stamp = ros::Time::now();
-
-    state_msg_.drive.angle = STEERING_ANGLE_RANGE * (angle_pwm_ / STEERING_PWM_RANGE) - ABS_MAX_STEERING_ANGLE;
-    state_msg_.drive.vel_left = motor_rpm_left_ * RPM_TO_M_S * gearRatio;
-    state_msg_.drive.vel_right = motor_rpm_right_ * RPM_TO_M_S * gearRatio;
     // state_msg_.header.frame_id = "odom"; ?
 
-    state_pub_.publish(control_msg_);
+    //$ convert mode int to string
+    if (mode_ == 0) {
+      state_msg_.mode = "RC";
+    } else if (mode_ == 1) {
+      state_msg_.mode = "SEMIAUTOMATIC";
+    } else if (mode_ == 2) {
+      state_msg_.mode = "2AUTO4U";
+    } else {
+      state_msg_.mode = "WTF?";
+    }
+
+    //$ convert PWM to actual steering angle
+    state_msg_.drive.angle = STEERING_ANGLE_RANGE * (angle_pwm_ / STEERING_PWM_RANGE) - ABS_MAX_STEERING_ANGLE;
+
+    //$ convert motor RPM to wheel velocity
+    //$ TODO: double check this is correct
+    state_msg_.drive.vel_left = motor_rpm_left_ * RPM_TO_M_S * gearRatio;
+    state_msg_.drive.vel_right = motor_rpm_right_ * RPM_TO_M_S * gearRatio;
+
+    state_pub_.publish(state_msg_);
 
   }
 
 private:
   ros::NodeHandle n_; 
-  ros::Publisher control_pub_;
-  ros::Publisher state_pub_;
+
   ros::Subscriber motor_sub_;
   ros::Subscriber steer_sub_;
   ros::Subscriber drive_sub_;
-  gigatron_hardware::MotorCommand control_msg_; //$ command message
-  gigatron::State state_msg_; //$ command message
-  double angle_pwm_;  //$ current steering angle
-  double motor_rpm_right_, motor_rpm_left_;
+  ros::Subscriber mode_sub_;
 
-}; // end of class ArduinoDriveController
+  ros::Publisher control_pub_;
+  ros::Publisher state_pub_;
+  
+  gigatron_hardware::MotorCommand cmd_msg_; //$ command message
+  gigatron::State state_msg_; //$ state message
+  
+  unsigned int mode_;  //$ current mode
+  double angle_pwm_;  //$ current steering angle PWM value
+  double motor_rpm_right_, motor_rpm_left_; //$ current motor RPM values
 
-/**
- * This node demonstrates simple sending of messages over the ROS system.
- */
+
+}; //$ end of class ArduinoDriveController
+
 int main(int argc, char **argv) {
   /**
    * The ros::init() function needs to see argc and argv so that it can perform
@@ -134,38 +175,18 @@ int main(int argc, char **argv) {
   // create a ArduinoDriveController object to publish and subscribe at same time
   ArduinoDriveController debugger;
 
-  ros::Rate loop_rate(5);  // run at 1hz
+  ros::Rate loop_rate(10);  // run at 1hz
 
   int i = 0;
 
   ROS_INFO_STREAM("SPEED!");
 
-  while (ros::ok() && i > -250)
+  while (ros::ok())
   {
-    // debugger.publishTickCommands(i, i);
-
-    boost::this_thread::sleep(boost::posix_time::seconds(2));
-
     ros::spinOnce();
-    i = i - 10;
+    debugger.publishState();
+    loop_rate.sleep();
   }
-  ROS_INFO_STREAM("Slowing down!");
-  while (ros::ok() && i < 250)
-  {
-    // debugger.publishTickCommands(i, i);
-
-    boost::this_thread::sleep(boost::posix_time::seconds(2));
-
-    ros::spinOnce();
-    i = i + 10;
-  }
-  // debugger.publishTickCommands(0, 0);
-
-  boost::this_thread::sleep(boost::posix_time::seconds(2));
-
-  ros::spinOnce();
-  ROS_INFO_STREAM("DONE!");
-
 
   return 0;
 }
