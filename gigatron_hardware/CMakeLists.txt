@@ -52,6 +52,7 @@ add_message_files(
   Radio.msg
   Steering.msg
   Motors.msg
+  MotorCommand.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -136,6 +137,7 @@ include_directories(include
 ## Declare a C++ executable
 # add_executable(gigatron_hardware_node src/gigatron_hardware_node.cpp)
 add_executable(encoder_debug src/encoder_debug.cpp)
+add_executable(arduino_drive_controller src/arduino_drive_controller.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -145,12 +147,21 @@ add_dependencies(encoder_debug
   ${${gigatron_hardware}_EXPORTED_TARGETS}
 )
 
+add_dependencies(arduino_drive_controller 
+  ${catkin_EXPORTED_TARGETS}
+  ${${gigatron_hardware}_EXPORTED_TARGETS}
+  ${${gigatron}_EXPORTED_TARGETS}
+)
+
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(gigatron_hardware_node
 #   ${catkin_LIBRARIES}
 # )
 target_link_libraries(encoder_debug
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(arduino_drive_controller
   ${catkin_LIBRARIES}
 )
 
@@ -174,7 +185,9 @@ target_link_libraries(encoder_debug
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
-install(TARGETS encoder_debug
+install(TARGETS 
+  encoder_debug
+  arduino_drive_controller
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
