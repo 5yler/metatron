@@ -111,11 +111,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 # )
 
 ## Declare a cpp executable
-add_executable(SteeringPub src/SteeringPub.cpp)
-add_executable(ThrottlePub src/ThrottlePub.cpp)
-add_executable(control_pub_sub src/control_pub_sub.cpp)
 add_executable(odom_tf_publisher src/odom_tf_publisher.cpp)
-add_executable(vector_pub src/vector_pub.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -133,11 +129,7 @@ add_dependencies(odom_tf_publisher
 # target_link_libraries(gigatron_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(SteeringPub ${catkin_LIBRARIES})
-target_link_libraries(ThrottlePub ${catkin_LIBRARIES})
-target_link_libraries(control_pub_sub ${catkin_LIBRARIES})
 target_link_libraries(odom_tf_publisher ${catkin_LIBRARIES})
-target_link_libraries(vector_pub ${catkin_LIBRARIES})
 
 #############
 ## Install ##
