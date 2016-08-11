@@ -1,5 +1,5 @@
  /**
- * odom_to_tf.cpp
+ * odom_tf_publisher.cpp
  * Gigatron publisher for odometry and odometry transform.
  * 
  * @author  Chris Desnoyers   <cjdesno@mit.edu>
@@ -7,13 +7,14 @@
 
  * @date    2015-09-12  cjdesno   creation
  * @date    2015-09-13  syler     added proper model dimensions 
+ * @date    2016-08-10  syler     adapted to work with new custom messages
  *
  * This node listens for odometry sensor readings from the Arduino, 
  * then publishes Odometry messages and broadcasts associated transforms.
  **/
 
 #include "ros/ros.h"
-#include "geometry_msgs/Vector3.h"
+#include <gigatron/State.h>
 #include "nav_msgs/Odometry.h"
 #include "tf/transform_broadcaster.h"
 
@@ -27,21 +28,32 @@ const static double gearRatio = 11.0 / 60.0;  //$ gear ratio between motor and w
 double leftWheelVelocity = 0.0;
 double rightWheelVelocity = 0.0;
 
-void velocityCallback(const geometry_msgs::Vector3::ConstPtr& vel) {
-  leftWheelVelocity = vel->y;
-  rightWheelVelocity = vel->z;
+std::string odom_topic_;
+std::string state_topic_;
+int rate_;
+
+void driveStateCallback(const gigatron::State::ConstPtr& msg)
+{
+  leftWheelVelocity = msg->drive.vel_left;
+  rightWheelVelocity = msg->drive.vel_right;
 }
 
 int main(int argc, char** argv) {
-  ros::init(argc, argv, "odometry_publisher");
+  ros::init(argc, argv, "odom_tf_publisher");
 
-  ros::NodeHandle n;
+  ros::NodeHandle n("~");
   tf::TransformBroadcaster odom_broadcaster;
 
-  ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
-  ros::Subscriber rpm_sub = n.subscribe("odo_val", 1000, velocityCallback);
+  //$ load parameters
+  n.param("rate", rate_, 200); //$ default rate 200 Hz
+  n.param<std::string>("odom_topic", odom_topic_, "odom");
+  n.param<std::string>("state_topic", state_topic_, "state");
 
-  ros::Rate r(1000.0);
+  ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>(odom_topic_, 5);
+  ros::Subscriber rpm_sub = n.subscribe(state_topic_, 10, driveStateCallback);
+
+
+  ros::Rate r(rate_);
 
   double x = 0.0;       // [m/s]
   double y = 0.0;       // [m/s]

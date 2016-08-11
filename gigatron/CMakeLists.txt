@@ -114,7 +114,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(SteeringPub src/SteeringPub.cpp)
 add_executable(ThrottlePub src/ThrottlePub.cpp)
 add_executable(control_pub_sub src/control_pub_sub.cpp)
-add_executable(odom_to_tf src/odom_to_tf.cpp)
+add_executable(odom_tf_publisher src/odom_tf_publisher.cpp)
 add_executable(vector_pub src/vector_pub.cpp)
 
 ## Add cmake target dependencies of the executable/library
@@ -123,7 +123,10 @@ add_executable(vector_pub src/vector_pub.cpp)
 # add_dependencies(SteeringPub gigatron_generate_messages_cpp)
 # add_dependencies(ThrottlePub gigatron_generate_messages_cpp)
 # add_dependencies(control_pub_sub gigatron_generate_messages_cpp)
-# add_dependencies(odom_to_tf gigatron_generate_messages_cpp)
+add_dependencies(odom_tf_publisher 
+  ${${gigatron}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
 # add_dependencies(vector_pub gigatron_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
@@ -133,7 +136,7 @@ add_executable(vector_pub src/vector_pub.cpp)
 target_link_libraries(SteeringPub ${catkin_LIBRARIES})
 target_link_libraries(ThrottlePub ${catkin_LIBRARIES})
 target_link_libraries(control_pub_sub ${catkin_LIBRARIES})
-target_link_libraries(odom_to_tf ${catkin_LIBRARIES})
+target_link_libraries(odom_tf_publisher ${catkin_LIBRARIES})
 target_link_libraries(vector_pub ${catkin_LIBRARIES})
 
 #############
