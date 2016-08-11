@@ -20,7 +20,7 @@ import matplotlib.patches as mpatches
 import numpy as np
 import math
 from sensor_msgs.msg import LaserScan   # for switching Jetson/RC mode
-from geometry_msgs.msg import Vector3   # for sending controls
+from gigatron.msg import Drive   # for sending controls
 
 follow_syler = False
 
@@ -135,21 +135,21 @@ def callback(scan):
     ranges = scan.ranges
     intensities = scan.intensities
     drive_angle = steer(ranges, intensities)
-     v = throttle(drive_angle)
-     v_left, v_right = split_throttle(drive_angle, v)
+    v = throttle(drive_angle)
+    v_left, v_right = split_throttle(drive_angle, v)
     #drive_angle, v_left, v_right = proportional_throttle(steer_angle, ranges, intensities)
 
-    control = Vector3()
+    control = Drive()
 
     if abs(drive_angle) > ABS_MAX_STEERING_ANGLE:
         drive_angle = drive_angle * (ABS_MAX_STEERING_ANGLE / abs(drive_angle))
 
     # set velocity commands
-    control.x = drive_angle  # driveing angle 
-    control.y = max(v_left, 0)  # left wheel velocity
-    control.z = max(v_right, 0) # right wheel velocity
+    control.angle = drive_angle  # driveing angle 
+    control.vel_left = max(v_left, 0)  # left wheel velocity
+    control.vel_right = max(v_right, 0) # right wheel velocity
 
-    print " [ > ] angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s" % (control.x, control.y, control.z)
+    print " [ > ] angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s" % (control.angle, control.vel_left, control.vel_right)
     pub.publish(control)
 
 
@@ -159,7 +159,7 @@ if __name__=="__main__":
     rospy.init_node('drive')
 
     # control publisher
-    pub = rospy.Publisher('control', Vector3, queue_size=5)
+    pub = rospy.Publisher('/command/drive', Drive, queue_size=5)
 
     # scan subscriber
     rospy.Subscriber('scan', LaserScan, callback)
