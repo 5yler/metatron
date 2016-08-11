@@ -16,14 +16,17 @@
 
 <launch>
 
+    <arg name="mac" default="false" /> <!-- control from OS X -->
+    <arg unless="$(arg mac)" name="port" default="/dev/ttyACM0" />
+    <arg if="$(arg mac)" name="port" default="/dev/tty.usbmodem1421" />
+
 <!-- rosserial_python -->
   <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
-    <param name="port" value="/dev/ttyACM0"/>
+    <param name="port" value="$(arg port)"/>
     <param name="baud" value="115200"/>
   </node>
 
-<!-- control_pub_sub -->
-  <!-- <node pkg="gigatron" type="control_pub_sub" name="control_pub_sub" output="screen" /> -->
+  <node pkg="gigatron_hardware" type="arduino_drive_controller" name="arduino_drive_controller" output="screen" />
 
 <!-- turtle sim keyboard remote -->
   <!-- <node pkg="gigatron" type="gigaturtle" name="gigaturtle" output="screen" /> -->
