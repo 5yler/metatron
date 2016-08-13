@@ -143,11 +143,13 @@ add_executable(arduino_drive_controller src/arduino_drive_controller.cpp)
 ## same as for the library above
 # add_dependencies(gigatron_hardware_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(encoder_debug 
-  ${catkin_EXPORTED_TARGETS}
+  gigatron_hardware_generate_messages_cpp
   ${${gigatron_hardware}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
 )
 
 add_dependencies(arduino_drive_controller 
+  gigatron_hardware_generate_messages_cpp
   ${catkin_EXPORTED_TARGETS}
   ${${gigatron_hardware}_EXPORTED_TARGETS}
   ${${gigatron}_EXPORTED_TARGETS}
