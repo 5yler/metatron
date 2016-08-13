@@ -1,5 +1,6 @@
 <launch>
 <arg name="map_file" default="$(find gigatron)/miters.yaml"/>
+<!--<arg name="scan" default="scan"/>-->
 <node pkg="map_server" type="map_server" name="map_server" args="$(arg map_file)"/>
 <!-- Transform from robot center to LIDAR -->
 <node pkg="tf" type="static_transform_publisher" name="laser_broadcaster" args="0.9 -0.1 0 0 0 0 base_link laser 100" />
@@ -37,6 +38,6 @@
   <param name="recovery_alpha_slow" value="0.0"/>
   <param name="recovery_alpha_fast" value="0.0"/>
   
-  <param name="use_map_topic" value="false"/>
+  <param name="use_map_topic" value="true"/>
 </node>
 </launch>
