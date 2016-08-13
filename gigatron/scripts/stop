@@ -64,7 +64,7 @@ if __name__=="__main__":
     rospy.init_node('stop')
 
     # control publisher
-    pub = rospy.Publisher('stop', Bool, queue_size=5)
+    pub = rospy.Publisher('/arduino/command/stop', Bool, queue_size=5)
 
     # scan subscriber
     rospy.Subscriber('scan_filtered', LaserScan, callback)

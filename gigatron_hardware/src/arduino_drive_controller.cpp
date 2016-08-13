@@ -20,7 +20,6 @@
  **/
 
 #include "ros/ros.h"
-#include "geometry_msgs/Vector3.h"
 #include <boost/thread/thread.hpp>
 
 //$ motor commands
@@ -33,6 +32,7 @@
 #include <gigatron_hardware/Steering.h>
 #include <gigatron_hardware/Motors.h>
 #include <std_msgs/UInt8.h>
+#include <std_msgs/Bool.h>
 
 
 #define PI 3.141592653589793238463
@@ -56,16 +56,19 @@ public:
   ArduinoDriveController()
   {
     //$ set up ROS subscribers
-    drive_sub_ = n_.subscribe("command/drive", 1000, &ArduinoDriveController::driveCallback, this);
-    motor_sub_ = n_.subscribe("arduino/motors", 1000, &ArduinoDriveController::motorCallback, this);
-    steer_sub_ = n_.subscribe("arduino/steering", 1000, &ArduinoDriveController::steerCallback, this);
-    mode_sub_ = n_.subscribe("arduino/mode", 1000, &ArduinoDriveController::modeCallback, this);
+    drive_sub_ = n_.subscribe("command/drive", 5, &ArduinoDriveController::driveCallback, this);
+    stop_sub_ = n_.subscribe("command/stop", 5, &ArduinoDriveController::stopCallback, this);
+    
+    motor_sub_ = n_.subscribe("arduino/motors", 5, &ArduinoDriveController::motorCallback, this);
+    steer_sub_ = n_.subscribe("arduino/steering", 5, &ArduinoDriveController::steerCallback, this);
+    mode_sub_ = n_.subscribe("arduino/mode", 5, &ArduinoDriveController::modeCallback, this);
 
     //$ set up ROS publishers
-    control_pub_ = n_.advertise<gigatron_hardware::MotorCommand>("arduino/command/motors", 1000);
-    state_pub_ = n_.advertise<gigatron::State>("state", 1000);
+    control_pub_ = n_.advertise<gigatron_hardware::MotorCommand>("arduino/command/motors", 5);
+    state_pub_ = n_.advertise<gigatron::State>("state", 5);
 
     mode_ = 0;
+    estop_ = false;
     angle_pwm_ = 128;
     motor_rpm_right_ = motor_rpm_left_ = 0;
   }
@@ -77,9 +80,24 @@ public:
   {
     cmd_msg_.angle_command = (msg->angle + ABS_MAX_STEERING_ANGLE) * (STEERING_PWM_RANGE / STEERING_ANGLE_RANGE);
 
-    cmd_msg_.rpm_left = msg->vel_left / (RPM_TO_M_S * gearRatio);
-    cmd_msg_.rpm_right = msg->vel_right / (RPM_TO_M_S * gearRatio);
+    if (estop_) {
+      cmd_msg_.rpm_left = 0;
+      cmd_msg_.rpm_right = 0;
+    } else {
+      cmd_msg_.rpm_left = msg->vel_left / (RPM_TO_M_S * gearRatio);
+      cmd_msg_.rpm_right = msg->vel_right / (RPM_TO_M_S * gearRatio);
+    }
     control_pub_.publish(cmd_msg_);
+  }
+
+/*$
+  Callback method for estop messages. If estopped, the RPM commands to both drive motors will be zero.
+ */
+  void stopCallback(const std_msgs::Bool::ConstPtr& msg) 
+  {
+    // estop_ = msg->data;
+    ROS_ERROR("ESTOPPED? %d", estop_);
+
   }
 
 /*$
@@ -141,9 +159,11 @@ public:
 private:
   ros::NodeHandle n_; 
 
+  ros::Subscriber drive_sub_;
+  ros::Subscriber stop_sub_;
+
   ros::Subscriber motor_sub_;
   ros::Subscriber steer_sub_;
-  ros::Subscriber drive_sub_;
   ros::Subscriber mode_sub_;
 
   ros::Publisher control_pub_;
@@ -155,7 +175,7 @@ private:
   unsigned int mode_;  //$ current mode
   double angle_pwm_;  //$ current steering angle PWM value
   double motor_rpm_right_, motor_rpm_left_; //$ current motor RPM values
-
+  bool estop_;  //$ estop
 
 }; //$ end of class ArduinoDriveController
 
