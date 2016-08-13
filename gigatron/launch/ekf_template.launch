@@ -68,7 +68,7 @@
       <!--<param name="odom1" value="example/another_odom"/>-->
       <param name="pose0" value="amcl_pose"/>
       <!--<param name="twist0" value="example/twist"/>-->
-      <param name="imu0" value="imu"/>
+      <param name="imu0" value="imu/data"/>
 
       <!-- Each sensor reading updates some or all of the filter's state. These options give you greater control over
            which values from each measurement are fed to the filter. For example, if you have an odometry message as input,
