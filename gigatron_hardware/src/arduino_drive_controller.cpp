@@ -53,13 +53,33 @@ public:
    _abs_max_steering_angle = 0.5 * _steering_angle_range;
 
     ros::param::get("~gear_ratio", _gear_ratio);
-    ros::param::get("~wheel_radius", _wheel_radius);
 
     //$ print output
     ROS_WARN("Steering PWM range: %d", _steering_pwm_range);
     ROS_WARN("Steering angle range: %4.2f radians", _steering_angle_range);
     ROS_WARN("Gear ratio: %4.2f", _gear_ratio);
-    ROS_WARN("Wheel radius: %4.2f", _wheel_radius);
+
+    if (ros::param::has("~wheel_radius")) 
+    {
+      ros::param::get("~wheel_radius", _wheel_radius);
+      ROS_WARN("Wheel radius: %4.4f", _wheel_radius);
+
+    }
+    else if (ros::param::has("~wheel_diameter")) 
+    {
+      double wheel_diameter;
+      ros::param::get("~wheel_diameter", wheel_diameter);
+      ROS_ERROR("Wheel diameter: %4.4f", wheel_diameter);
+      _wheel_radius = 0.5 * wheel_diameter;
+    }
+    else 
+    {
+      ROS_ERROR("No wheel_radius or wheel_diameter parameter set. Make sure your config files are correct!");
+      ROS_WARN("Exiting...");
+      ros::shutdown();
+    }
+
+
 
     _rpm_to_vel = (2 * PI * _wheel_radius) / 60.0;
 
