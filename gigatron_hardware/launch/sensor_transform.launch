@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<!-- sensor_transform.launch
+     Launch file for publishing transform from base_link to sensor link
+
+     @author  Syler Wagner  <syler@mit.edu>
+     
+     @date    2016-08-17    syler   creation
+
+     Example usage:
+        roslaunch gigatron_hardware sensor_transform.launch car:=kilotron sensor:=imu
+
+     Prerequisites:
+        - the static transform must be defined in gigatron_hardware/config/[CAR]_sensors/[SENSOR]_link.yaml
+        - you must have this forked version of the tf package, which supports parameter loading in the static_transform_publisher node:
+                https://github.com/orzechow/geometry/tree/indigo-devel/tf
+    -->
+
+    <launch>
+
+    	<arg name="sensor" doc="the name of the sensor, assuming the corresponding frame_id is [SENSOR]_link" /> 
+        <arg name="car" default="gigatron" />
+
+    	<!-- transform from base_link to sensor link -->
+    	<node pkg="tf" type="static_transform_publisher" name="$(arg sensor)_link_tf_broadcaster" output="screen">
+    		<rosparam file="$(find gigatron_hardware)/config/$(arg car)_sensors/$(arg sensor)_link.yaml" command="load" />
+    	</node>
+
+    </launch>
