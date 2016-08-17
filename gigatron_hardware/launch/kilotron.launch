@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<!-- kilotron.launch
+     Launch file for Kilotron hardware
+
+     @author  Syler Wagner  <syler@mit.edu>
+     
+     @date    2016-08-17    syler   creation
+    -->
+
+<launch>
+
+	<arg name="mac" default="false" /> <!-- control from OS X -->
+	<!-- <arg name="lidar" default="rplidar" /> -->
+
+
+	<!-- Arduino -->
+	<include file="$(find gigatron_hardware)/launch/arduino.launch" >
+		<arg name="mac" value="$(arg mac)" />
+		<arg name="kilotron" value="true" />
+	</include>
+
+
+	<!-- Adafruit 9DOF IMU -->
+	<include file="$(find gigatron_hardware)/launch/imu.launch" >
+		<arg name="frame_id" default="imu_link"/>
+		<arg name="update_rate" default="0" />
+	</include>
+	<!-- base_link to imu_link static_transform_publisher -->
+	<include file="$(find gigatron_hardware)/launch/sensor_transform.launch" >
+		<arg name="car" value="kilotron" />
+		<arg name="sensor" value="imu" />
+	</include>
+
+	<!-- TODO: fill in LIDAR launch file -->
+
+	<!-- base_link to laser_link static_transform_publisher -->
+	<include file="$(find gigatron_hardware)/launch/sensor_transform.launch" >
+		<arg name="car" value="kilotron" />
+		<arg name="sensor" value="laser" />
+	</include>
+
+</launch>
