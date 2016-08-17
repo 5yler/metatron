@@ -1,47 +1,37 @@
 <?xml version="1.0"?>
 
-<!-- arduino_control.launch
+<!-- arduino.launch
      Gigatron Arduino control launch file
 
      @author  Syler Wagner  <syler@mit.edu>
      
      @date    2015-09-11    syler   creation
  
-     This launch file runs rosserial_python and control_pub_sub.
-
      Usage Instructions:
-     1. In a terminal window, run:
-        roslaunch gigatron_hardware arduino.launch
+        Gigatron: roslaunch gigatron_hardware arduino.launch
+        Kilotron: roslaunch gigatron_hardware arduino.launch kilotron:=true
+    -->
 
-    If running Kilotron, do:
-        roslaunch gigatron_hardware arduino.launch kilotron:=true
+    <launch>
 
--->
+        <arg name="kilotron" default="false" /> <!-- Kilotron or Gigatron? -->
 
-<launch>
+        <!-- load car platform parameters into "car" namespace -->
+        <rosparam file="$(find gigatron_hardware)/config/gigatron_platform.yaml" ns="car" command="load" unless="$(arg kilotron)"/>  
+        <rosparam file="$(find gigatron_hardware)/config/kilotron_platform.yaml" ns="car" command="load" if="$(arg kilotron)"/> 
 
-    <arg name="kilotron" default="false" /> <!-- Kilotron or Gigatron? -->
+        <!-- Arduino port setting -->
+        <arg name="mac" default="false" /> <!-- control from OS X -->
+        <arg unless="$(arg mac)" name="port" default="/dev/ttyACM0" />
+        <arg if="$(arg mac)" name="port" default="/dev/tty.usbmodem1421" />
 
-    <arg name="mac" default="false" /> <!-- control from OS X -->
-    <arg unless="$(arg mac)" name="port" default="/dev/ttyACM0" />
-    <arg if="$(arg mac)" name="port" default="/dev/tty.usbmodem1421" />
+        <!-- rosserial_python -->
+        <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
+            <param name="port" value="$(arg port)"/>
+            <param name="baud" value="115200"/>
+        </node>
 
-<!-- rosserial_python -->
-  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
-    <param name="port" value="$(arg port)"/>
-    <param name="baud" value="115200"/>
-  </node>
+        <!-- Arduino drive controller node that summarizes car state and publishes arduino commands -->
+        <node pkg="gigatron_hardware" type="arduino_drive_controller" name="arduino_drive_controller" output="screen" />
 
-<!-- Arduino drive controller node that summarizes car state and publishes arduino commands -->
-  <node pkg="gigatron_hardware" type="arduino_drive_controller" name="arduino_drive_controller" output="screen">
-    <!-- load car base parameters -->
-    <rosparam file="$(find gigatron_hardware)/config/gigatron_platform.yaml" command="load" unless="$(arg kilotron)"/> 
-    <rosparam file="$(find gigatron_hardware)/config/kilotron_platform.yaml" command="load" if="$(arg kilotron)"/> 
-  </node>
-
-  
-
-    
-</launch>
-  
-  
+    </launch>

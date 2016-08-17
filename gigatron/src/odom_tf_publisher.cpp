@@ -48,12 +48,12 @@ int main(int argc, char** argv) {
   n.param<std::string>("state_topic", state_topic_, "state");
 
   std::string name;
-  ros::param::param<std::string>("~name", name, "ERROR");
+  ros::param::param<std::string>("/car/name", name, "ERROR");
   ROS_ERROR("Loading parameters for %s frame...", name.c_str());
 
-  if (ros::param::has("~wheelbase_width"))
+  if (ros::param::has("/car/wheelbase_width"))
   {
-    ros::param::get("~wheelbase_width", _wheelbase_width);
+    ros::param::get("/car/wheelbase_width", _wheelbase_width);
     ROS_WARN("Wheelbase width: %4.4f", _wheelbase_width);
 
   }

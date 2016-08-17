@@ -37,30 +37,30 @@ public:
   {
     //$ get some parameters
     std::string name;
-    ros::param::param<std::string>("~name", name, "ERROR"); 
+    ros::param::param<std::string>("/car/name", name, "ERROR"); 
     ROS_ERROR("Loading parameters for %s frame...", name.c_str());   
 
-    ros::param::get("~steering_pwm_range", _steering_pwm_range);
-    ros::param::get("~steering_angle_range", _steering_angle_range);
+    ros::param::get("/car/steering_pwm_range", _steering_pwm_range);
+    ros::param::get("/car/steering_angle_range", _steering_angle_range);
    _abs_max_steering_angle = 0.5 * _steering_angle_range;
 
-    ros::param::get("~gear_ratio", _gear_ratio);
+    ros::param::get("/car/gear_ratio", _gear_ratio);
 
     //$ print output
     ROS_WARN("Steering PWM range: %d", _steering_pwm_range);
     ROS_WARN("Steering angle range: %4.2f radians", _steering_angle_range);
     ROS_WARN("Gear ratio: %4.2f", _gear_ratio);
 
-    if (ros::param::has("~wheel_radius")) 
+    if (ros::param::has("/car/wheel_radius")) 
     {
-      ros::param::get("~wheel_radius", _wheel_radius);
+      ros::param::get("/car/wheel_radius", _wheel_radius);
       ROS_WARN("Wheel radius: %4.4f", _wheel_radius);
 
     }
-    else if (ros::param::has("~wheel_diameter")) 
+    else if (ros::param::has("/car/wheel_diameter")) 
     {
       double wheel_diameter;
-      ros::param::get("~wheel_diameter", wheel_diameter);
+      ros::param::get("/car/wheel_diameter", wheel_diameter);
       ROS_ERROR("Wheel diameter: %4.4f", wheel_diameter);
       _wheel_radius = 0.5 * wheel_diameter;
     }
