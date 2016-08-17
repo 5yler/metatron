@@ -77,7 +77,7 @@ public:
 
     mode_ = 0;
     estop_ = false;
-    angle_pwm_ = 128;
+    angle_pwm_ = _steering_pwm_range / 2;
     motor_rpm_right_ = motor_rpm_left_ = 0;
   }
 

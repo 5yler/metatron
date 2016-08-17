@@ -11,14 +11,20 @@
 
      Usage Instructions:
      1. In a terminal window, run:
-        roslaunch gigatron_hardware arduino_control.launch
+        roslaunch gigatron_hardware arduino.launch
+
+    If running Kilotron, do:
+        roslaunch gigatron_hardware arduino.launch kilotron:=true
+
 -->
 
 <launch>
 
+    <arg name="kilotron" default="false" /> <!-- Kilotron or Gigatron? -->
+
     <arg name="mac" default="false" /> <!-- control from OS X -->
     <arg unless="$(arg mac)" name="port" default="/dev/ttyACM0" />
-    <arg if="$(arg mac)" name="port" default="/dev/tty.usbmodem14221" />
+    <arg if="$(arg mac)" name="port" default="/dev/tty.usbmodem1421" />
 
 <!-- rosserial_python -->
   <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
@@ -29,7 +35,8 @@
 <!-- Arduino drive controller node that summarizes car state and publishes arduino commands -->
   <node pkg="gigatron_hardware" type="arduino_drive_controller" name="arduino_drive_controller" output="screen">
     <!-- load car base parameters -->
-    <rosparam file="$(find gigatron_hardware)/config/gigatron_base.yaml" command="load"/> 
+    <rosparam file="$(find gigatron_hardware)/config/gigatron_platform.yaml" command="load" unless="$(arg kilotron)"/> 
+    <rosparam file="$(find gigatron_hardware)/config/kilotron_platform.yaml" command="load" if="$(arg kilotron)"/> 
   </node>
 
   
