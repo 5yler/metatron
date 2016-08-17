@@ -8,6 +8,7 @@
  * @date    2015-09-12  cjdesno   creation
  * @date    2015-09-13  syler     added proper model dimensions 
  * @date    2016-08-10  syler     adapted to work with new custom messages
+ * @date    2016-08-17  syler     refactored to take in parameters instead of hardcoding
  *
  * This node listens for odometry sensor readings from the Arduino, 
  * then publishes Odometry messages and broadcasts associated transforms.
@@ -18,24 +19,21 @@
 #include "nav_msgs/Odometry.h"
 #include "tf/transform_broadcaster.h"
 
-const static double INCHES_TO_M = 0.0254; //$ conversion from inches to meters
-const static double PI = 3.141592653589793238463;
+#define PI 3.141592653589793238463
 
-const static double wheelBaseWidth = 23.0 * INCHES_TO_M;  //$ [m]
-const static double wheelRadius = 4.90 * INCHES_TO_M;     //$ [m]
-const static double gearRatio = 11.0 / 60.0;  //$ gear ratio between motor and wheels
-
-double leftWheelVelocity = 0.0;
-double rightWheelVelocity = 0.0;
+double left_wheel_velocity_ = 0.0;
+double right_wheel_velocity_ = 0.0;
 
 std::string odom_topic_;
 std::string state_topic_;
 int rate_;
 
+double _wheelbase_width;
+
 void driveStateCallback(const gigatron::State::ConstPtr& msg)
 {
-  leftWheelVelocity = msg->drive.vel_left;
-  rightWheelVelocity = msg->drive.vel_right;
+  left_wheel_velocity_ = msg->drive.vel_left;
+  right_wheel_velocity_ = msg->drive.vel_right;
 }
 
 int main(int argc, char** argv) {
@@ -49,33 +47,53 @@ int main(int argc, char** argv) {
   n.param<std::string>("odom_topic", odom_topic_, "odom");
   n.param<std::string>("state_topic", state_topic_, "state");
 
+  std::string name;
+  ros::param::param<std::string>("/car/name", name, "ERROR");
+  ROS_ERROR("Loading parameters for %s frame...", name.c_str());
+
+  if (ros::param::has("/car/wheelbase_width"))
+  {
+    ros::param::get("/car/wheelbase_width", _wheelbase_width);
+    ROS_WARN("Wheelbase width: %4.4f", _wheelbase_width);
+
+  }
+  else
+  {
+    ROS_ERROR("No wheelbase_width parameter set. Make sure your config files are correct!");
+    ROS_WARN("Exiting...");
+    ros::shutdown();
+  }
+
+
+  //$ initialize publishers and subscribers
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>(odom_topic_, 5);
   ros::Subscriber rpm_sub = n.subscribe(state_topic_, 10, driveStateCallback);
-
-
   ros::Rate r(rate_);
+
+  ROS_WARN("Subscribed to car state topic: %s", state_topic_.c_str());
+  ROS_WARN("Publishing to odometry topic: %s at %d Hz", odom_topic_.c_str(), rate_);
 
   double x = 0.0;       // [m/s]
   double y = 0.0;       // [m/s]
-  double theta = 0.0;   // [rad] where 0 is forward
-  ros::Time lastTime = ros::Time::now();
-  ros::Time currentTime = ros::Time::now();
+  double theta = 0.0;   // [rad] yaw angle, where 0 is forward
+  ros::Time last_time = ros::Time::now();
+  ros::Time current_time = ros::Time::now();
 
   while(n.ok()) {
     ros::spinOnce();
-    currentTime = ros::Time::now();
-    double dt = (currentTime - lastTime).toSec();
+    current_time = ros::Time::now();
+    double dt = (current_time - last_time).toSec();
 
-    double centerVelocity = (rightWheelVelocity + leftWheelVelocity) / 2;
+    double center_velocity = (right_wheel_velocity_ + left_wheel_velocity_) / 2;
 
-    x += centerVelocity * dt * cos(theta);
-    y += centerVelocity * dt * sin(theta);
-    theta += (rightWheelVelocity - leftWheelVelocity) * dt / wheelBaseWidth;
+    x += center_velocity * dt * cos(theta);
+    y += center_velocity * dt * sin(theta);
+    theta += (right_wheel_velocity_ - left_wheel_velocity_) * dt / _wheelbase_width;
 
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
 
     geometry_msgs::TransformStamped odom_trans;
-    odom_trans.header.stamp = currentTime;
+    odom_trans.header.stamp = current_time;
     odom_trans.header.frame_id = "odom";
     odom_trans.child_frame_id = "base_link";
 
@@ -87,7 +105,7 @@ int main(int argc, char** argv) {
     odom_broadcaster.sendTransform(odom_trans);
 
     nav_msgs::Odometry odom;
-    odom.header.stamp = currentTime;
+    odom.header.stamp = current_time;
     odom.header.frame_id = "odom";
 
     odom.pose.pose.position.x = x;
@@ -96,13 +114,13 @@ int main(int argc, char** argv) {
     odom.pose.pose.orientation = odom_quat;
 
     odom.child_frame_id = "base_link";
-    odom.twist.twist.linear.x = centerVelocity;
+    odom.twist.twist.linear.x = center_velocity;
     odom.twist.twist.linear.y = 0.0;
-    odom.twist.twist.angular.z = (rightWheelVelocity - leftWheelVelocity) / wheelBaseWidth;
+    odom.twist.twist.angular.z = (right_wheel_velocity_ - left_wheel_velocity_) / _wheelbase_width;
 
     odom_pub.publish(odom);
 
-    lastTime = currentTime;
+    last_time = current_time;
     r.sleep();
   }
 }

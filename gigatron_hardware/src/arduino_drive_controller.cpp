@@ -3,20 +3,13 @@
  * Gigatron publisher/subscriber for Arduino motor control 
  * 
  * @author  Syler Wagner  <syler@mit.edu>
- * @date    2016-08-10    creation
  *
- * This node listens for Twist messages with forward and angular velocity values,
+ * @date    2016-08-10  syler   creation
+ * @date    2016-08-17  syler   refactored to take in parameters instead of hardcoding
+ *
+ * This node listens for gigatron/Drive messages with velocity values and desired steering angle,
  * applies the dynamic model of the car, and publishes ROS msgs to a sketch on the Arduino
  * in order to control the steering and motors.
- * 
- * Usage Instructions:
- * 1. Startup your roscore and the rosserial python node in their own terminal windows.
- *      roscore
- *      rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0
- * 2. Start control_pub_sub in a separate window to send controls
- *      rosrun gigatron control_pub_sub
- * 3. Start whatever node sends geometry_msgs/Twist messages. For testing, you can use 
- *      rosrun turtlesim turtle_teleop_key /turtle1/cmd_vel:=cmd_vel 
  **/
 
 #include "ros/ros.h"
@@ -36,28 +29,55 @@
 
 
 #define PI 3.141592653589793238463
-#define INCHES_TO_M 0.0254 //$ conversion from inches to meters
-#define S_LOOP_INTERVAL 100.0
-
-const double STEERING_PWM_RANGE = 255.0;
-
-const double ZERO_STEERING_ANGLE = 0.0; // [radians]
-const double STEERING_ANGLE_RANGE = 50 * (PI / 180); //$ [radians] this is the correct steering range
-const double ABS_MAX_STEERING_ANGLE = 25 * (PI / 180); //$ [radians]
-
-const static double gearRatio = 11.0 / 60.0;  //$ gear ratio between motor and wheels
-const static double wheelRadius = 4.90 * INCHES_TO_M;     //$ [m]
-const static double RPM_TO_M_S = (2 * PI * wheelRadius) / 60.0;   //$ conversion from RPM to meters per second
-
 
 class ArduinoDriveController
 {
 public:
   ArduinoDriveController()
   {
+    //$ get some parameters
+    std::string name;
+    ros::param::param<std::string>("/car/name", name, "ERROR"); 
+    ROS_ERROR("Loading parameters for %s frame...", name.c_str());   
+
+    ros::param::get("/car/steering_pwm_range", _steering_pwm_range);
+    ros::param::get("/car/steering_angle_range", _steering_angle_range);
+   _abs_max_steering_angle = 0.5 * _steering_angle_range;
+
+    ros::param::get("/car/gear_ratio", _gear_ratio);
+
+    //$ print output
+    ROS_WARN("Steering PWM range: %d", _steering_pwm_range);
+    ROS_WARN("Steering angle range: %4.2f radians", _steering_angle_range);
+    ROS_WARN("Gear ratio: %4.2f", _gear_ratio);
+
+    if (ros::param::has("/car/wheel_radius")) 
+    {
+      ros::param::get("/car/wheel_radius", _wheel_radius);
+      ROS_WARN("Wheel radius: %4.4f", _wheel_radius);
+
+    }
+    else if (ros::param::has("/car/wheel_diameter")) 
+    {
+      double wheel_diameter;
+      ros::param::get("/car/wheel_diameter", wheel_diameter);
+      ROS_ERROR("Wheel diameter: %4.4f", wheel_diameter);
+      _wheel_radius = 0.5 * wheel_diameter;
+    }
+    else 
+    {
+      ROS_ERROR("No wheel_radius or wheel_diameter parameter set. Make sure your config files are correct!");
+      ROS_WARN("Exiting...");
+      ros::shutdown();
+    }
+
+
+
+    _rpm_to_vel = (2 * PI * _wheel_radius) / 60.0;
+
     //$ set up ROS subscribers
     drive_sub_ = n_.subscribe("command/drive", 5, &ArduinoDriveController::driveCallback, this);
-    stop_sub_ = n_.subscribe("command/stop", 5, &ArduinoDriveController::stopCallback, this);
+//    stop_sub_ = n_.subscribe("command/stop", 5, &ArduinoDriveController::stopCallback, this);
     
     motor_sub_ = n_.subscribe("arduino/motors", 5, &ArduinoDriveController::motorCallback, this);
     steer_sub_ = n_.subscribe("arduino/steering", 5, &ArduinoDriveController::steerCallback, this);
@@ -69,7 +89,7 @@ public:
 
     mode_ = 0;
     estop_ = false;
-    angle_pwm_ = 128;
+    angle_pwm_ = _steering_pwm_range / 2;
     motor_rpm_right_ = motor_rpm_left_ = 0;
   }
 
@@ -78,14 +98,14 @@ public:
  */
   void driveCallback(const gigatron::Drive::ConstPtr& msg) 
   {
-    cmd_msg_.angle_command = (msg->angle + ABS_MAX_STEERING_ANGLE) * (STEERING_PWM_RANGE / STEERING_ANGLE_RANGE);
+    cmd_msg_.angle_command = (msg->angle + _abs_max_steering_angle) * (_steering_pwm_range / _steering_angle_range);
 
     if (estop_) {
       cmd_msg_.rpm_left = 0;
       cmd_msg_.rpm_right = 0;
     } else {
-      cmd_msg_.rpm_left = msg->vel_left / (RPM_TO_M_S * gearRatio);
-      cmd_msg_.rpm_right = msg->vel_right / (RPM_TO_M_S * gearRatio);
+      cmd_msg_.rpm_left = msg->vel_left / (_rpm_to_vel * _gear_ratio);
+      cmd_msg_.rpm_right = msg->vel_right / (_rpm_to_vel * _gear_ratio);
     }
     control_pub_.publish(cmd_msg_);
   }
@@ -97,7 +117,6 @@ public:
   {
     // estop_ = msg->data;
     ROS_ERROR("ESTOPPED? %d", estop_);
-
   }
 
 /*$
@@ -145,12 +164,12 @@ public:
     }
 
     //$ convert PWM to actual steering angle
-    state_msg_.drive.angle = STEERING_ANGLE_RANGE * (angle_pwm_ / STEERING_PWM_RANGE) - ABS_MAX_STEERING_ANGLE;
+    state_msg_.drive.angle = _steering_angle_range * (angle_pwm_ / _steering_pwm_range) - _abs_max_steering_angle;
 
     //$ convert motor RPM to wheel velocity
     //$ TODO: double check this is correct
-    state_msg_.drive.vel_left = motor_rpm_left_ * RPM_TO_M_S * gearRatio;
-    state_msg_.drive.vel_right = motor_rpm_right_ * RPM_TO_M_S * gearRatio;
+    state_msg_.drive.vel_left = motor_rpm_left_ * _rpm_to_vel * _gear_ratio;
+    state_msg_.drive.vel_right = motor_rpm_right_ * _rpm_to_vel * _gear_ratio;
 
     state_pub_.publish(state_msg_);
 
@@ -171,7 +190,20 @@ private:
   
   gigatron_hardware::MotorCommand cmd_msg_; //$ command message
   gigatron::State state_msg_; //$ state message
-  
+
+  /* parameters */
+  int _steering_pwm_range;       //$ OK so this isn't actually PWM, but it's the input to the Arduino sketch
+
+  double _steering_angle_range;     //$ [radians]
+  double _abs_max_steering_angle;   //$ [radians]
+
+  double _gear_ratio;               //$ drive motors / wheels
+  double _wheel_radius;             //$ [m]
+  double _rpm_to_vel;               //$ conversion factor between wheel rpm to velocity in m/s
+
+  double _state_publish_rate;
+
+  /* current values */
   unsigned int mode_;  //$ current mode
   double angle_pwm_;  //$ current steering angle PWM value
   double motor_rpm_right_, motor_rpm_left_; //$ current motor RPM values
@@ -193,9 +225,12 @@ int main(int argc, char **argv) {
   ros::init(argc, argv, "arduino_drive_controller");
 
   // create a ArduinoDriveController object to publish and subscribe at same time
-  ArduinoDriveController debugger;
+  ArduinoDriveController controller;
 
-  ros::Rate loop_rate(10);  // run at 1hz
+  //$ get state message publishing rate as a parameter
+  double state_msg_rate;
+  ros::param::param("~state_msg_rate", state_msg_rate, 4.0);
+  ros::Rate loop_rate(state_msg_rate);  // run at 1hz
 
   int i = 0;
 
@@ -204,7 +239,7 @@ int main(int argc, char **argv) {
   while (ros::ok())
   {
     ros::spinOnce();
-    debugger.publishState();
+    controller.publishState();
     loop_rate.sleep();
   }
 

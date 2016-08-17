@@ -30,11 +30,11 @@
 #define INCHES_TO_M 0.0254 //$ conversion from inches to meters
 #define S_LOOP_INTERVAL 100.0
 
-const double STEERING_PWM_RANGE = 255.0;
+const double _steering_pwm_range = 255.0;
 
 const double ZERO_STEERING_ANGLE = 0.0; // [radians]
-const double STEERING_ANGLE_RANGE = 50 * (PI / 180); //$ [radians] this is the correct steering range
-const double ABS_MAX_STEERING_ANGLE = 25 * (PI / 180); //$ [radians]
+const double _steering_angle_range = 50 * (PI / 180); //$ [radians] this is the correct steering range
+const double _abs_max_steering_angle = 25 * (PI / 180); //$ [radians]
 
 const static double gearRatio = 11.0 / 60.0;  //$ gear ratio between motor and wheels
 const static double wheelRadius = 4.90 * INCHES_TO_M;     //$ [m]
@@ -63,10 +63,10 @@ public:
       ROS_ERROR_STREAM("/arduino/motors: \tleft_ticks\t" << ticks_left << "\tright_ticks\t" << ticks_right << "\tRight encoder direction is wrong!");
 
       // double motor_revs = ticks_right / 600.0;
-      // double wheel_revs = motor_revs * gearRatio;
+      // double wheel_revs = motor_revs * _gear_ratio;
 
       // double rpm = wheel_revs * (60.0 * 1000) / S_LOOP_INTERVAL;
-      // double vel_right = rpm * RPM_TO_M_S;
+      // double vel_right = rpm * _rpm_to_vel;
     }
     else if ((ticks_left <= 0) != (cmd_left <= 0)) {
       ROS_ERROR_STREAM("/arduino/motors: \tleft_ticks\t" << ticks_left << "\tright_ticks\t" << ticks_right << "\tLeft encoder direction is wrong!");

@@ -1,0 +1,6 @@
+name: "Kilotron"
+steering_pwm_range: 180
+steering_angle_range: 0.76096 # [radians] 43.6 degrees
+gear_ratio: 1                 # drive motors / wheels
+wheel_diameter: 0.0666        # [m]
+wheelbase_width: 0.1778       # [m]
