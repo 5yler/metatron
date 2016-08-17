@@ -1,5 +1,6 @@
 name: "Gigatron"
 steering_pwm_range: 255
-steering_angle_range: 0.8726646259971648 # 50 * pi / 180 [radians]
-gear_ratio: 0.18333333333333332 # 11.0 / 60.0; drive motors / wheels
-wheel_radius: 0.12446 # 4.90 * INCHES_TO_M [m]
+steering_angle_range: 0.8726646   # [radians] 50 degrees
+gear_ratio: 0.18333               # 11.0 : 60.0 drive motors : wheels
+wheel_radius: 0.12446             # [m] 4.9 inches
+wheelbase_width: 0.5842           # [m] 23 inches

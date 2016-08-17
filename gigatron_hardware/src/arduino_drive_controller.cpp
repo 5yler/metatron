@@ -3,20 +3,13 @@
  * Gigatron publisher/subscriber for Arduino motor control 
  * 
  * @author  Syler Wagner  <syler@mit.edu>
- * @date    2016-08-10    creation
  *
- * This node listens for Twist messages with forward and angular velocity values,
+ * @date    2016-08-10  syler   creation
+ * @date    2016-08-17  syler   refactored to take in parameters instead of hardcoding
+ *
+ * This node listens for gigatron/Drive messages with velocity values and desired steering angle,
  * applies the dynamic model of the car, and publishes ROS msgs to a sketch on the Arduino
  * in order to control the steering and motors.
- * 
- * Usage Instructions:
- * 1. Startup your roscore and the rosserial python node in their own terminal windows.
- *      roscore
- *      rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0
- * 2. Start control_pub_sub in a separate window to send controls
- *      rosrun gigatron control_pub_sub
- * 3. Start whatever node sends geometry_msgs/Twist messages. For testing, you can use 
- *      rosrun turtlesim turtle_teleop_key /turtle1/cmd_vel:=cmd_vel 
  **/
 
 #include "ros/ros.h"
@@ -36,7 +29,6 @@
 
 
 #define PI 3.141592653589793238463
-#define S_LOOP_INTERVAL 100.0
 
 class ArduinoDriveController
 {
