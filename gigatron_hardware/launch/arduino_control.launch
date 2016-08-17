@@ -11,14 +11,14 @@
 
      Usage Instructions:
      1. In a terminal window, run:
-        roslaunch gigatron arduino_control.launch
+        roslaunch gigatron_hardware arduino_control.launch
 -->
 
 <launch>
 
     <arg name="mac" default="false" /> <!-- control from OS X -->
     <arg unless="$(arg mac)" name="port" default="/dev/ttyACM0" />
-    <arg if="$(arg mac)" name="port" default="/dev/tty.usbmodem1421" />
+    <arg if="$(arg mac)" name="port" default="/dev/tty.usbmodem14221" />
 
 <!-- rosserial_python -->
   <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
@@ -26,10 +26,12 @@
     <param name="baud" value="115200"/>
   </node>
 
-  <node pkg="gigatron_hardware" type="arduino_drive_controller" name="arduino_drive_controller" output="screen" />
+<!-- Arduino drive controller node that summarizes car state and publishes arduino commands -->
+  <node pkg="gigatron_hardware" type="arduino_drive_controller" name="arduino_drive_controller" output="screen">
+    <!-- load car base parameters -->
+    <rosparam file="$(find gigatron_hardware)/config/gigatron_base.yaml" command="load"/> 
+  </node>
 
-<!-- turtle sim keyboard remote -->
-  <!-- <node pkg="gigatron" type="gigaturtle" name="gigaturtle" output="screen" /> -->
   
 
     
