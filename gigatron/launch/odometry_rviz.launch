@@ -1,6 +1,6 @@
 <launch>
-	<arg name="map_file" default="$(find gigatron)/maps/nonexistent_map.yaml"/> <!-- placeholder for map file loading -->
-	<arg name="map_server" default="false"/> <!-- launch map server or not -->
+	<arg name="map_file" default="$(find gigatron)/maps/canny_hallway_test_2016-08-13-12-38-26/map.yaml"/> <!-- placeholder for map file loading -->
+	<arg name="map_server" default="true"/> <!-- launch map server or not -->
 	<arg name="rviz_config_file" default="$(find gigatron)/rviz/odometry.rviz"/>
 
 	<!-- run the map server with our map -->

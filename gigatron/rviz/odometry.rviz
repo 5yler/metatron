@@ -7,6 +7,8 @@ Panels:
         - /Global Options1
         - /Status1
         - /Odometry1
+        - /Map1
+        - /Map1/Status1
       Splitter Ratio: 0.5
     Tree Height: 447
   - Class: rviz/Selection
@@ -59,6 +61,15 @@ Visualization Manager:
       Position Tolerance: 0.1
       Topic: /odom
       Value: true
+    - Alpha: 0.7
+      Class: rviz/Map
+      Color Scheme: map
+      Draw Behind: false
+      Enabled: true
+      Name: Map
+      Topic: /map
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -91,7 +102,7 @@ Visualization Manager:
         Value: false
       Name: Current View
       Near Clip Distance: 0.01
-      Scale: 10
+      Scale: 5.52207
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
       X: 5
@@ -125,6 +136,34 @@ Visualization Manager:
         Value: TopDownOrtho (rviz)
         X: 5
         Y: 15
+      - Angle: 0
+        Class: rviz/TopDownOrtho
+        Enable Stereo Rendering:
+          Stereo Eye Separation: 0.06
+          Stereo Focal Distance: 1
+          Swap Stereo Eyes: false
+          Value: false
+        Name: TopDownOrtho
+        Near Clip Distance: 0.01
+        Scale: 10
+        Target Frame: <Fixed Frame>
+        Value: TopDownOrtho (rviz)
+        X: 5
+        Y: 15
+      - Angle: 0
+        Class: rviz/TopDownOrtho
+        Enable Stereo Rendering:
+          Stereo Eye Separation: 0.06
+          Stereo Focal Distance: 1
+          Swap Stereo Eyes: false
+          Value: false
+        Name: TopDownOrtho
+        Near Clip Distance: 0.01
+        Scale: 5.52207
+        Target Frame: <Fixed Frame>
+        Value: TopDownOrtho (rviz)
+        X: 5
+        Y: 15
 Window Geometry:
   Displays:
     collapsed: false
@@ -142,4 +181,4 @@ Window Geometry:
     collapsed: false
   Width: 1200
   X: 60
-  Y: 60
+  Y: 22
