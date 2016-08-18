@@ -21,10 +21,10 @@
 	</include>
 
 	<!-- Adafruit 9DOF IMU -->
-	<include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
+	<!-- <include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
 		<arg name="frame_id" default="imu_link"/>
 		<arg name="update_rate" default="0" />
-	</include>
+	</include> -->
 	<!-- base_link to imu_link static_transform_publisher -->
 	<include file="$(find gigatron_hardware)/launch/sensor_transform.launch" >
 		<arg name="car" value="kilotron" />

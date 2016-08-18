@@ -3,7 +3,7 @@ frame_id: "base_link"
 child_frame_id: "imu_link"
 x: 0        # center of car
 y: 0        # center of car
-z: 0.0254   # 1" up from center of platform (car is 6" tall, IMU is 4" off the ground)
+z: 0.0635   # 2.5" up from wheel axis
 yaw: 0
 pitch: 0
 roll: 0
