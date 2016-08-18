@@ -11,8 +11,8 @@
 <launch>
 
 	<arg name="mac" default="false" /> <!-- control from OS X -->
-	<!-- <arg name="lidar" default="rplidar" /> -->
-
+	<arg name="lidar" default="rplidar" doc="'rplidar' or 'xv'?" /> 
+	<arg name="lidar_port" default="/dev/ttyUSB0" doc="serial port for LIDAR" /> 
 
 	<!-- Arduino -->
 	<include file="$(find gigatron_hardware)/launch/arduino.launch" >
@@ -20,9 +20,8 @@
 		<arg name="kilotron" value="true" />
 	</include>
 
-
 	<!-- Adafruit 9DOF IMU -->
-	<include file="$(find gigatron_hardware)/launch/imu.launch" >
+	<include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
 		<arg name="frame_id" default="imu_link"/>
 		<arg name="update_rate" default="0" />
 	</include>
@@ -32,8 +31,11 @@
 		<arg name="sensor" value="imu" />
 	</include>
 
-	<!-- TODO: fill in LIDAR launch file -->
-
+	<!-- RPLIDAR or Neato XV LIDAR  -->
+	<include file="$(find gigatron_hardware)/launch/sensors/$(arg lidar).launch" >
+		<arg name="frame_id" default="laser_link"/>
+		<arg name="port" default="$(arg lidar_port)"/>
+	</include>
 	<!-- base_link to laser_link static_transform_publisher -->
 	<include file="$(find gigatron_hardware)/launch/sensor_transform.launch" >
 		<arg name="car" value="kilotron" />

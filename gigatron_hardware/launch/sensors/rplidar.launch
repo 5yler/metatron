@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="frame_id" default="laser_link" />  
+	<arg name="port" default="/dev/ttyUSB0" /> <!-- TODO: http://wiki.ros.org/rplidar#Device_Settings set persistent serial port /dev/rplidar -->
+	<arg name="baud" default="115200" />
+	<arg name="inverted" default="" doc="indicates whether the LIDAR is mounted inverted" />
+	<arg name="angle_compensate" default="true" doc="whether the driver needs do angle compensation" /> <!-- I have no idea what this means -->
+
+	<node pkg="rplidar_ros" type="rplidarNode" name="rplidar_node" output="screen">
+		<param name="frame_id" value="$(arg frame_id)" /> <!-- /map is used for debug in RViz, to be replaced by the imu_link -->
+		<param name="serial_port" value="$(arg port)" />  
+		<param name="serial_baudrate" value="$(arg baud)" />
+		<param name="inverted" value="$(arg inverted)" />
+		<param name="angle_compensate" value="$(arg angle_compensate)" />
+	</node>
+</launch>

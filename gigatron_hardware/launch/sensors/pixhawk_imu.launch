@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<launch>
+
+	<arg name="mac" default="false" />
+	<arg name="pixhawk_port" if="$(arg mac)" value="/dev/tty.usbmodem1" />
+
+	<!-- Pixhawk IMU -->
+	<node pkg="mavros" type="mavros_node" name="mavros" output="screen">
+		<rosparam command="load" file="$(find mavros)/launch/apm_pluginlists.yaml" />
+		<rosparam command="load" file="$(find mavros)/launch/apm_config.yaml" />
+		<param name="fcu_url" value="$(arg pixhawk_port)" />
+		<param name="gcs_url" value="" />
+		<param name="target_system_id" value="1" />
+		<param name="target_component_id" value="240" />
+		<remap from="~imu/atm_pressure" to="imu/atm_pressure"/>
+		<remap from="~imu/data" to="imu/data"/>
+		<remap from="~imu/data_raw" to="imu/data_raw"/>
+		<remap from="~imu/mag" to="imu/mag"/>
+		<remap from="~imu/temperature" to="imu/temperature"/>
+
+	</node>
+	<node name="set_mavros_stream_rate" pkg="hexacopter" type="set_mavros_stream_rate" respawn="false" output="log" />
+
+
+</launch>
