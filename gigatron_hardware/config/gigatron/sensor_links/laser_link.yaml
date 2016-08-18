@@ -1,0 +1,10 @@
+# config file for static transform publisher between base_link and laser_link on Gigatron
+frame_id: "base_link" 
+child_frame_id: "laser_link"
+x: -0.0254    # 1" back from center of car
+y: 0.1524     # 6" left from center of car
+z: 0.2794     # 11" up from wheel axis
+yaw: 0
+pitch: 0
+roll: 0
+period: 100

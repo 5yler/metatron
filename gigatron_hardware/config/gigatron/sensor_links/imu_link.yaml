@@ -1,0 +1,10 @@
+# config file for static transform publisher between base_link and imu_link on Gigatron
+frame_id: "base_link" 
+child_frame_id: "imu_link"
+x: 0        # center of car
+y: 0        # center of car
+z: 0.2286   # 9" up from wheel axis
+yaw: 0
+pitch: 0
+roll: 0
+period: 100
