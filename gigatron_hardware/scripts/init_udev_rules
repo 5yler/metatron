@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo "[>   ] Symlinking 99-usb-serial-device.rules into /etc/udev/rules.d, you will need to enter your password."
+sudo ln -s `rospack find gigatron_hardware`/config/udev/99-usb-serial-device.rules /etc/udev/rules.d/99-usb-serial-device.rules
+
+echo # newline
+echo "[ > ] Restarting udev sevice..."
+echo # newline
+
+sudo service udev reload
+sudo service udev restart
+echo "[>>>] Done! Now you can unplug your USB device and plug it back in, and it should be recognized."

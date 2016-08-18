@@ -22,7 +22,7 @@
 
         <!-- Arduino port setting -->
         <arg name="mac" default="false" /> <!-- control from OS X -->
-        <arg unless="$(arg mac)" name="port" default="/dev/ttyACM0" />
+        <arg unless="$(arg mac)" name="port" default="/dev/arduino" />
         <arg if="$(arg mac)" name="port" default="/dev/tty.usbmodem1421" />
 
         <!-- rosserial_python -->

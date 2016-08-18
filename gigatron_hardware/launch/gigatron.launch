@@ -11,8 +11,7 @@
 <launch>
 
 	<arg name="mac" default="false" /> <!-- control from OS X -->
-	<arg name="lidar" default="rplidar" doc="'rplidar' or 'xv'?" /> 
-	<arg name="lidar_port" default="/dev/ttyUSB0" doc="serial port for LIDAR" /> 
+	<arg name="lidar" default="rplidar" doc="'rplidar' or 'xvlidar'?" /> 
 
 	<!-- Arduino -->
 	<include file="$(find gigatron_hardware)/launch/arduino.launch" >
@@ -35,7 +34,6 @@
 	<!-- RPLIDAR or Neato XV LIDAR  -->
 	<include file="$(find gigatron_hardware)/launch/sensors/$(arg lidar).launch" >
 		<arg name="frame_id" default="laser_link"/>
-		<arg name="port" default="$(arg lidar_port)"/>
 	</include>
 	<!-- base_link to laser_link static_transform_publisher -->
 	<include file="$(find gigatron_hardware)/launch/sensor_transform.launch" >

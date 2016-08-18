@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 	<arg name="frame_id" default="laser_link" />  
-	<arg name="port" default="/dev/ttyUSB0" /> <!-- TODO: http://wiki.ros.org/rplidar#Device_Settings set persistent serial port /dev/rplidar -->
+	<arg name="port" default="/dev/rplidar" /> 
 	<arg name="baud" default="115200" />
 	<arg name="inverted" default="" doc="indicates whether the LIDAR is mounted inverted" />
 	<arg name="angle_compensate" default="true" doc="whether the driver needs do angle compensation" /> <!-- I have no idea what this means -->
