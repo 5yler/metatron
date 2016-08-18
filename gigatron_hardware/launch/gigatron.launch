@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
-<!-- kilotron.launch
-     Launch file for Kilotron hardware
+<!-- gigatron.launch
+     Launch file for gigatron hardware
 
      @author  Syler Wagner  <syler@mit.edu>
      
@@ -11,23 +11,24 @@
 <launch>
 
 	<arg name="mac" default="false" /> <!-- control from OS X -->
-	<arg name="lidar" default="xv" doc="'rplidar' or 'xv'?" /> 
+	<arg name="lidar" default="rplidar" doc="'rplidar' or 'xv'?" /> 
 	<arg name="lidar_port" default="/dev/ttyUSB0" doc="serial port for LIDAR" /> 
 
 	<!-- Arduino -->
 	<include file="$(find gigatron_hardware)/launch/arduino.launch" >
 		<arg name="mac" value="$(arg mac)" />
-		<arg name="kilotron" value="true" />
+		<arg name="gigatron" value="true" />
 	</include>
 
 	<!-- Adafruit 9DOF IMU -->
-	<!-- <include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
+	<include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
+		<arg name="car" value="kilotron" />
 		<arg name="frame_id" default="imu_link"/>
 		<arg name="update_rate" default="0" />
-	</include> -->
+	</include>
 	<!-- base_link to imu_link static_transform_publisher -->
 	<include file="$(find gigatron_hardware)/launch/sensor_transform.launch" >
-		<arg name="car" value="kilotron" />
+		<arg name="car" value="gigatron" />
 		<arg name="sensor" value="imu" />
 	</include>
 
@@ -38,7 +39,7 @@
 	</include>
 	<!-- base_link to laser_link static_transform_publisher -->
 	<include file="$(find gigatron_hardware)/launch/sensor_transform.launch" >
-		<arg name="car" value="kilotron" />
+		<arg name="car" value="gigatron" />
 		<arg name="sensor" value="laser" />
 	</include>
 
