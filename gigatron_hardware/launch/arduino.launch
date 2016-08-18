@@ -14,11 +14,10 @@
 
     <launch>
 
-        <arg name="kilotron" default="false" /> <!-- Kilotron or Gigatron? -->
+        <arg name="car" default="gigatron" /> <!-- Kilotron or Gigatron? -->
 
         <!-- load car platform parameters into "car" namespace -->
-        <rosparam file="$(find gigatron_hardware)/config/gigatron_platform.yaml" ns="car" command="load" unless="$(arg kilotron)"/>  
-        <rosparam file="$(find gigatron_hardware)/config/kilotron_platform.yaml" ns="car" command="load" if="$(arg kilotron)"/> 
+        <rosparam file="$(find gigatron_hardware)/config/$(arg car)_platform.yaml" ns="car" command="load" /> 
 
         <!-- Arduino port setting -->
         <arg name="mac" default="false" /> <!-- control from OS X -->

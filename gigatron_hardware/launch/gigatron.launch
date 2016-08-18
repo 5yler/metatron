@@ -16,12 +16,12 @@
 	<!-- Arduino -->
 	<include file="$(find gigatron_hardware)/launch/arduino.launch" >
 		<arg name="mac" value="$(arg mac)" />
-		<arg name="gigatron" value="true" />
+		<arg name="car" value="gigatron" />
 	</include>
 
 	<!-- Adafruit 9DOF IMU -->
 	<include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
-		<arg name="car" value="kilotron" />
+		<arg name="car" value="gigatron" />
 		<arg name="frame_id" default="imu_link"/>
 		<arg name="update_rate" default="0" />
 	</include>

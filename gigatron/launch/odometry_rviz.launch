@@ -15,7 +15,7 @@
 	<node if="$(arg map_server)" name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
 
 	<!-- launch rviz -->
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_config_file)" output="screen" required="true" />
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_config_file)" output="screen" />
 
 	<!-- publish odometry and tf based on wheel velocities -->
 	<node name="odom_tf_publisher" type="odom_tf_publisher" pkg="gigatron">
