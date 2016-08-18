@@ -10,9 +10,12 @@
 
 <launch>
 
+
+
 	<arg name="mac" default="false" /> <!-- control from OS X -->
 	<arg name="lidar" default="xv" doc="'rplidar' or 'xv'?" /> 
-	<arg name="lidar_port" default="/dev/ttyUSB0" doc="serial port for LIDAR" /> 
+	<arg name="lidar_port" default="/dev/ttyACM1" doc="serial port for LIDAR" /> 
+	<arg name="arduino_port" default="/dev/ttyACM0" doc="serial port for Arduino" /> 
 
 	<!-- Arduino -->
 	<include file="$(find gigatron_hardware)/launch/arduino.launch" >
@@ -21,10 +24,11 @@
 	</include>
 
 	<!-- Adafruit 9DOF IMU -->
-	<!-- <include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
+	<include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
+		<arg name="car" value="kilotron" />
 		<arg name="frame_id" default="imu_link"/>
 		<arg name="update_rate" default="0" />
-	</include> -->
+	</include>
 	<!-- base_link to imu_link static_transform_publisher -->
 	<include file="$(find gigatron_hardware)/launch/sensor_transform.launch" >
 		<arg name="car" value="kilotron" />
