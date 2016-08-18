@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 	<arg name="frame_id" default="laser_link" />  
-	<arg name="port" default="/dev/xvlidar" /> <!-- TODO: http://wiki.ros.org/rplidar#Device_Settings set persistent serial port /dev/rplidar -->
+	<arg name="port" default="/dev/tty.xvlidar" /> <!-- TODO: http://wiki.ros.org/rplidar#Device_Settings set persistent serial port /dev/rplidar -->
 	<arg name="baud" default="115200" />
 	<arg name="firmware_version" default="1" />
 	<!-- 

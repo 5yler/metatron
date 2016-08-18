@@ -9,7 +9,7 @@ The result is everytime you plug in a recognized device, the system will symlink
 
 ```
 15:04 board /etc/udev/rules.d ls -l /dev/*
-0 lrwxrwxrwx 1 root 7 Aug 18 15:04 /dev/rplidar -> ttyUSB0
-0 lrwxrwxrwx 1 root 7 Aug 18 15:04 /dev/xvlidar -> ttyACM0
-0 lrwxrwxrwx 1 root 7 Aug 18 15:04 /dev/arduino -> ttyACM1
+0 lrwxrwxrwx 1 root 7 Aug 18 15:04 /dev/tty.rplidar -> ttyUSB0
+0 lrwxrwxrwx 1 root 7 Aug 18 15:04 /dev/tty.xvlidar -> ttyACM0
+0 lrwxrwxrwx 1 root 7 Aug 18 15:04 /dev/tty.arduino -> ttyACM1
 ```
