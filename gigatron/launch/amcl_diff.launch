@@ -5,7 +5,7 @@
 
   <!-- if map_server arg is set, launch the map server -->
   <group if="$(arg map_server)">
-    <arg name="map" default="canny_hallway" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
+    <arg name="map" default="canny_loop" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
     <!-- run map server with our map -->
     <include file="$(find gigatron)/launch/map_server.launch" >
       <arg name="map" value="$(arg map)" />
