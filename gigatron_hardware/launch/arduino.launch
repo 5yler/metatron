@@ -33,4 +33,11 @@
         <!-- Arduino drive controller node that summarizes car state and publishes arduino commands -->
         <node pkg="gigatron_hardware" type="arduino_drive_controller" name="arduino_drive_controller" output="screen" />
 
+        <!-- publish odometry and tf based on wheel velocities -->
+        <node name="odom_tf_publisher" type="odom_tf_publisher" pkg="gigatron">
+            <param name="rate" value="200" />
+            <param name="odom_topic" value="/odom" />
+            <param name="state_topic" value="/state" />
+        </node> 
+
     </launch>
