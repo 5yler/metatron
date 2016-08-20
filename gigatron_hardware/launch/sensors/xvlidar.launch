@@ -3,7 +3,7 @@
 	<arg name="frame_id" default="laser_link" />  
 	<arg name="port" default="/dev/tty.xvlidar" /> <!-- TODO: http://wiki.ros.org/rplidar#Device_Settings set persistent serial port /dev/rplidar -->
 	<arg name="baud" default="115200" />
-	<arg name="firmware_version" default="1" />
+	<arg name="firmware_version" default="2" /> <!-- kilotron's LIDAR appears to need firmware V2. -->
 	<!-- 
 		http://wiki.ros.org/xv_11_laser_driver
 		The firmware version that attempts to interpret the byte format of the laser. There are two known firmwares right now. One is noted for sending all 360 pings in a structure. This is probably the older firmware and is "1" for this value. The other sends the pings 4 at a time. This is probably the newer firmware and is "2" for this value. There isn't a reliable way to get the firmware version from the laser right now, so you'll have to set this and check a visualization of the pings in order to see if the driver is correctly interpreting the laser bytes. 
