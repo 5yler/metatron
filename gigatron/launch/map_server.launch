@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+	<!-- launch map server or not -->
+
+	<arg name="map_server" default="true"/>
+	<arg name="map" default="canny_loop"/>
+	<arg name="map_location" value="$(find gigatron)/maps/$(arg map).yaml"/> <!-- placeholder for map file loading -->
+		<!-- run the map server with our map -->
+	<node if="$(arg map_server)" name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
+
+</launch>

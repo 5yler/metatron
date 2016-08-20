@@ -18,8 +18,10 @@
 	<!-- Arduino -->
 	<include file="$(find gigatron_hardware)/launch/arduino.launch" >
 		<arg name="mac" value="$(arg mac)" />
-		<arg name="kilotron" value="true" />
+		<arg name="car" value="kilotron" />
 	</include>
+
+	<!-- sensors -->
 
 	<!-- Adafruit 9DOF IMU -->
 	<include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
