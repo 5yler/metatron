@@ -21,7 +21,7 @@
     <param name="odom_alpha5" value="0.1" />
     <param name="transform_tolerance" value="0.2" />
     <param name="gui_publish_rate" value="10.0" />
-    <param name="laser_max_beams" value="30" />
+    <param name="laser_max_beams" value="300" />
     <param name="min_particles" value="500" />
     <param name="max_particles" value="5000" />
     <param name="kld_err" value="0.05" />
@@ -43,7 +43,7 @@
     <param name="laser_likelihood_max_dist" value="2.0" />
     <param name="update_min_d" value="0.2" />
     <param name="update_min_a" value="0.5" />
-    <param name="odom_frame_id" value="odometry/filtered" />
+    <param name="odom_frame_id" value="odom" />
     <param name="resample_interval" value="1" />
     <param name="transform_tolerance" value="0.1" />
     <param name="recovery_alpha_slow" value="0.0" />
