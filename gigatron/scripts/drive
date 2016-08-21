@@ -22,6 +22,10 @@ import math
 from sensor_msgs.msg import LaserScan   # for switching Jetson/RC mode
 from gigatron.msg import Drive   # for sending controls
 
+from laser_geometry import LaserProjection # for getting and using PointCloud from LaserScan
+from sensor_msgs.msg import PointCloud2 
+import sensor_msgs.point_cloud2 as pc2
+
 follow_syler = False
 
 v_forward = 5
@@ -38,6 +42,8 @@ angle_max = -3.12413907051
 angle_increment = -0.0174532923847
 range_min = 0.15000000596
 range_max = 6.0
+wheelbase_width = rospy.get_param("wheelbase_width")
+
 
 inf = float('nan')
 
@@ -47,15 +53,6 @@ def point_ok(point):
     if r < 0:
         return False
     elif intensity == 0.0: # this might not be necessary
-        return False
-    else:
-        return True
-
-def point_ok2(point):
-    r, theta, intensity = point[0], point[1], point[2]
-    if r < 0:
-        return False
-    elif r < range_min or r > range_max: 
         return False
     else:
         return True
@@ -99,7 +96,10 @@ def polar_integrate(narrow):
 
 def steer(ranges, intensities, theta_min=-math.pi/2, theta_max=math.pi/2):
     narrow = generate_narrow_fov_points(ranges, intensities, theta_min, theta_max)
-    drive_angle = polar_integrate(narrow)
+    if len(narrow) != 0:
+	    drive_angle = polar_integrate(narrow)
+    else:
+    	drive_angle = 0 
     return drive_angle
 
 def throttle(steer_angle):
@@ -130,27 +130,41 @@ def proportional_throttle(steer_angle, ranges, intensities):
     v_left, v_right = split_throttle(angle, v)
     return angle, v_left, v_right
 
+def ahead_clear(scan):
+	Projector = LaserProjection()
+	cloud = Projector.projectLaser(scan) #gets PointCloud2
+	pts = pc2.read_points(cloud,skip_nans=True,field_names=("x","y","z"))
+	for p in pts:
+		if abs(p[1]) <= wheelbase_width/2 and p[0] > 0: #is the point in the way?
+			return False
+	return True
+
 # laser scan callback method
 def callback(scan):
-    ranges = scan.ranges
-    intensities = scan.intensities
-    drive_angle = steer(ranges, intensities)
-    v = throttle(drive_angle)
-    v_left, v_right = split_throttle(drive_angle, v)
-    #drive_angle, v_left, v_right = proportional_throttle(steer_angle, ranges, intensities)
+	ranges = scan.ranges
+	intensities = scan.intensities
+	control = Drive()
+ 
+	if ahead_clear(scan): #if clear, go fast!
+		control.angle = 0.0
+		control.vel_left = v_faster
+		control.vel_right = v_faster
+	else: #drive normally
+		drive_angle = steer(ranges, intensities)
+		v = throttle(drive_angle)
+		v_left, v_right = split_throttle(drive_angle, v)
+		#drive_angle, v_left, v_right = proportional_throttle(steer_angle, ranges, intensities)
 
-    control = Drive()
+		if abs(drive_angle) > ABS_MAX_STEERING_ANGLE:
+			drive_angle = drive_angle * (ABS_MAX_STEERING_ANGLE / abs(drive_angle))
 
-    if abs(drive_angle) > ABS_MAX_STEERING_ANGLE:
-        drive_angle = drive_angle * (ABS_MAX_STEERING_ANGLE / abs(drive_angle))
+		# set velocity commands
+		control.angle = drive_angle  # driving angle 
+		control.vel_left = max(v_left, 0)  # left wheel velocity
+		control.vel_right = max(v_right, 0) # right wheel velocity
 
-    # set velocity commands
-    control.angle = drive_angle  # driveing angle 
-    control.vel_left = max(v_left, 0)  # left wheel velocity
-    control.vel_right = max(v_right, 0) # right wheel velocity
-
-    print " [ > ] angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s" % (control.angle, control.vel_left, control.vel_right)
-    pub.publish(control)
+	print " [ > ] angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s" % (control.angle, control.vel_left, control.vel_right)
+	pub.publish(control)
 
 
 if __name__=="__main__":
