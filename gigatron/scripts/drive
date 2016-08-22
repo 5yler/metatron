@@ -28,9 +28,16 @@ import sensor_msgs.point_cloud2 as pc2
 
 follow_syler = False
 
+wheelbase_width = rospy.get_param("wheelbase_width")
+_wheel_radius = rospy.get_param("wheel_diameter")/2.0
+_gear_ratio = rospy.get_param("gear_ratio")
+
+_rpm_to_vel = (2 * PI * _wheel_radius) / 60.0;
+
 v_forward = 5
 v_slowest = 2
 v_faster = 8
+v_max = max_rpm * _rpm_to_vel * _gear_ratio;
 fast_dist = 5   #Assumes with 5m of clearance ahead we can go as fast as possible
 ABS_MAX_STEERING_ANGLE = 25.0 * (math.pi / 180.0)
 INCHES_TO_M = 0.0254
@@ -42,7 +49,6 @@ angle_max = -3.12413907051
 angle_increment = -0.0174532923847
 range_min = 0.15000000596
 range_max = 6.0
-wheelbase_width = rospy.get_param("wheelbase_width")
 
 
 inf = float('nan')
