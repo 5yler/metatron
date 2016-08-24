@@ -40,9 +40,10 @@ public:
     ros::param::param<std::string>("/car/name", name, "ERROR"); 
     ROS_ERROR("Loading parameters for %s frame...", name.c_str());   
 
+    ros::param::get("/car/max_motor_rpm", _max_motor_rpm);
     ros::param::get("/car/steering_pwm_range", _steering_pwm_range);
     ros::param::get("/car/steering_angle_range", _steering_angle_range);
-   _abs_max_steering_angle = 0.5 * _steering_angle_range;
+    _abs_max_steering_angle = 0.5 * _steering_angle_range;
 
     ros::param::get("/car/gear_ratio", _gear_ratio);
 
@@ -98,7 +99,39 @@ public:
  */
   void driveCallback(const gigatron::Drive::ConstPtr& msg) 
   {
-    cmd_msg_.angle_command = (msg->angle + _abs_max_steering_angle) * (_steering_pwm_range / _steering_angle_range);
+    double tmp_angle = - msg->angle;
+
+    //$ error checking 
+    if (tmp_angle > _abs_max_steering_angle) 
+    {
+      //$ clip commanded angle to upper limit
+      tmp_angle  = _abs_max_steering_angle;
+    }
+    if (tmp_angle < - _abs_max_steering_angle) 
+    {
+      //$ clip commanded angle to lower limit
+      tmp_angle  = - _abs_max_steering_angle;
+    }
+
+    int tmp_angle_pwm_cmd = (tmp_angle + _abs_max_steering_angle) * (_steering_pwm_range / _steering_angle_range);
+
+    //$ double error checking for sanity
+    if (tmp_angle_pwm_cmd > _steering_pwm_range) 
+    {
+      //$ clip commanded angle PWM to upper limit
+      tmp_angle_pwm_cmd  = _steering_pwm_range;
+      ROS_ERROR("tmp_angle_pwm_cmd %d is out of possible PWM range - what are you doing?", tmp_angle_pwm_cmd);
+    }
+    if (tmp_angle_pwm_cmd < 0) 
+    {
+      //$ clip commanded angle PWM to lower limit
+      tmp_angle_pwm_cmd = 0;
+      ROS_ERROR("tmp_angle_pwm_cmd %d is out of possible PWM range - what are you doing?", tmp_angle_pwm_cmd);
+    }
+
+    cmd_msg_.angle_command = (uint8_t) tmp_angle_pwm_cmd;
+
+    //$ todo: clip RPM to limits
 
     if (estop_) {
       cmd_msg_.rpm_left = 0;
@@ -108,6 +141,7 @@ public:
       cmd_msg_.rpm_right = msg->vel_right / (_rpm_to_vel * _gear_ratio);
     }
     control_pub_.publish(cmd_msg_);
+    ROS_INFO("Published PWM %d (%d)", tmp_angle_pwm_cmd, cmd_msg_.angle_command);
   }
 
 /*$
@@ -164,7 +198,7 @@ public:
     }
 
     //$ convert PWM to actual steering angle
-    state_msg_.drive.angle = _steering_angle_range * (angle_pwm_ / _steering_pwm_range) - _abs_max_steering_angle;
+    state_msg_.drive.angle = _abs_max_steering_angle - _steering_angle_range * (angle_pwm_ / _steering_pwm_range);
 
     //$ convert motor RPM to wheel velocity
     //$ TODO: double check this is correct
@@ -196,6 +230,7 @@ private:
 
   double _steering_angle_range;     //$ [radians]
   double _abs_max_steering_angle;   //$ [radians]
+  int _max_motor_rpm;   
 
   double _gear_ratio;               //$ drive motors / wheels
   double _wheel_radius;             //$ [m]
