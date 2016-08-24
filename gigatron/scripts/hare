@@ -97,7 +97,7 @@ class Hare():
                     count = 0
                     print " [ >>] Set self.speed to %2.1f m/s" % (self.speed) 
                     if (status == 14):
-                        print msg
+                        print help_msg
                     status = (status + 1) % 15
                 elif key == ' ' or key == 'k' :
                     x = 0.0
@@ -105,15 +105,19 @@ class Hare():
                     control_speed = 0.0
                     control_turn = 0.0
                     print " [>>>] STOP!"
+                elif key == 'a' :
+                    th -= 0.1
+                elif key == 'd' :
+                    th += 0.1
                 elif key == 'h' :
                     print help_msg
-                else:
-                    count = count + 1
-                    if count > 4:
-                        x = 0.0
-                        th = 0.0
-                    if (key == '\x03'):
-                        break
+                # else:
+                #     count = count + 1
+                #     if count > 4:
+                #         x = 0.0
+                #         th = 0.0
+                #     if (key == '\x03'):
+                #         break
 
                 target_speed = self.speed * x
                 target_turn = self.turn * th
