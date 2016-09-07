@@ -27,6 +27,9 @@
 #include <std_msgs/UInt8.h>
 #include <std_msgs/Bool.h>
 
+//$ joint state for wheels
+#include <sensor_msgs/JointState.h>
+
 
 #define PI 3.141592653589793238463
 
@@ -87,6 +90,8 @@ public:
     //$ set up ROS publishers
     control_pub_ = n_.advertise<gigatron_hardware::MotorCommand>("arduino/command/motors", 5);
     state_pub_ = n_.advertise<gigatron::State>("state", 5);
+    joint_pub_ = n_.advertise<sensor_msgs::JointState>("joint_states", 1);
+
 
     mode_ = 0;
     estop_ = false;
@@ -209,6 +214,23 @@ public:
 
   }
 
+/*$
+  Publish the current wheel joint state. 
+ */
+  void publishJointState()
+  {
+    joint_msg_.header.stamp = ros::Time::now();
+    //update joint_msg_
+    joint_msg_.name.resize(2);
+    joint_msg_.position.resize(2);
+    joint_msg_.name[0] ="front_left_wheel_joint";
+    joint_msg_.position[0] = state_msg_.drive.angle;
+    joint_msg_.name[1] ="front_right_wheel_joint";
+    joint_msg_.position[1] = state_msg_.drive.angle;
+
+    joint_pub_.publish(joint_msg_);
+  }
+
 private:
   ros::NodeHandle n_; 
 
@@ -221,9 +243,11 @@ private:
 
   ros::Publisher control_pub_;
   ros::Publisher state_pub_;
+  ros::Publisher joint_pub_;
   
   gigatron_hardware::MotorCommand cmd_msg_; //$ command message
   gigatron::State state_msg_; //$ state message
+  sensor_msgs::JointState joint_msg_;
 
   /* parameters */
   int _steering_pwm_range;       //$ OK so this isn't actually PWM, but it's the input to the Arduino sketch
@@ -275,6 +299,7 @@ int main(int argc, char **argv) {
   {
     ros::spinOnce();
     controller.publishState();
+    controller.publishJointState();
     loop_rate.sleep();
   }
 
