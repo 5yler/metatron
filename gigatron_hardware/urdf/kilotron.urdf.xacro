@@ -13,18 +13,31 @@
     <xacro:property name="wheel_radius" value="0.0333" />
     <xacro:property name="wheel_width" value="0.0254" /> <!-- 1" -->
     
+    <!-- IMU placement relative to base_link -->
+    <xacro:property name="imu_x" value="0" /> 
+    <xacro:property name="imu_y" value="0" />
+    <xacro:property name="imu_z" value="0.00637" /> 
+
+    <!-- LIDAR placement relative to base_link -->
+    <xacro:property name="lidar_x" value="0.1016" /> 
+    <xacro:property name="lidar_y" value="0" />
+    <xacro:property name="lidar_z" value="0.05715" /> 
+    <xacro:property name="lidar_yaw" value="${M_PI}" />
+
+
+
     <!-- Physical Material Macros -->
     <material name="Grey">
-        <color rgba="0 0 0 0.5"/>
+        <color rgba="0 0 0 0.4"/>
     </material>
     <material name="Blue">
-        <color rgba="0 0 1.0 0.5"/>
+        <color rgba="0 0.3 0.9 0.3"/>
     </material>
     <material name="Black">
-        <color rgba="0 0 0 1.0"/>
+        <color rgba="0 0 0 0.9"/>
     </material>
-    <material name="Aqua">
-        <color rgba="0 255 255 1.0"/>
+    <material name="DarkGrey">
+        <color rgba="0.5 0 0.05 0.75"/>
     </material>
 
 
@@ -167,7 +180,7 @@
 
     <!-- LIDAR -->
     <joint name="laser_base_mount_joint" type="fixed">
-        <origin xyz="0.1016 0 0.05715" rpy="0 0 ${M_PI}" /> 
+        <origin xyz="${lidar_x} ${lidar_y} ${lidar_z}" rpy="0 0 ${lidar_yaw}" /> 
         <parent link="base_link"/>
         <child link="laser_link"/>
     </joint>
@@ -182,6 +195,7 @@
             <geometry>
                 <cylinder radius="0.04" length="0.03175"/>
             </geometry>
+            <material name="DarkGrey"/>
         </visual>
         <collision>
             <origin rpy="0 0 0" xyz="0 0 0.025"/>
@@ -190,4 +204,33 @@
             </geometry>
         </collision>
     </link>
+
+    <!-- IMU -->
+    <joint name="imu_mount_joint" type="fixed">
+        <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="0 0 0" />
+        <parent link="base_link"/>
+        <child link="imu_link"/>
+    </joint>
+    <link name="imu_link" type="fixed">
+        <inertial>
+            <mass value="0.01" />
+            <origin xyz="0 0 0" /> 
+            <inertia  ixx="0.2" ixy="0.0"  ixz="0.0"  iyy="0.2"  iyz="0.0"  izz="0.2" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="0.02 0.027 0.004" /> <!-- IMU dimensions -->
+            </geometry>
+            <material name="Blue"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="${car_length} ${wheelbase_width} ${car_height}" />
+            </geometry>
+        </collision>
+    </link>
+
+
 </robot>
