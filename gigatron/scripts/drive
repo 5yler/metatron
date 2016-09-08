@@ -26,7 +26,7 @@ from laser_geometry import LaserProjection # for getting and using PointCloud fr
 from sensor_msgs.msg import PointCloud2 
 import sensor_msgs.point_cloud2 as pc2
 
-follow_syler = False
+follow_syler = True
 
 
 fast_dist = 5   #Assumes with 5m of clearance ahead we can go as fast as possible
@@ -43,7 +43,7 @@ class Driver():
 
         # scan subscriber
         print "Init'ing Subscriber"
-        rospy.Subscriber('/scan', LaserScan, self.callback)
+        rospy.Subscriber('/scan_forward', LaserScan, self.callback)
 
         # get some parameters
         self._car_name = rospy.get_param("car/name")
@@ -79,41 +79,41 @@ class Driver():
         intensities = scan.intensities
         control = Drive()
      
-        if self.ahead_clear(scan): #if clear, go fast!
-            control.angle = 0.0
-            control.vel_left = self._v_max
-            control.vel_right = self._v_max
-        else: #drive normally
-            drive_angle = self.steer(ranges, intensities)
-            v = self.throttle(drive_angle)
-            v_left, v_right = self.split_throttle(drive_angle, v)
-            #drive_angle, v_left, v_right = proportional_throttle(steer_angle, ranges, intensities)
+        # if self.ahead_clear(scan): #if clear, go fast!
+        #     control.angle = 0.0
+        #     control.vel_left = self._v_max
+        #     control.vel_right = self._v_max
+        # else: #drive normally
+        drive_angle = self.steer(ranges, intensities)
+        v = self.throttle(drive_angle)
+        v_left, v_right = self.split_throttle(drive_angle, v)
+        #drive_angle, v_left, v_right = proportional_throttle(steer_angle, ranges, intensities)
 
-            if abs(drive_angle) > self._abs_max_steering_angle:
-                drive_angle = drive_angle * (self._abs_max_steering_angle / abs(drive_angle))
+        if abs(drive_angle) > self._abs_max_steering_angle:
+            drive_angle = drive_angle * (self._abs_max_steering_angle / abs(drive_angle))
 
-            # set velocity commands
-            control.angle = drive_angle  # driving angle 
-            control.vel_left = max(v_left, 0)  # left wheel velocity
-            control.vel_right = max(v_right, 0) # right wheel velocity
+        # set velocity commands
+        control.angle = drive_angle  # driving angle 
+        control.vel_left = max(v_left, 0)  # left wheel velocity
+        control.vel_right = max(v_right, 0) # right wheel velocity
 
         print " [ > ] angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s" % (control.angle, control.vel_left, control.vel_right)
         self._pub.publish(control)
 
     def initialize_laser_parameters(self, scan):
-        if self._car_name == "Gigatron":
-            # hardcoded RPLIDAR parameters that worked
-            self._angle_min = 3.14159274101
-            self._angle_max = -3.12413907051
-            self._angle_increment = -0.0174532923847
-            self._range_min = 0.15000000596
-            self._range_max = 6.0
-        else:
-            self._angle_min = scan.angle_min
-            self._angle_max = scan.angle_max
-            self._angle_increment = scan.angle_increment
-            self._range_min = scan.range_min
-            self._range_max = scan.range_max
+        # if self._car_name == "Gigatron":
+        #     # hardcoded RPLIDAR parameters that worked
+        #     self._angle_min = 3.14159274101
+        #     self._angle_max = -3.12413907051
+        #     self._angle_increment = -0.0174532923847
+        #     self._range_min = 0.15000000596
+        #     self._range_max = 6.0
+        # else:
+        self._angle_min = scan.angle_min
+        self._angle_max = scan.angle_max
+        self._angle_increment = scan.angle_increment
+        self._range_min = scan.range_min
+        self._range_max = scan.range_max
         self._got_laser_parameters = True
 
     # helper functions
@@ -135,7 +135,11 @@ class Driver():
         #somehow otherwise indicate that their spot has unknown value, but maybe since they 
         #all have an associated theta value this is unnecessary?
 
-        narrow = [p for p in zip(points[0], points[1], points[2]) if theta_min < p[1] < theta_max and self.point_ok(p)]
+        # return self.narrow_fov(points, theta_min + (self._angle_max - self._angle_min), theta_max + (self._angle_max - self._angle_min))
+
+        # narrow = [p for p in zip(points[0], points[1], points[2]) if theta_min < p[1] < theta_max and self.point_ok(p)]
+        #$ removed angle filtering because we're just using an angle filtered scan now
+        narrow = [p for p in zip(points[0], points[1], points[2]) if self.point_ok(p)]
         return [list(n) for n in zip(*narrow)]
 
     def generate_narrow_fov_points(self, ranges, intensities, theta_min=-math.pi/2, theta_max=math.pi/2):
@@ -206,7 +210,7 @@ class Driver():
         v_left, v_right = split_throttle(angle, v)
         return angle, v_left, v_right
 
-    def ahead_clear(self, scan):
+    def ahead_clear(self, scan_unfiltered):
         Projector = LaserProjection()
         cloud = Projector.projectLaser(scan) #gets PointCloud2
         pts = pc2.read_points(cloud,skip_nans=True,field_names=("x","y","z"))

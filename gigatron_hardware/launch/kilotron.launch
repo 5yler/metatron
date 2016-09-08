@@ -15,6 +15,13 @@
 	<arg name="mac" default="false" /> <!-- control from OS X -->
 	<arg name="lidar" default="xvlidar" doc="'rplidar' or 'xvlidar'?" /> 
 
+	<arg name="rviz" default="true" /> <!-- display robot in RViz -->
+
+	<!-- URDF model with robot state publisher -->
+	<include file="$(find gigatron_hardware)/launch/xacro.launch" >
+		<arg name="model" value="$(find gigatron_hardware)/urdf/kilotron.urdf.xacro" />
+	</include>
+
 	<!-- Arduino -->
 	<include file="$(find gigatron_hardware)/launch/arduino.launch" >
 		<arg name="mac" value="$(arg mac)" />
@@ -24,6 +31,7 @@
 	<!-- sensors -->
 
 	<!-- Adafruit 9DOF IMU -->
+	<!-- TODO: replace with URDF -->
 	<include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
 		<arg name="car" value="kilotron" />
 		<arg name="frame_id" default="imu_link"/>
@@ -39,10 +47,15 @@
 	<include file="$(find gigatron_hardware)/launch/sensors/$(arg lidar).launch" >
 		<arg name="frame_id" default="laser_link"/>
 	</include>
-	<!-- base_link to laser_link static_transform_publisher -->
-	<include file="$(find gigatron_hardware)/launch/sensor_transform.launch" >
-		<arg name="car" value="kilotron" />
-		<arg name="sensor" value="laser" />
+
+	<!-- laser filters -->
+	<include file="$(find gigatron_hardware)/launch/laser_filters.launch" >
+		<arg name="range_filter" value="false" /> <!-- turn this off for now -->
+	</include>
+
+	<!-- RViz -->
+	<include if="$(arg rviz)" file="$(find gigatron)/launch/rviz.launch" >
+		<arg name="rviz_config_file" default="$(find gigatron)/rviz/kilotron.rviz"/>
 	</include>
 
 </launch>

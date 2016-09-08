@@ -129,8 +129,8 @@
     </gazebo>
     
 	<!-- the back left wheel -->
-    <joint name="back_left_wheel_joint" type="continuous" >
-        <axis xyz="0 1 0" />
+    <joint name="back_left_wheel_joint" type="fixed" >
+        <!-- <axis xyz="0 1 0" /> -->
         <parent link="base_link" />
         <child link="back_left_wheel_link" />
         <origin xyz="-0.127 0.089 -0.0508" rpy="0 0 0" /> <!-- 5, 3.5, 2 -->
@@ -160,8 +160,8 @@
     </gazebo>
     
 	<!-- the back right wheel -->
-    <joint name="back_right_wheel_joint" type="continuous" >
-        <axis xyz="0 1 0" />
+    <joint name="back_right_wheel_joint" type="fixed" >
+        <!-- <axis xyz="0 1 0" /> -->
         <parent link="base_link" />
         <child link="back_right_wheel_link" />
         <origin xyz="-0.127 -0.089 -0.0508" rpy="0 0 0" />
@@ -229,7 +229,7 @@ z: 0.1143   # 4.5" up from wheel axis -->
 
 
         <joint name="laser_base_mount_joint" type="fixed">
-            <origin xyz="0.1016 0 0.05715" rpy="0 0 0" /> 
+            <origin xyz="0.1016 0 0.05715" rpy="0 0 ${M_PI}" /> 
             <parent link="base_link"/>
             <child link="laser_link"/>
         </joint>
