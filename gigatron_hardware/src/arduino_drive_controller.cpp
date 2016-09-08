@@ -29,6 +29,9 @@
 
 //$ joint state for wheels
 #include <sensor_msgs/JointState.h>
+#include <visualization_msgs/MarkerArray.h>
+#include <visualization_msgs/Marker.h>
+#include <tf/transform_datatypes.h>
 
 
 #define PI 3.141592653589793238463
@@ -49,6 +52,9 @@ public:
     _abs_max_steering_angle = 0.5 * _steering_angle_range;
 
     ros::param::get("/car/gear_ratio", _gear_ratio);
+    ros::param::get("/car/wheelbase_width", _wheelbase_width);
+    ros::param::get("/car/car_length", _car_length);
+    ros::param::get("/car/car_height", _car_height);
 
     //$ print output
     ROS_WARN("Steering PWM range: %d", _steering_pwm_range);
@@ -91,12 +97,63 @@ public:
     control_pub_ = n_.advertise<gigatron_hardware::MotorCommand>("arduino/command/motors", 5);
     state_pub_ = n_.advertise<gigatron::State>("state", 5);
     joint_pub_ = n_.advertise<sensor_msgs::JointState>("joint_states", 1);
-
+    vis_pub_ = n_.advertise<visualization_msgs::MarkerArray>( "visualization_marker_array", 0);
 
     mode_ = 0;
     estop_ = false;
     angle_pwm_ = _steering_pwm_range / 2;
     motor_rpm_right_ = motor_rpm_left_ = 0;
+
+    //$ initialize some constant fields for visualization markers
+    angle_marker_.header.frame_id = "base_link";
+    angle_marker_.id = 0;
+    angle_marker_.type = visualization_msgs::Marker::ARROW;
+    angle_marker_.action = 0; //$ 0 add/modify an object
+    angle_marker_.pose.position.x = _car_length / 2;
+    angle_marker_.pose.position.z = _car_height / 2;
+    angle_marker_.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
+    angle_marker_.scale.x = 0.5;
+    angle_marker_.scale.y = 0.05;
+    angle_marker_.scale.z = 0.05;
+    angle_marker_.color.a = 0.5; // Don't forget to set the alpha!
+    angle_marker_.color.r = 1.0;
+    angle_marker_.color.g = 0.0;
+    angle_marker_.color.b = 0.0;
+
+    //$ left wheel marker
+    l_wheel_marker_.header.frame_id = "base_link";
+    l_wheel_marker_.id = 1;
+    l_wheel_marker_.type = visualization_msgs::Marker::ARROW;
+    l_wheel_marker_.action = 0; //$ 0 add/modify an object
+    l_wheel_marker_.pose.position.x = - 2 * _car_length;
+    l_wheel_marker_.pose.position.y = - _wheelbase_width;
+    l_wheel_marker_.pose.position.z = _car_height / 2;
+    l_wheel_marker_.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
+    l_wheel_marker_.scale.x = 0;
+    l_wheel_marker_.scale.y = 0.05;
+    l_wheel_marker_.scale.z = 0.05;
+    l_wheel_marker_.color.a = 0.3; // Don't forget to set the alpha!
+    l_wheel_marker_.color.r = 1.0;
+    l_wheel_marker_.color.g = 1.0;
+    l_wheel_marker_.color.b = 1.0;
+
+    //$ right wheel marker
+    r_wheel_marker_.header.frame_id = "base_link";
+    r_wheel_marker_.id = 2;
+    r_wheel_marker_.type = visualization_msgs::Marker::ARROW;
+    r_wheel_marker_.action = 0; //$ 0 add/modify an object
+    r_wheel_marker_.pose.position.x = - 2 * _car_length;
+    r_wheel_marker_.pose.position.y = _wheelbase_width;
+    r_wheel_marker_.pose.position.z = _car_height / 2;
+    r_wheel_marker_.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
+    r_wheel_marker_.scale.x = 0;
+    r_wheel_marker_.scale.y = 0.05;
+    r_wheel_marker_.scale.z = 0.05;
+    r_wheel_marker_.color.a = 0.3; // Don't forget to set the alpha!
+    r_wheel_marker_.color.r = 1.0;
+    r_wheel_marker_.color.g = 1.0;
+    r_wheel_marker_.color.b = 1.0;
+
   }
 
 /*$
@@ -147,6 +204,33 @@ public:
     }
     control_pub_.publish(cmd_msg_);
     ROS_INFO("Published PWM %d (%d)", tmp_angle_pwm_cmd, cmd_msg_.angle_command);
+
+    publishDriveVectors(tmp_angle, msg->vel_left, msg->vel_right);
+
+  }
+
+/*$
+  Publish the current wheel joint state. 
+ */
+  void publishDriveVectors(double drive_angle, double v_left, double v_right)
+  {
+    ros::Time now = ros::Time::now();
+    angle_marker_.header.stamp = now;
+    l_wheel_marker_.header.stamp = now;
+    r_wheel_marker_.header.stamp = now;
+
+    angle_marker_.pose.orientation = tf::createQuaternionMsgFromYaw(drive_angle);
+    l_wheel_marker_.scale.x = v_left * 0.25;
+    r_wheel_marker_.scale.x = v_right * 0.25;
+
+    visualization_msgs::MarkerArray array;
+
+    array.markers.resize(3);
+    array.markers[0] = angle_marker_;
+    array.markers[1] = l_wheel_marker_;
+    array.markers[2] = r_wheel_marker_;
+
+    vis_pub_.publish(array);
   }
 
 /*$
@@ -214,6 +298,8 @@ public:
 
   }
 
+
+
 /*$
   Publish the current wheel joint state. 
  */
@@ -244,10 +330,14 @@ private:
   ros::Publisher control_pub_;
   ros::Publisher state_pub_;
   ros::Publisher joint_pub_;
+  ros::Publisher vis_pub_;
   
   gigatron_hardware::MotorCommand cmd_msg_; //$ command message
   gigatron::State state_msg_; //$ state message
   sensor_msgs::JointState joint_msg_;
+  visualization_msgs::Marker angle_marker_;
+  visualization_msgs::Marker l_wheel_marker_;
+  visualization_msgs::Marker r_wheel_marker_;
 
   /* parameters */
   int _steering_pwm_range;       //$ OK so this isn't actually PWM, but it's the input to the Arduino sketch
@@ -257,6 +347,9 @@ private:
   int _max_motor_rpm;   
 
   double _gear_ratio;               //$ drive motors / wheels
+  double _wheelbase_width;          //$ [m]
+  double _car_length;               //$ [m]
+  double _car_height;               //$ [m]
   double _wheel_radius;             //$ [m]
   double _rpm_to_vel;               //$ conversion factor between wheel rpm to velocity in m/s
 
