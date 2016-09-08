@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!-- gigatron.launch
-     Launch file for gigatron hardware
+     Launch file for Gigatron hardware
 
      @author  Syler Wagner  <syler@mit.edu>
      
@@ -10,35 +10,15 @@
 
 <launch>
 
-	<arg name="mac" default="false" /> <!-- control from OS X -->
+	<arg name="car" value="gigatron" />
 	<arg name="lidar" default="rplidar" doc="'rplidar' or 'xvlidar'?" /> 
+	<arg name="rviz" default="true" /> <!-- display robot in RViz -->
 
-	<!-- Arduino -->
-	<include file="$(find gigatron_hardware)/launch/arduino.launch" >
-		<arg name="mac" value="$(arg mac)" />
-		<arg name="car" value="gigatron" />
-	</include>
-
-	<!-- Adafruit 9DOF IMU -->
-	<include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
-		<arg name="car" value="gigatron" />
-		<arg name="frame_id" default="imu_link"/>
-		<arg name="update_rate" default="0" />
-	</include>
-	<!-- base_link to imu_link static_transform_publisher -->
-	<include file="$(find gigatron_hardware)/launch/sensor_transform.launch" >
-		<arg name="car" value="gigatron" />
-		<arg name="sensor" value="imu" />
-	</include>
-
-	<!-- RPLIDAR or Neato XV LIDAR  -->
-	<include file="$(find gigatron_hardware)/launch/sensors/$(arg lidar).launch" >
-		<arg name="frame_id" default="laser_link"/>
-	</include>
-	<!-- base_link to laser_link static_transform_publisher -->
-	<include file="$(find gigatron_hardware)/launch/sensor_transform.launch" >
-		<arg name="car" value="gigatron" />
-		<arg name="sensor" value="laser" />
+	<!-- car launch file -->
+	<include file="$(find gigatron_hardware)/launch/car.launch" >
+		<arg name="car" value="$(arg car)" />
+		<arg name="lidar" value="$(arg lidar)" />
+		<arg name="rviz" value="$(arg rviz)" />
 	</include>
 
 </launch>

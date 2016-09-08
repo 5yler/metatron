@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+
+<!-- car.launch
+     Launch file for Gigatron and Kilotron hardware
+
+     @author  Syler Wagner  <syler@mit.edu>
+     
+     @date    2016-08-17    syler   creation
+
+     Launch Gigatron:
+     	roslaunch gigatron_hardware car.launch gigatron:=true
+     Launch Kilotron:
+       	roslaunch gigatron_hardware car.launch gigatron:=false
+    -->
+
+<launch>
+
+
+	<arg name="car" doc="'kilotron' or 'gigatron'?" />
+
+	<arg name="lidar" doc="'rplidar' or 'xvlidar'?" /> 
+
+	<arg name="rviz" default="true" /> <!-- display robot in RViz -->
+
+	<!-- URDF model with robot state publisher -->
+	<include file="$(find gigatron_hardware)/launch/xacro.launch" >
+		<arg name="car" value="$(arg car)" />
+	</include>
+
+	<!-- Arduino -->
+	<include file="$(find gigatron_hardware)/launch/arduino.launch" >
+		<arg name="car" value="$(arg car)" />
+	</include>
+
+	<!-- sensors -->
+
+	<!-- Adafruit 9DOF IMU -->
+	<!-- TODO: replace with URDF -->
+	<include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
+		<arg name="car" value="$(arg car)" />
+		<arg name="frame_id" default="imu_link"/>
+		<arg name="update_rate" default="0" />
+	</include>
+
+
+	<!-- RPLIDAR or Neato XV LIDAR  -->
+	<include file="$(find gigatron_hardware)/launch/sensors/$(arg lidar).launch" >
+		<arg name="frame_id" default="laser_link" />
+	</include>
+
+	<!-- laser filters -->
+	<include file="$(find gigatron_hardware)/launch/laser_filters.launch" >
+		<arg name="range_filter" value="false" /> <!-- turn this off for now -->
+	</include>
+
+	<!-- RViz -->
+	<include if="$(arg rviz)" file="$(find gigatron)/launch/rviz.launch" >
+		<arg name="rviz_config_file" default="$(find gigatron)/rviz/car.rviz"/>
+	</include>
+
+</launch>

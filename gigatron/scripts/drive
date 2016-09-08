@@ -6,7 +6,7 @@
 # 
 # @author  Syler Wagner  <syler@mit.edu>
 #
-# @date    2015-09-21    syler   creation
+# @date 2015-09-21   syler   creation
 ##
 
 from __future__ import division
@@ -22,147 +22,208 @@ import math
 from sensor_msgs.msg import LaserScan   # for switching Jetson/RC mode
 from gigatron.msg import Drive   # for sending controls
 
-follow_syler = False
+from laser_geometry import LaserProjection # for getting and using PointCloud from LaserScan
+from sensor_msgs.msg import PointCloud2 
+import sensor_msgs.point_cloud2 as pc2
 
-v_forward = 5
-v_slowest = 2
-v_faster = 8
+follow_syler = True
+
+
 fast_dist = 5   #Assumes with 5m of clearance ahead we can go as fast as possible
-ABS_MAX_STEERING_ANGLE = 25.0 * (math.pi / 180.0)
-INCHES_TO_M = 0.0254
-wheelbase_width = 23.0 * INCHES_TO_M
-
-# RPLIDAR data constant in all LaserScan messages
-angle_min = 3.14159274101
-angle_max = -3.12413907051
-angle_increment = -0.0174532923847
-range_min = 0.15000000596
-range_max = 6.0
 
 inf = float('nan')
 
-# helper functions
-def point_ok(point):
-    r, theta, intensity = point[0], point[1], point[2]
-    if r < 0:
-        return False
-    elif intensity == 0.0: # this might not be necessary
-        return False
-    else:
-        return True
+class Driver():
 
-def point_ok2(point):
-    r, theta, intensity = point[0], point[1], point[2]
-    if r < 0:
-        return False
-    elif r < range_min or r > range_max: 
-        return False
-    else:
-        return True
+    def __init__(self):
+        
+        # control publisher
+        print "Init'ing Publisher"
+        self._pub = rospy.Publisher('/command/drive', Drive, queue_size=5)
 
-def narrow_fov(points, theta_min, theta_max):
-    # return points with theta in specified range
-    #narrow = [p for p in zip(points[0], points[1], points[2]) if theta_min < p[1] < theta_max]
+        # scan subscriber
+        print "Init'ing Subscriber"
+        rospy.Subscriber('/scan_forward', LaserScan, self.callback)
 
-    #TODO won't this mess up if it has enough invalid points by offsetting by their angles?
-    #I would expect to need to insert some placeholder point at min or max range, or 
-    #somehow otherwise indicate that their spot has unknown value, but maybe since they 
-    #all have an associated theta value this is unnecessary?
+        # get some parameters
+        self._car_name = rospy.get_param("car/name")
+        self._wheelbase_width = rospy.get_param("car/wheelbase_width")
+        self._wheel_radius = rospy.get_param("car/wheel_diameter") / 2.0
+        self._gear_ratio = rospy.get_param("car/gear_ratio")
+        self._steering_angle_range = rospy.get_param("car/steering_angle_range")
+        self._max_motor_rpm  = rospy.get_param("car/max_motor_rpm")
 
-    narrow = [p for p in zip(points[0], points[1], points[2]) if theta_min < p[1] < theta_max and point_ok(p)]
-    return [list(n) for n in zip(*narrow)]
+        print "Got parameters!"
 
-def generate_narrow_fov_points(ranges, intensities, theta_min=-math.pi/2, theta_max=math.pi/2):
-    theta = []
-    for i in xrange(360):
-        if (follow_syler):
-            theta.append(angle_min + i*angle_increment)
+        self._rpm_to_vel = (2 * math.pi * self._wheel_radius) / 60.0
+
+        self._abs_max_steering_angle = 0.5 * self._steering_angle_range
+        self._v_max = self._max_motor_rpm * self._rpm_to_vel * self._gear_ratio
+
+        self._v_faster = self._v_max
+        self._v_forward = 0.5 * self._v_max
+        self._v_slowest = 0.25 * self._v_max
+
+        self._got_laser_parameters = False
+
+        rospy.spin()
+
+    # laser scan callback method
+    def callback(self, scan):
+
+        if not self._got_laser_parameters:
+            self.initialize_laser_parameters(scan)
+
+    	print "started callback"
+        ranges = scan.ranges
+        intensities = scan.intensities
+        control = Drive()
+     
+        # if self.ahead_clear(scan): #if clear, go fast!
+        #     control.angle = 0.0
+        #     control.vel_left = self._v_max
+        #     control.vel_right = self._v_max
+        # else: #drive normally
+        drive_angle = self.steer(ranges, intensities)
+        v = self.throttle(drive_angle)
+        v_left, v_right = self.split_throttle(drive_angle, v)
+        #drive_angle, v_left, v_right = proportional_throttle(steer_angle, ranges, intensities)
+
+        if abs(drive_angle) > self._abs_max_steering_angle:
+            drive_angle = drive_angle * (self._abs_max_steering_angle / abs(drive_angle))
+
+        # set velocity commands
+        control.angle = drive_angle  # driving angle 
+        control.vel_left = max(v_left, 0)  # left wheel velocity
+        control.vel_right = max(v_right, 0) # right wheel velocity
+
+        print " [ > ] angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s" % (control.angle, control.vel_left, control.vel_right)
+        self._pub.publish(control)
+
+    def initialize_laser_parameters(self, scan):
+        # if self._car_name == "Gigatron":
+        #     # hardcoded RPLIDAR parameters that worked
+        #     self._angle_min = 3.14159274101
+        #     self._angle_max = -3.12413907051
+        #     self._angle_increment = -0.0174532923847
+        #     self._range_min = 0.15000000596
+        #     self._range_max = 6.0
+        # else:
+        self._angle_min = scan.angle_min
+        self._angle_max = scan.angle_max
+        self._angle_increment = scan.angle_increment
+        self._range_min = scan.range_min
+        self._range_max = scan.range_max
+        self._got_laser_parameters = True
+
+    # helper functions
+    def point_ok(self, point):
+        r, theta, intensity = point[0], point[1], point[2]
+        if r < 0:
+            return False
+        elif intensity == 0.0: # this might not be necessary
+            return False
         else:
-            theta.append(angle_max - i*angle_increment)
-    points = [ranges, theta, intensities]
-    return narrow_fov(points, theta_min, theta_max)
+            return True
 
-def polar_integrate(narrow):
-    integral = 0;
-    dirintegral = 0;
-    for p in zip(narrow[0], narrow[1], narrow[2]):
-        r = p[0]
-        theta = p[1]
-        if theta >= 0:
-            dirintegral -= (1/r) * math.cos(theta)
-        elif theta < 0:
-            dirintegral += (1/r) * math.cos(theta)
-        integral += (1/r) * math.cos(theta)
-        #print r, theta
-    #print integral, dirintegral, dirintegral/integral
-    return dirintegral/integral
+    def narrow_fov(self, points, theta_min, theta_max):
+        # return points with theta in specified range
+        #narrow = [p for p in zip(points[0], points[1], points[2]) if theta_min < p[1] < theta_max]
 
-def steer(ranges, intensities, theta_min=-math.pi/2, theta_max=math.pi/2):
-    narrow = generate_narrow_fov_points(ranges, intensities, theta_min, theta_max)
-    drive_angle = polar_integrate(narrow)
-    return drive_angle
+        #TODO won't this mess up if it has enough invalid points by offsetting by their angles?
+        #I would expect to need to insert some placeholder point at min or max range, or 
+        #somehow otherwise indicate that their spot has unknown value, but maybe since they 
+        #all have an associated theta value this is unnecessary?
 
-def throttle(steer_angle):
-    v = v_forward * (ABS_MAX_STEERING_ANGLE - abs(steer_angle)) / ABS_MAX_STEERING_ANGLE
-    v = max(v, v_slowest) # so it doesn't stop at the extremes of turning range
-    return v
+        # return self.narrow_fov(points, theta_min + (self._angle_max - self._angle_min), theta_max + (self._angle_max - self._angle_min))
 
-def split_throttle(steer_angle, v):
-    # v = control_speed
-    omega = (v * math.tan(steer_angle)) / wheelbase_width
-    v_left = v - (omega / wheelbase_width)   # left wheel velocity
-    v_right = v + (omega / wheelbase_width)   # right wheel velocity
-    return v_left, v_right
+        # narrow = [p for p in zip(points[0], points[1], points[2]) if theta_min < p[1] < theta_max and self.point_ok(p)]
+        #$ removed angle filtering because we're just using an angle filtered scan now
+        narrow = [p for p in zip(points[0], points[1], points[2]) if self.point_ok(p)]
+        return [list(n) for n in zip(*narrow)]
 
-def proportional_throttle(steer_angle, ranges, intensities):
-    v = throttle(steer_angle)
-    points_ahead = generate_narrow_fov_points(ranges, intensities, (steer_angle - math.pi/8), (steer_angle + math.pi/8))
-    ranges_ahead = []
-    for p in zip(points_ahead[0], points_ahead[1], points_ahead[2]):
-        ranges_ahead.append(p[0])
-    min_dist = min(ranges_ahead)
-    if (min_dist < 5):
-        angle = steer_angle
-    else:
-        angle = 0
-    v *= (v_faster / v_forward) * (min_dist / fast_dist)
-    v = max(v, v_slowest)
-    v_left, v_right = split_throttle(angle, v)
-    return angle, v_left, v_right
+    def generate_narrow_fov_points(self, ranges, intensities, theta_min=-math.pi/2, theta_max=math.pi/2):
+        theta = []
+        for i in xrange(360):
+            if (follow_syler):
+                theta.append(self._angle_min + i*self._angle_increment)
+            else:
+                theta.append(self._angle_max - i*self._angle_increment)
+        points = [ranges, theta, intensities]
+        return self.narrow_fov(points, theta_min, theta_max)
 
-# laser scan callback method
-def callback(scan):
-    ranges = scan.ranges
-    intensities = scan.intensities
-    drive_angle = steer(ranges, intensities)
-    v = throttle(drive_angle)
-    v_left, v_right = split_throttle(drive_angle, v)
-    #drive_angle, v_left, v_right = proportional_throttle(steer_angle, ranges, intensities)
+    def polar_integrate(self, narrow):
+        integral = 0;
+        dirintegral = 0;
+        for p in zip(narrow[0], narrow[1], narrow[2]):
+            r = p[0]
+            theta = p[1]
+            if theta >= 0:
+                dirintegral -= (1/r) * math.cos(theta)
+            elif theta < 0:
+                dirintegral += (1/r) * math.cos(theta)
+            integral += (1/r) * math.cos(theta)
+            #print r, theta
+        #print integral, dirintegral, dirintegral/integral
+        return dirintegral/integral
 
-    control = Drive()
+    def steer(self, ranges, intensities, theta_min=-math.pi/2, theta_max=math.pi/2):
+        narrow = self.generate_narrow_fov_points(ranges, intensities, theta_min, theta_max)
+        if len(narrow) != 0:
+           drive_angle = self.polar_integrate(narrow)
+        else:
+            drive_angle = 0 
+        return drive_angle
 
-    if abs(drive_angle) > ABS_MAX_STEERING_ANGLE:
-        drive_angle = drive_angle * (ABS_MAX_STEERING_ANGLE / abs(drive_angle))
+    def throttle(self, steer_angle):
+        v = self._v_forward * (self._abs_max_steering_angle - abs(steer_angle)) / self._abs_max_steering_angle
+        v = max(v, self._v_slowest) # so it doesn't stop at the extremes of turning range
+        return v
 
-    # set velocity commands
-    control.angle = drive_angle  # driveing angle 
-    control.vel_left = max(v_left, 0)  # left wheel velocity
-    control.vel_right = max(v_right, 0) # right wheel velocity
+    def split_throttle(self, steer_angle, v):
+        # v = control_speed
+        omega = (v * math.tan(steer_angle)) / self._wheelbase_width
 
-    print " [ > ] angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s" % (control.angle, control.vel_left, control.vel_right)
-    pub.publish(control)
+        # TODO: test on Gigatron and see if it's actually worth using
+        if self._car_name == "Kilotron":
+            k_split = 0.25
+        else:
+            k_split = 1
 
+        v_left = v - k_split * (omega / self._wheelbase_width)   # left wheel velocity
+        v_right = v + k_split * (omega / self._wheelbase_width)   # right wheel velocity
+        return v_left, v_right
+
+    def proportional_throttle(self, steer_angle, ranges, intensities):
+        v = throttle(steer_angle)
+        points_ahead = self.generate_narrow_fov_points(ranges, intensities, (steer_angle - math.pi/8), (steer_angle + math.pi/8))
+        ranges_ahead = []
+        for p in zip(points_ahead[0], points_ahead[1], points_ahead[2]):
+            ranges_ahead.append(p[0])
+        min_dist = min(ranges_ahead)
+        if (min_dist < 5):
+            angle = steer_angle
+        else:
+            angle = 0
+        v *= (self._v_faster / self._v_forward) * (min_dist / self._fast_dist)
+        v = max(v, self.v_slowest)
+        v_left, v_right = split_throttle(angle, v)
+        return angle, v_left, v_right
+
+    def ahead_clear(self, scan_unfiltered):
+        Projector = LaserProjection()
+        cloud = Projector.projectLaser(scan) #gets PointCloud2
+        pts = pc2.read_points(cloud,skip_nans=True,field_names=("x","y","z"))
+        for p in pts:
+            if abs(p[1]) <= self._wheelbase_width / 2 and p[0] > 0: #is the point in the way?
+                return False
+        return True
 
 if __name__=="__main__":
-    settings = termios.tcgetattr(sys.stdin)
     
     rospy.init_node('drive')
 
-    # control publisher
-    pub = rospy.Publisher('/command/drive', Drive, queue_size=5)
-
-    # scan subscriber
-    rospy.Subscriber('scan', LaserScan, callback)
-
-    rospy.spin()
-
+    try:
+        Driver()
+    except rospy.ROSInterruptException:
+        print "broken"

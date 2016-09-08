@@ -1,0 +1,236 @@
+<?xml version="1.0"?>
+<robot
+    xmlns:xacro="http://www.ros.org/wiki/xacro"
+    name="gigatron">
+
+    <!-- Physical Constant Macros -->
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+
+    <!-- Dimension Macros -->
+    <xacro:property name="car_length" value="0.7239" /> <!-- 28.5" front to back wheel axes -->
+    <xacro:property name="wheelbase_width" value="0.5842" /> <!-- 24" -->
+    <xacro:property name="car_height" value="0.2794" /> <!-- 11"? -->
+    <xacro:property name="wheel_radius" value="0.12446" /> <!-- 4.9" -->
+    <xacro:property name="wheel_width" value="0.06" /> <!-- ? -->
+
+    <!-- IMU placement relative to base_link -->
+    <xacro:property name="imu_x" value="0" /> 
+    <xacro:property name="imu_y" value="0" />
+    <xacro:property name="imu_z" value="0.22862" /> 
+
+    <!-- LIDAR placement relative to base_link -->
+    <xacro:property name="lidar_x" value="-0.0254" /> 
+    <xacro:property name="lidar_y" value="0.1524" />
+    <xacro:property name="lidar_z" value="0.27942" /> 
+    <xacro:property name="lidar_yaw" value="${M_PI}" />
+
+
+
+    <!-- Physical Material Macros -->
+    <material name="Grey">
+        <color rgba="0 0 0 0.4"/>
+    </material>
+    <material name="Blue">
+        <color rgba="0 0.3 0.9 0.3"/>
+    </material>
+    <material name="Black">
+        <color rgba="0 0 0 0.9"/>
+    </material>
+    <material name="DarkGrey">
+        <color rgba="0.5 0 0.05 0.75"/>
+    </material>
+
+
+    <!-- Main body -->
+    <link name="base_link">
+        <inertial>
+            <mass value="0.2" />
+            <origin xyz="0 0 0" /> 
+            <inertia  ixx="0.2" ixy="0.0"  ixz="0.0"  iyy="0.2"  iyz="0.0"  izz="0.2" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="${car_length} ${wheelbase_width} ${car_height}" />
+            </geometry>
+            <material name="Grey"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="${car_length} ${wheelbase_width} ${car_height}" />
+            </geometry>
+        </collision>
+    </link>
+    
+
+    <!-- the front left wheel -->
+    <joint name="front_left_wheel_joint" type="revolute" >
+        <limit lower="-0.76096" upper="0.76096" effort="100" velocity="10" />
+        <axis xyz="0 0 1" />
+        <parent link="base_link" />
+        <child link="front_left_wheel_link" />
+        <origin xyz="${car_length/2} -${wheelbase_width/2} -${wheel_radius}" rpy="0 0 0" /> <!-- ? -->
+    </joint>
+    <link name="front_left_wheel_link">
+        <inertial>
+            <mass value="0.01" />
+            <origin xyz="0 0 0" /> 
+            <inertia  ixx="0.01" ixy="0.0"  ixz="0.0"  iyy="0.01"  iyz="0.0"  izz="0.01" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_width}" />
+            </geometry>
+            <material name="Black"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_width}" />
+            </geometry>
+        </collision>
+    </link>
+    
+    <!-- the front right wheel -->
+    <joint name="front_right_wheel_joint" type="revolute" >
+        <limit lower="-0.76096" upper="0.76096" effort="100" velocity="10" />
+        <axis xyz="0 0 1" />
+        <parent link="base_link" />
+        <child link="front_right_wheel_link" />
+        <origin xyz="${car_length/2} ${wheelbase_width/2} -${wheel_radius}" rpy="0 0 0" /> <!-- ? -->
+    </joint>
+    <link name="front_right_wheel_link">
+        <inertial>
+            <mass value="0.01" />
+            <origin xyz="0 0 0" /> 
+            <inertia  ixx="0.01" ixy="0.0"  ixz="0.0"  iyy="0.01"  iyz="0.0"  izz="0.01" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_width}" />
+            </geometry>
+            <material name="Black"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_width}" />
+            </geometry>
+        </collision>
+    </link>
+    
+    <!-- the back left wheel -->
+    <joint name="back_left_wheel_joint" type="fixed" >
+        <!-- <axis xyz="0 1 0" /> -->
+        <parent link="base_link" />
+        <child link="back_left_wheel_link" />
+        <origin xyz="-${car_length/2} -${wheelbase_width/2} -${wheel_radius}" rpy="0 0 0" /> <!-- ? -->
+    </joint>
+    <link name="back_left_wheel_link">
+        <inertial>
+            <mass value="0.01" />
+            <origin xyz="0 0 0" /> 
+            <inertia  ixx="0.01" ixy="0.0"  ixz="0.0"  iyy="0.01"  iyz="0.0"  izz="0.01" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_width}" />
+            </geometry>
+            <material name="Black"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_width}" />
+            </geometry>
+        </collision>
+    </link>
+    
+    <!-- the back right wheel -->
+    <joint name="back_right_wheel_joint" type="fixed" >
+        <!-- <axis xyz="0 1 0" /> -->
+        <parent link="base_link" />
+        <child link="back_right_wheel_link" />
+        <origin xyz="-${car_length/2} ${wheelbase_width/2} -${wheel_radius}" rpy="0 0 0" /> <!-- ? -->
+    </joint>
+    <link name="back_right_wheel_link">
+        <inertial>
+            <mass value="0.01" />
+            <origin xyz="0 0 0" /> 
+            <inertia  ixx="0.01" ixy="0.0"  ixz="0.0"  iyy="0.01"  iyz="0.0"  izz="0.01" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_width}" />
+            </geometry>
+            <material name="Black"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+            <geometry>
+                <cylinder radius="${wheel_radius}" length="${wheel_width}" />
+            </geometry>
+        </collision>
+    </link>
+
+    <!-- LIDAR -->
+    <joint name="laser_base_mount_joint" type="fixed">
+        <origin xyz="${lidar_x} ${lidar_y} ${lidar_z}" rpy="0 0 ${lidar_yaw}" /> 
+        <parent link="base_link"/>
+        <child link="laser_link"/>
+    </joint>
+    <link name="laser_link" type="fixed">
+        <inertial>
+            <mass value="0.1"/>
+            <origin xyz="0 0 0.0"/>
+            <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
+        </inertial>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0.02"/>
+            <geometry>
+                <cylinder radius="0.04" length="0.03175"/>
+            </geometry>
+            <material name="DarkGrey"/>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0 0.025"/>
+            <geometry>
+                <box size="0.05 0.05 0.05"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <!-- IMU -->
+    <joint name="imu_mount_joint" type="fixed">
+        <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="0 0 0" />
+        <parent link="base_link"/>
+        <child link="imu_link"/>
+    </joint>
+    <link name="imu_link" type="fixed">
+        <inertial>
+            <mass value="0.01" />
+            <origin xyz="0 0 0" /> 
+            <inertia  ixx="0.2" ixy="0.0"  ixz="0.0"  iyy="0.2"  iyz="0.0"  izz="0.2" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="0.02 0.027 0.004" /> <!-- IMU dimensions -->
+            </geometry>
+            <material name="Blue"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="${car_length} ${wheelbase_width} ${car_height}" />
+            </geometry>
+        </collision>
+    </link>
+
+
+</robot>
