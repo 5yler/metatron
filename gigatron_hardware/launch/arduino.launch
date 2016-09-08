@@ -20,7 +20,7 @@
         <rosparam file="$(find gigatron_hardware)/config/$(arg car)_platform.yaml" ns="car" command="load" /> 
 
         <!-- Arduino port setting -->
-        <arg name="mac" default="false" /> <!-- control from OS X -->
+        <arg name="mac" value="$(optenv OS_X false)" /> <!-- auto detect operating system -->
         <arg unless="$(arg mac)" name="port" default="/dev/tty.arduino" />
         <arg if="$(arg mac)" name="port" default="/dev/tty.usbmodem1421" />
 
