@@ -1,13 +1,16 @@
 <?xml version="1.0"?>
 <launch>
 	<arg name="frame_id" default="laser_link" />  
-	<arg name="port" default="/dev/tty.xvlidar" /> <!-- TODO: http://wiki.ros.org/rplidar#Device_Settings set persistent serial port /dev/rplidar -->
+
 	<arg name="baud" default="115200" />
 	<arg name="firmware_version" default="2" /> <!-- kilotron's LIDAR appears to need firmware V2. -->
 	<!-- 
 		http://wiki.ros.org/xv_11_laser_driver
 		The firmware version that attempts to interpret the byte format of the laser. There are two known firmwares right now. One is noted for sending all 360 pings in a structure. This is probably the older firmware and is "1" for this value. The other sends the pings 4 at a time. This is probably the newer firmware and is "2" for this value. There isn't a reliable way to get the firmware version from the laser right now, so you'll have to set this and check a visualization of the pings in order to see if the driver is correctly interpreting the laser bytes. 
 	-->
+	<arg name="mac" value="$(optenv OS_X false)" /> <!-- auto detect operating system -->
+	<arg unless="$(arg mac)" name="port" default="/dev/tty.xvlidar" /> <!-- Ubuntu -->
+	<arg if="$(arg mac)" name="port" default="/dev/tty.usbmodem12341" /> <!-- OS X -->
 
 	<node pkg="xv_11_laser_driver" type="neato_laser_publisher" name="xv_laser_node" output="screen">
 		<param name="frame_id" value="$(arg frame_id)" /> <!-- /map is used for debug in RViz, to be replaced by the imu_link -->

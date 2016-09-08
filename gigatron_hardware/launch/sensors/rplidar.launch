@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <launch>
 	<arg name="frame_id" default="laser_link" />  
-	<arg name="port" default="/dev/tty.rplidar" /> 
 	<arg name="baud" default="115200" />
 	<arg name="inverted" default="" doc="indicates whether the LIDAR is mounted inverted" />
 	<arg name="angle_compensate" default="true" doc="whether the driver needs do angle compensation" /> <!-- I have no idea what this means -->
+
+	<arg name="mac" value="$(optenv OS_X false)" /> <!-- auto detect operating system -->
+	<arg unless="$(arg mac)" name="port" default="/dev/tty.rplidar" /> <!-- Ubuntu -->
+	<arg if="$(arg mac)" name="port" default="/dev/tty.SLAB_USBtoUART" /> <!-- OS X -->
 
 	<node pkg="rplidar_ros" type="rplidarNode" name="rplidar_node" output="screen">
 		<param name="frame_id" value="$(arg frame_id)" /> <!-- /map is used for debug in RViz, to be replaced by the imu_link -->
