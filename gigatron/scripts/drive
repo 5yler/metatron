@@ -31,14 +31,6 @@ follow_syler = False
 
 fast_dist = 5   #Assumes with 5m of clearance ahead we can go as fast as possible
 
-# RPLIDAR data constant in all LaserScan messages
-angle_min = 3.14159274101
-angle_max = -3.12413907051
-angle_increment = -0.0174532923847
-range_min = 0.15000000596
-range_max = 6.0
-
-
 inf = float('nan')
 
 class Driver():
@@ -72,10 +64,16 @@ class Driver():
         self._v_forward = 0.5 * self._v_max
         self._v_slowest = 0.25 * self._v_max
 
+        self._got_laser_parameters = False
+
         rospy.spin()
 
     # laser scan callback method
     def callback(self, scan):
+
+        if not self._got_laser_parameters:
+            self.initialize_laser_parameters(scan)
+
     	print "started callback"
         ranges = scan.ranges
         intensities = scan.intensities
@@ -102,6 +100,21 @@ class Driver():
         print " [ > ] angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s" % (control.angle, control.vel_left, control.vel_right)
         self._pub.publish(control)
 
+    def initialize_laser_parameters(self, scan):
+        if self._car_name == "Gigatron":
+            # hardcoded RPLIDAR parameters that worked
+            self._angle_min = 3.14159274101
+            self._angle_max = -3.12413907051
+            self._angle_increment = -0.0174532923847
+            self._range_min = 0.15000000596
+            self._range_max = 6.0
+        else:
+            self._angle_min = scan.angle_min
+            self._angle_max = scan.angle_max
+            self._angle_increment = scan.angle_increment
+            self._range_min = scan.range_min
+            self._range_max = scan.range_max
+        self._got_laser_parameters = True
 
     # helper functions
     def point_ok(self, point):
@@ -129,9 +142,9 @@ class Driver():
         theta = []
         for i in xrange(360):
             if (follow_syler):
-                theta.append(angle_min + i*angle_increment)
+                theta.append(self._angle_min + i*self._angle_increment)
             else:
-                theta.append(angle_max - i*angle_increment)
+                theta.append(self._angle_max - i*self._angle_increment)
         points = [ranges, theta, intensities]
         return self.narrow_fov(points, theta_min, theta_max)
 
