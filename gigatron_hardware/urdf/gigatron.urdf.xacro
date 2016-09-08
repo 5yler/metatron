@@ -11,12 +11,13 @@
     xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering"
     xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics"
     xmlns:xacro="http://www.ros.org/wiki/xacro"
-    name="kilotron">
+    name="gigatron">
 
     <!-- Physical Constant Macros -->
     <xacro:property name="M_PI" value="3.1415926535897931" />
 
     <!-- Dimension Macros -->
+    <!-- TODO: update with values for Gigatron -->
     <xacro:property name="car_length" value="0.254" /> <!-- 10" -->
     <xacro:property name="wheelbase_width" value="0.1778" />
     <xacro:property name="car_height" value="0.127" /> <!-- 5" -->
