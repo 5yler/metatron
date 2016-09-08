@@ -181,7 +181,7 @@ class Driver():
         omega = (v * math.tan(steer_angle)) / self._wheelbase_width
 
         # TODO: test on Gigatron and see if it's actually worth using
-        if self._car_name == "Kilotron"
+        if self._car_name == "Kilotron":
             k_split = 0.25
         else:
             k_split = 1
