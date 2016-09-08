@@ -16,6 +16,9 @@
                 https://github.com/orzechow/geometry/tree/indigo-devel/tf
     -->
 
+
+    <!-- DEPRECATED since we are using URDF to publish transforms to sensor links -->
+
     <launch>
 
     	<arg name="sensor" doc="the name of the sensor, assuming the corresponding frame_id is [SENSOR]_link" /> 

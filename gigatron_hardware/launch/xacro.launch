@@ -1,5 +1,6 @@
 <launch>
-	<arg name="model" />
+	<arg name="car" doc="gigatron or kilotron?" />
+	<arg name="model" value="$(find gigatron_hardware)/urdf/$(arg car).urdf.xacro" />
 	<arg name="rvizconfig" default="$(find urdf_tutorial)/urdf.rviz" />
 	<param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
 <!-- 	<param name="use_gui" value="false"/>
