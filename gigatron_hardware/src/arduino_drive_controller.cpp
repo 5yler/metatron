@@ -265,6 +265,16 @@ public:
   void modeCallback(const std_msgs::UInt8::ConstPtr& msg) 
   {
     mode_ = msg->data;
+
+    if (mode_ == 0) { //$ RC
+      //$ make angle marker blue
+      angle_marker_.color.r = 0.0;
+      angle_marker_.color.b = 1.0;
+    } else { //$ automatic or semiautomatic
+      //$ make angle marker red
+      angle_marker_.color.r = 1.0;
+      angle_marker_.color.b = 0.0;
+    }
   }
 
 /*$
