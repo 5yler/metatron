@@ -1,6 +1,24 @@
+# map file parameters
 image: avc.jpg
 resolution: 0.07575934579439252 # 75.06 m / 724 px
 origin: [-31.413232044198896, -14.61803867403315, 0.0] # 303 px x, 141 px y
 negate: 0
 occupied_thresh: 0.55
 free_thresh: 0.35
+
+# map origin GPS coordinates
+lat: 40.091123    # map origin latitude
+lon: -105.185087  # map origin longitude
+
+# parameters for static transform from map to local UTM origin
+# get x, y from lat, long: http://www.latlong.net/lat-long-utm.html
+frame_id: "map" 
+child_frame_id: "utm" # zone 13T
+x: -484222.05
+y: -4437887.47
+z: 0
+qx: 0
+qy: 0
+qz: 0
+qw: 1
+period: 100
