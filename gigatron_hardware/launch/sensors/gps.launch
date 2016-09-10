@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- gps.launch
+     Launch file for Adafruit Ultimate GPS breakout module
+
+     @author  Syler Wagner      <syler@mit.edu>
+     
+     @date    2016-09-09	syler  creation
+-->
+<launch>
+
+	<arg name="frame_id" default="gps_link" />
+	<arg name="rmc" doc="If True, fixes will be generated from RMC. If False, fixes will be generated based on the GGA sentences. Using GGA sentences allows for approximated covariance output while RMC provides velocity information." />
+
+	<arg name="mac" value="$(optenv OS_X false)" /> <!-- auto detect operating system -->
+	<arg unless="$(arg mac)" name="port" default="/dev/tty.gps" /> <!-- Ubuntu -->
+	<arg if="$(arg mac)" name="port" default="/dev/tty.usbserial-00001014" /> <!-- OS X -->
+
+	<node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="gps_driver">
+		<param name="port" value="$(arg port)" />
+		<param name="baud" value="9600" />
+		<param name="frame_id" value="$(arg frame_id)" />
+		<param name="time_ref_source" value="$(arg frame_id)" /> <!-- The value to use as the source in the sensor_msgs/TimeReference. -->
+		<param name="useRMC" value="$(arg rmc)" /> <!-- Whether to generate position fixes from GGA sentences or RMC sentences. -->
+	</node>
+
+
+</launch>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<!-- hector_mapping.launch
+<!-- gmapping.launch
      Mapping launch file using gmapping
 
      @author  Syler Wagner      <syler@mit.edu>
