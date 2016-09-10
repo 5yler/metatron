@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!-- save_map.launch
+     Launch file to save a map generated with SLAM
+
+     @author  Syler Wagner      <syler@mit.edu>
+     
+     @date    2016-09-09	syler  creation
+-->
+<launch>
+	<arg name="name" doc="filename for the map that is being saved" />
+
+	<!-- gmapping node -->
+	<node pkg="map_server" type="map_saver" name="map_saver" output="screen" args="-f $(find gigatron)/maps/$(arg name)" />
+</launch>
