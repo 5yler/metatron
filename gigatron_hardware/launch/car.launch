@@ -19,6 +19,7 @@
 	<arg name="car" doc="'kilotron' or 'gigatron'?" />
 
 	<arg name="lidar" doc="'rplidar' or 'xvlidar'?" /> 
+	<arg name="gps" doc="using GPS sensor or no?" default="false" />
 
 	<arg name="rviz" default="true" /> <!-- display robot in RViz -->
 
@@ -32,6 +33,7 @@
 		<arg name="car" value="$(arg car)" />
 	</include>
 
+
 	<!-- sensors -->
 
 	<!-- Adafruit 9DOF IMU -->
@@ -42,11 +44,22 @@
 		<arg name="update_rate" default="0" />
 	</include>
 
-
 	<!-- RPLIDAR or Neato XV LIDAR  -->
 	<include file="$(find gigatron_hardware)/launch/sensors/$(arg lidar).launch" >
 		<arg name="frame_id" default="laser_link" />
 	</include>
+
+	<!-- launch GPS sensor if applicable -->
+	<group if="$(arg gps)" >
+		<include file="$(find gigatron_hardware)/launch/sensors/gps.launch" >
+			<arg name="frame_id" default="gps_link" />
+			<arg name="rmc" default="true" doc="If 'true', fixes will be generated from RMC. If 'false', fixes will be generated based on the GGA sentences. Using GGA sentences allows for approximated covariance output while RMC provides velocity information." />
+			<arg name="odom" default="true" doc="set to 'true' to generate gps-based odometry" />
+		</include>
+	</group>
+
+	<!-- /sensors -->
+
 
 	<!-- laser filters -->
 	<include file="$(find gigatron_hardware)/launch/laser_filters.launch" >
