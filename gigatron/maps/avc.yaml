@@ -1,0 +1,6 @@
+image: avc.jpg
+resolution: 0.07575934579439252 # 75.06 m / 724 px
+origin: [-31.413232044198896, -14.61803867403315, 0.0] # 303 px x, 141 px y
+negate: 0
+occupied_thresh: 0.55
+free_thresh: 0.35
