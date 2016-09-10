@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<!-- mapping.launch
+<!-- hector_mapping.launch
      Gigatron mapping launch file for hector_slam using RPLIDAR and IMU from rosbag data
 
      @author  Chris Desnoyers   <cjdesno@mit.edu>
@@ -24,6 +24,8 @@
   <arg name="scan_subscriber_queue_size" default="5"/>
   <arg name="scan_topic" default="scan"/>
   <arg name="map_size" default="2048"/>
+  <arg name="laser_max_range" default="6"/>
+  <arg name="laser_min_range" default="0.2"/>
 
 <!-- IMU attitude to tf conversion -->
   <node pkg="hector_imu_attitude_to_tf" type="imu_attitude_to_tf_node" name="imu_attitude_to_tf_node" output="screen">
@@ -57,8 +59,8 @@
     <param name="update_factor_occupied" value="0.9" />    
     <param name="map_update_distance_thresh" value="0.4"/>
     <param name="map_update_angle_thresh" value="0.06" />
-    <param name="laser_min_dist" value="0.15" />
-    <param name="laser_max_dist" value="6.0" />
+    <param name="laser_min_dist" value="#(arg laser_min_range)" />
+    <param name="laser_max_dist" value="$(arg laser_max_range)" />
     
     <!-- Advertising config --> 
     <param name="advertise_map_service" value="true"/>
