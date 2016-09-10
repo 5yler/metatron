@@ -55,7 +55,7 @@
 
 	<!-- RViz -->
 	<include if="$(arg rviz)" file="$(find gigatron)/launch/rviz.launch" >
-		<arg name="rviz_config_file" default="$(find gigatron)/rviz/car.rviz"/>
+		<arg name="config" default="car"/>
 	</include>
 
 </launch>
