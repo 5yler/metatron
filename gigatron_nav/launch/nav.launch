@@ -11,6 +11,7 @@
     <arg name="car" doc="'kilotron' or 'gigatron'?" />
     <arg name="using_bag" default="false" />
     <arg name="map" default="canny_hallway" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
+    <arg name="planner" doc="'base' or 'teb' for base_local_planner or teb_local_planner" default="teb" />
 
     <!-- initial pose and covariance used to initialize filter with Gaussian distribution -->
     <arg name="x" default="0" doc="initial x mean estimate [m]" />
@@ -38,6 +39,7 @@
     <!-- move_base -->
     <include file="$(find gigatron_nav)/launch/move_base.launch">
         <arg name="car" value="$(arg car)" />
+        <arg name="planner" value="$(arg planner)" />
     </include>
 
 </launch>

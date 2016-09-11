@@ -9,6 +9,7 @@
 <launch>
 
     <arg name="car" doc="'kilotron' or 'gigatron'?" />
+    <arg name="planner" doc="'base' or 'teb' for base_local_planner or teb_local_planner" default="teb" />
 
     <!-- move_base -->
     <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
@@ -16,6 +17,6 @@
         <rosparam file="$(find gigatron_nav)/config/$(arg car)/costmap_common_params.yaml" command="load" ns="local_costmap" />
         <rosparam file="$(find gigatron_nav)/config/local_costmap.yaml" command="load" />
         <rosparam file="$(find gigatron_nav)/config/global_costmap.yaml" command="load" />
-        <rosparam file="$(find gigatron_nav)/config/$(arg car)/base_local_planner.yaml" command="load" />
+        <rosparam file="$(find gigatron_nav)/config/$(arg car)/$(arg planner)_local_planner.yaml" command="load" />
     </node>
 </launch>
