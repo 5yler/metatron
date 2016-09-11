@@ -23,7 +23,7 @@
 
 
     <!--- amcl localization and map server -->
-    <include file="$(find gigatron)/launch/localization/amcl.launch">
+    <include file="$(find gigatron_nav)/launch/localization/amcl.launch">
         <arg name="map_server" default="true" />
         <arg name="map" value="$(arg map)" /> 
         <arg name="using_bag" value="$(arg using_bag)" />
