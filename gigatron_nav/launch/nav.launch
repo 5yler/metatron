@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!-- move_base.launch
+     Launch file for move_base
+
+     @author  Syler Wagner      <syler@mit.edu>
+     
+     @date    2016-09-10  syler  creation
+-->
+<launch>
+
+    <arg name="car" doc="'kilotron' or 'gigatron'?" />
+
+    <!--- amcl localization and map server -->
+    <include file="$(find gigatron)/launch/localization/amcl.launch">
+        <arg name="map_server" default="true" />
+        <arg name="map" default="canny_hallway" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
+        <arg name="using_bag" default="true" />
+        <!-- initial pose and covariance used to initialize filter with Gaussian distribution -->
+        <arg name="x" default="0" doc="initial x mean estimate [m]" />
+        <arg name="y" default="0" doc="initial y mean estimate [m]" />
+        <arg name="yaw" default="0" doc="initial yaw mean estimate [radians]" />
+        <arg name="cov_xx" default="1" doc="initial pose covariance (x*x) estimate [m]" />
+        <arg name="cov_yy" default="1" doc="Initial pose covariance (y*y) estimate [m]" />
+        <arg name="cov_yaw" default="1" doc="Initial pose covariance (yaw*yaw) estimate [radians]" />
+    </include>
+
+    <!-- move_base -->
+    <include file="$(find gigatron_nav)/launch/move_base.launch">
+        <arg name="car" value="$(arg car)" />
+    </include>
+
+</launch>

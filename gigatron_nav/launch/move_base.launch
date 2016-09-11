@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!-- move_base.launch
+     Launch file for move_base
+
+     @author  Syler Wagner      <syler@mit.edu>
+     
+     @date    2016-09-10  syler  creation
+-->
+<launch>
+
+    <arg name="car" doc="'kilotron' or 'gigatron'?" />
+
+    <!-- move_base -->
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+        <rosparam file="$(find gigatron_nav)/config/$(arg car)/costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find gigatron_nav)/config/$(arg car)/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find gigatron_nav)/config/local_costmap.yaml" command="load" />
+        <rosparam file="$(find gigatron_nav)/config/global_costmap.yaml" command="load" />
+        <rosparam file="$(find gigatron_nav)/config/$(arg car)/base_local_planner.yaml" command="load" />
+    </node>
+</launch>

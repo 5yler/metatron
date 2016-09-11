@@ -5,17 +5,8 @@ project(gigatron_nav)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  costmap_2d
   gigatron_hardware
-  gps_common
-  laser_filters
-  move_base
-  nmea_navsat_driver
-  rosserial_python
-  rplidar_ros
-  rtimulib_ros
   tf
-  xv_11_laser_driver
 )
 
 ## System dependencies are found with CMake's conventions

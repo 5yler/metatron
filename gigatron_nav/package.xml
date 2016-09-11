@@ -42,15 +42,7 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>costmap_2d</build_depend>
   <build_depend>gigatron_hardware</build_depend>
-  <build_depend>gps_common</build_depend>
-  <build_depend>laser_filters</build_depend>
-  <build_depend>move_base</build_depend>
-  <build_depend>nmea_navsat_driver</build_depend>
-  <build_depend>rosserial_python</build_depend>
-  <build_depend>rplidar_ros</build_depend>
-  <build_depend>rtimulib_ros</build_depend>
   <build_depend>tf</build_depend>
-  <build_depend>xv_11_laser_driver</build_depend>
   <run_depend>costmap_2d</run_depend>
   <run_depend>gigatron_hardware</run_depend>
   <run_depend>gps_common</run_depend>
@@ -59,7 +51,7 @@
   <run_depend>nmea_navsat_driver</run_depend>
   <run_depend>rosserial_python</run_depend>
   <run_depend>rplidar_ros</run_depend>
-  <run_depend>rtimulib_ros</run_depend>
+  <!-- <run_depend>rtimulib_ros</run_depend> -->
   <run_depend>tf</run_depend>
   <run_depend>xv_11_laser_driver</run_depend>
 
