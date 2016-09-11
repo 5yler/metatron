@@ -1,4 +1,4 @@
-image: /home/syler/catkin_ws/src/metatron/gigatron_nav/maps/street_xv.pgm
+image: street_xv.pgm
 resolution: 0.050000
 origin: [-50.000000, -50.000000, 0.000000]
 negate: 0
