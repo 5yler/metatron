@@ -31,6 +31,7 @@
 	<node pkg="gps_common" type="utm_odometry_node" name="gps_to_utm_odometry_node">
 		<param name="frame_id" value="utm" />
 		<param name="child_frame_id" value="$(arg frame_id)" /> <!-- I think this is OK? -->
+		<param name="rot_covariance" value="99999" />
 		<remap from="odom" to="utm_odom" />
 	</node>
 
