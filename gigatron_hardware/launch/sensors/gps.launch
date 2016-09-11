@@ -25,6 +25,7 @@
 		<param name="frame_id" value="$(arg frame_id)" />
 		<param name="time_ref_source" value="$(arg frame_id)" /> <!-- The value to use as the source in the sensor_msgs/TimeReference. -->
 		<param name="useRMC" value="$(arg rmc)" /> <!-- Whether to generate position fixes from GGA sentences or RMC sentences. -->
+		<remap from="fix" to="gps/fix" />
 	</node>
 
 	<!-- utm_odometry_node transforms GPS coordinates into the UTM frame -->
@@ -32,6 +33,7 @@
 		<param name="frame_id" value="utm" />
 		<param name="child_frame_id" value="$(arg frame_id)" /> <!-- I think this is OK? -->
 		<remap from="odom" to="utm_odom" />
+		<remap from="fix" to="gps/fix" />
 	</node>
 
 </launch>
