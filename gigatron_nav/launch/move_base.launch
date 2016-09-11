@@ -9,14 +9,21 @@
 <launch>
 
     <arg name="car" doc="'kilotron' or 'gigatron'?" />
-    <arg name="planner" doc="'base' or 'teb' for base_local_planner or teb_local_planner" default="teb" />
+    <arg name="teb_planner" doc="true if using teb_local_planner instead of base_local_planner" default="true" />
+
+    <!-- specify which planner to use -->
+    <arg if="$(arg teb_planner)" name="planner" default="teb" />
+    <arg unless="$(arg teb_planner)" name="planner" value="base" />
 
     <!-- move_base -->
-    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <node pkg="move_base" type="move_base" respawn="false" name="$(arg car)" output="screen">
         <rosparam file="$(find gigatron_nav)/config/$(arg car)/costmap_common_params.yaml" command="load" ns="global_costmap" />
         <rosparam file="$(find gigatron_nav)/config/$(arg car)/costmap_common_params.yaml" command="load" ns="local_costmap" />
         <rosparam file="$(find gigatron_nav)/config/local_costmap.yaml" command="load" />
         <rosparam file="$(find gigatron_nav)/config/global_costmap.yaml" command="load" />
         <rosparam file="$(find gigatron_nav)/config/$(arg car)/$(arg planner)_local_planner.yaml" command="load" />
+        <!-- additional parameter if using teb -->
+        <param if="$(arg teb_planner)" name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+        <param name="controller_frequency" value="10.0" />
     </node>
 </launch>
