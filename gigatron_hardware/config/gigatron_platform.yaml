@@ -4,5 +4,7 @@ steering_angle_range: 0.8726646   # [radians] 50 degrees
 gear_ratio: 0.18333               # 11.0 : 60.0 drive motors : wheels
 car_length: 0.7239
 wheel_radius: 0.12446             # [m] 4.9 inches
+wheel_width: 0.075                # [m]
 wheelbase_width: 0.5842           # [m] 23 inches
+wheelbase_length: 0.73            # [m] 
 max_motor_rpm: 5310               # spec sheet says 5,310 (+/- 10%) unloaded but empirically doesn't go above 2000

@@ -37,7 +37,6 @@
 	<!-- sensors -->
 
 	<!-- Adafruit 9DOF IMU -->
-	<!-- TODO: replace with URDF -->
 	<include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
 		<arg name="car" value="$(arg car)" />
 		<arg name="frame_id" default="imu_link"/>
