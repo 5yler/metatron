@@ -19,7 +19,7 @@
 	<arg name="car" doc="'kilotron' or 'gigatron'?" />
 
 	<arg name="lidar" doc="'rplidar' or 'xvlidar'?" /> 
-	<arg name="gps" doc="using GPS sensor or no?" default="false" />
+	<arg name="gps" doc="using GPS sensor or no?" />
 
 	<arg name="rviz" default="true" /> <!-- display robot in RViz -->
 
@@ -41,7 +41,7 @@
 	<include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
 		<arg name="car" value="$(arg car)" />
 		<arg name="frame_id" default="imu_link"/>
-		<arg name="update_rate" default="0" />
+		<arg name="update_rate" default="20" />
 	</include>
 
 	<!-- RPLIDAR or Neato XV LIDAR  -->

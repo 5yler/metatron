@@ -10,6 +10,7 @@
 <launch>
 
   <arg name="map_server" doc="launch map_server or no?" />
+  <arg name="map" default="canny_hallway" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
 
   <arg name="using_bag" doc="true if running gmapping on rosbagged data" />
   <param name="use_sim_time" value="$(arg using_bag)" />
@@ -27,7 +28,6 @@
 
   <!-- if map_server arg is set, launch the map server -->
   <group if="$(arg map_server)">
-    <arg name="map" default="canny_hallway" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
     <!-- run map server with our map -->
     <include file="$(find gigatron)/launch/map_server.launch" >
       <arg name="map" value="$(arg map)" />

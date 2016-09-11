@@ -13,12 +13,14 @@
 	<arg name="car" value="gigatron" />
 	<arg name="lidar" default="rplidar" doc="'rplidar' or 'xvlidar'?" /> 
 	<arg name="rviz" default="true" /> <!-- display robot in RViz -->
+	<arg name="gps" doc="using GPS sensor or no?" default="false" />
 
 	<!-- car launch file -->
 	<include file="$(find gigatron_hardware)/launch/car.launch" >
 		<arg name="car" value="$(arg car)" />
 		<arg name="lidar" value="$(arg lidar)" />
 		<arg name="rviz" value="$(arg rviz)" />
+		<arg name="gps" value="$(arg gps)" />
 	</include>
 
 </launch>
