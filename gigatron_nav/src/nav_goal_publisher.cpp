@@ -54,21 +54,24 @@ bool LoadPlan(std::string file_name)
         ROS_ERROR(".yaml waypoint %d has no y value",i);
         return false;
       }
+      double yaw;
       if(plan["goals"][i]["yaw"])
       {
-        double yaw = plan["goals"][i]["yaw"].as<double>();
-        waypoint.pose.orientation = tf::createQuaternionMsgFromYaw(yaw);
+        yaw = plan["goals"][i]["yaw"].as<double>();
       }
       else
       {
         ROS_WARN(".yaml waypoint %d has no yaw value, using 0 yaw",i);
-        waypoint.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
+        yaw = 0;
       }
 
+      waypoint.pose.orientation = tf::createQuaternionMsgFromYaw(yaw);
       waypoint.header.frame_id = plan_frame_id; 
       waypoint.header.stamp = ros::Time::now();
 
       goals.push_back(waypoint);
+      ROS_INFO("Added waypoint %d with x: %4.1f, y: %4.1f, yaw: %4.1f", i, waypoint.pose.position.x, waypoint.pose.position.y, yaw);
+
     }
     ROS_WARN("Done loading %lu waypoints.", plan["goals"].size());
   }
@@ -105,20 +108,20 @@ int main(int argc, char** argv){
     return false;
   }  
 
-  //tell the action client that we want to spin a thread by default
-  MoveBaseClient ac("move_base", true);
-
-  //wait for the action server to come up
-  while(!ac.waitForServer(ros::Duration(5.0)))
-  {
-    ROS_INFO("Waiting for the move_base action server");
-  }
-
   while (n.ok()) 
   {
+    //tell the action client that we want to spin a thread by default
+    MoveBaseClient ac("move_base", true);
+
+    //wait for the action server to come up
+    while(!ac.waitForServer(ros::Duration(5.0)))
+    {
+      ROS_INFO("Waiting for the move_base action server");
+    }
 
     for(unsigned int i = 0; i < goals.size(); i++)
     {
+      
       move_base_msgs::MoveBaseGoal goal;
       //Define goal
 
@@ -141,6 +144,7 @@ int main(int argc, char** argv){
           } 
           else 
           {
+            ROS_WARN("Plan executed successfully, all goals reached. Exiting...")
             ros::shutdown(); //idk if this is good practice
           }
         }

@@ -1,7 +1,7 @@
 loop: false
 goals: 
-- {x: 0.0, y: 0.0, yaw: 0.0}
-- {x: 0.0, y: 0.0, yaw: 0.0}
-- {x: 0.0, y: 0.0, yaw: 0.0}
+- {x: 1.0, y: 0.0, yaw: 0.0}
+- {x: 2.0, y: 0.0, yaw: 0.0}
+- {x: 3.0, y: 0.0, yaw: 0.0}
 
 #[x,y,theta] of goal
