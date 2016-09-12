@@ -113,6 +113,9 @@ int main(int argc, char** argv) {
     odom.pose.pose.position.z = 0.0;
     odom.pose.pose.orientation = odom_quat;
 
+    //TODO: For the robot_localization ekf nodes
+    //odom.pose.covariance[35] = ???;
+
     odom.child_frame_id = "base_link";
     odom.twist.twist.linear.x = center_velocity;
     odom.twist.twist.linear.y = 0.0;
