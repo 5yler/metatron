@@ -15,6 +15,16 @@
   <arg name="using_bag" doc="true if running gmapping on rosbagged data" />
   <param name="use_sim_time" value="$(arg using_bag)" />
 
+  <arg name="using_ekf" doc="use ekf output 'odometry/filtered' instead of raw 'odom'" />
+  <arg name="odom_frame_id" if="$(arg using_ekf)" value="odometry/filtered" />
+  <arg name="odom_frame_id" unless="$(arg using_ekf)" value="odom" />
+  <!-- current setup plan: 
+	one robot_localization node fuses the encoders with the IMU in the odom frame, 
+	then an amcl node uses this first node's output, the LIDAR, and the map 
+	to generate a PoseEstimateWithCovarianceStamped in the map frame, then 
+	a second robot_localization node fuses the amcl pose estimate 
+	with the encoders, the IMU, and possibly the GPS. -->
+
   <arg name="laser_min_range" default="0.2"/>
   <arg name="laser_max_usable_range" default="4.9" />
 
@@ -74,8 +84,8 @@
     <param name="kld_z" value="0.99" />
 
     <!-- odometry model parameters -->
-    <!-- current setup plan: one robot_localization node fuses the encoders with the IMU in the odom frame, then an amcl node uses this first node's output, the LIDAR, and the map to generate a PoseEstimateWithCovarianceStamped in the map frame, then a second robot_localization node fuses the amcl pose estimate with the encoders, the IMU, and possibly the GPS. -->
-    <param name="odom_frame_id" value="odometry/filtered" />
+
+    <param name="odom_frame_id" value="$(arg odom_frame_id)" />
     <param name="odom_model_type" value="diff" /> 
     <!-- Which model to use, either "diff", "omni", "diff-corrected" or "omni-corrected". If ~odom_model_type is "diff" then we use the sample_motion_model_odometry algorithm from Probabilistic Robotics, p136; this model uses the noise parameters odom_alpha_1 through odom_alpha4, as defined in the book. -->
     <param name="odom_alpha1" value="0.2" /> 
