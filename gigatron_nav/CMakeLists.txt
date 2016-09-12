@@ -146,7 +146,8 @@ add_dependencies(nav_goal_publisher
 #   ${catkin_LIBRARIES}
 # )
 target_link_libraries(nav_goal_publisher
-  ${catkin_LIBRARIES}
+	yaml-cpp
+ 	${catkin_LIBRARIES}
 )
 
 #############
