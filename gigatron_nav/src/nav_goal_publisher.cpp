@@ -2,14 +2,18 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
 #include <geometry_msgs/PoseStamped.h>
-
+#include <vector>
 //Adapted From http://wiki.ros.org/navigation/Tutorials/SendingSimpleGoals
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 
-geometry_msgs::PoseStamped goals [3]; //this won't work. Need to type correctly
-ros::param::get("goals",goals);
+std::vector<std::vector<double>> goals; //This will maybe work.
+//geometry_msgs::PoseStamped goals [3]; //this won't work. Need to type correctly
+ros::param::get("/route/goals",goals);
 int goal_counter = 0;
+
+bool loop;
+ros::param::get("route/loop",loop);
 
 int main(int argc, char** argv){
   ros::init(argc, argv, "nav_goals");
@@ -38,7 +42,7 @@ int main(int argc, char** argv){
   goal.target_pose.pose.orientation.w = 0.0;
   */
 
-  ROS_INFO("Sending goal");
+  ROS_INFO("Sending goal.");
   ac.sendGoal(goal);
 
   ac.waitForResult();
@@ -50,7 +54,7 @@ int main(int argc, char** argv){
       if (loop == true) {
         goal_counter = 0;
       } else {
-        ros::shutdown();
+        ros::shutdown(); //idk if this is good practice
       }
     }
   } else {

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- goal_test.launch
+     Test Launch File for nav_goal_publisher to stack
+
+     @author  Sarah Pohorecky     <spohorec@mit.edu>
+     
+     @date    2016-09-12  spohorec  creation
+-->
+
+<launch>
+	<arg name="route" default="template_route"/>
+	<node pkg="gigatron_nav" type="nav_goal_publisher" name="nav_goals" output="screen">
+		<rosparam file="$(find gigatron_nav)/maps/routes/$(arg route).yaml" command="load" ns="route"/>
+	</node>
+</launch>
