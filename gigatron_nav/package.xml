@@ -43,6 +43,12 @@
   <build_depend>costmap_2d</build_depend>
   <build_depend>gigatron_hardware</build_depend>
   <build_depend>tf</build_depend>
+  <build_depend>move_base</build_depend>
+  <build_depend>actionlib</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>roscpp</build_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>actionlib</run_depend>
   <run_depend>costmap_2d</run_depend>
   <run_depend>gigatron_hardware</run_depend>
   <run_depend>gps_common</run_depend>
@@ -54,6 +60,7 @@
   <!-- <run_depend>rtimulib_ros</run_depend> -->
   <run_depend>tf</run_depend>
   <run_depend>xv_11_laser_driver</run_depend>
+  <run_depend>geometry_msgs</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
