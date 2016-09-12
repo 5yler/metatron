@@ -161,7 +161,7 @@ public:
  */
   void driveCallback(const gigatron::Drive::ConstPtr& msg) 
   {
-    double tmp_angle = - msg->angle;
+    double tmp_angle = msg->angle;
 
     //$ error checking 
     if (tmp_angle > _abs_max_steering_angle) 
@@ -203,7 +203,7 @@ public:
       cmd_msg_.rpm_right = msg->vel_right / (_rpm_to_vel * _gear_ratio);
     }
     control_pub_.publish(cmd_msg_);
-    ROS_INFO("Published PWM %d (%d)", tmp_angle_pwm_cmd, cmd_msg_.angle_command);
+    // ROS_INFO("Published PWM %d (%d)", tmp_angle_pwm_cmd, cmd_msg_.angle_command);
 
     publishDriveVectors(tmp_angle, msg->vel_left, msg->vel_right);
 
@@ -297,7 +297,7 @@ public:
     }
 
     //$ convert PWM to actual steering angle
-    state_msg_.drive.angle = _abs_max_steering_angle - _steering_angle_range * (angle_pwm_ / _steering_pwm_range);
+    state_msg_.drive.angle =  (angle_pwm_ / _steering_pwm_range) * _steering_angle_range - _abs_max_steering_angle;
 
     //$ convert motor RPM to wheel velocity
     //$ TODO: double check this is correct
