@@ -32,8 +32,9 @@ bool LoadPlan(std::string file_name)
 
   if (plan["goals"])
   {
+    int plan_length = static_cast<int>(plan["goals"].size());
 
-    for(unsigned int i = 0; i < plan["goals"].size(); i++)
+    for(unsigned int i = 0; i < plan_length; i++)
     {
       geometry_msgs::PoseStamped waypoint;
       if(plan["goals"][i]["x"])
@@ -73,7 +74,8 @@ bool LoadPlan(std::string file_name)
       ROS_INFO("Added waypoint %d with x: %4.1f, y: %4.1f, yaw: %4.1f", i, waypoint.pose.position.x, waypoint.pose.position.y, yaw);
 
     }
-    ROS_WARN("Done loading %lu waypoints.", plan["goals"].size());
+
+    ROS_WARN("Done loading %d waypoints.", plan_length);
   }
   else
   {
@@ -144,7 +146,7 @@ int main(int argc, char** argv){
           } 
           else 
           {
-            ROS_WARN("Plan executed successfully, all goals reached. Exiting...")
+            ROS_WARN("Plan executed successfully, all goals reached. Exiting...");
             ros::shutdown(); //idk if this is good practice
           }
         }
