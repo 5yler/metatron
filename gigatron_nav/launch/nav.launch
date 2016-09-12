@@ -11,7 +11,10 @@
     <arg name="car" doc="'kilotron' or 'gigatron'?" />
     <arg name="using_bag" default="false" />
     <arg name="map" default="canny_hallway" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
-    <arg name="teb_planner" doc="true if using teb_local_planner instead of base_local_planner" default="true" />
+    <arg name="teb_planner" default="true" doc="true if using teb_local_planner instead of base_local_planner" />
+
+    <arg name="using_ekf" default="false" doc="use ekf output 'odometry/filtered' instead of raw 'odom'" />
+
 
     <!-- initial pose and covariance used to initialize filter with Gaussian distribution -->
     <arg name="x" default="0" doc="initial x mean estimate [m]" />
@@ -27,6 +30,7 @@
         <arg name="map_server" default="true" />
         <arg name="map" value="$(arg map)" /> 
         <arg name="using_bag" value="$(arg using_bag)" />
+        <arg name="using_ekf" value="$(arg using_ekf)" />
         <!-- initial pose and covariance -->
         <arg name="x" value="$(arg x)" />
         <arg name="y" value="$(arg x)" />
