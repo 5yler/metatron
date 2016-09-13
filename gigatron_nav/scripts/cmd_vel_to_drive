@@ -41,8 +41,8 @@ def cmd_callback(data):
 
   msg = Drive()
   msg.angle = steering
-  msg.v_left = v_left
-  msg.v_right = v_right
+  msg.vel_left = v_left
+  msg.vel_right = v_right
 
   pub.publish(msg)
 
