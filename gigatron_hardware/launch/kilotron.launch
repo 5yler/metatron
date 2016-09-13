@@ -26,5 +26,9 @@
 	<include file="$(find gigatron_hardware)/launch/sensors/$(arg lidar).launch" >
 		<arg name="frame_id" default="laser_link" />
 	</include>
+	<include file="$(find gigatron_hardware)/launch/laser_angle_filter.launch" >
+    	<arg name="input_topic" value="scan" />
+    	<arg name="output_topic" value="scan_front" />
+	</include>
 
 </launch>
