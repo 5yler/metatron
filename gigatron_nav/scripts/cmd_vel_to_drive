@@ -19,7 +19,7 @@ def convert_trans_rot_vel_to_steering_angle(v, omega, wheelbase_length):
     return 0
 
   radius = v / omega
-  return math.atan(wheelbase / radius)
+  return math.atan(wheelbase_length / radius)
 
 
 def split_throttle(v, omega, wheelbase_width):
