@@ -10,7 +10,7 @@
 
 <launch>
 
-≈<arg name="car" value="kilotron" />
+<arg name="car" value="kilotron" />
 	<arg name="lidar" default="xvlidar" doc="'rplidar' or 'xvlidar'?" /> 
 	<arg name="rviz" default="true" /> <!-- display robot in RViz -->
 	<arg name="gps" default="true" doc="using GPS sensor or no?" />
