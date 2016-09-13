@@ -21,7 +21,7 @@
 	<arg name="lidar" doc="'rplidar' or 'xvlidar'?" /> 
 	<arg name="gps" doc="using GPS sensor or no?" />
 
-	<arg name="rviz" default="true" /> <!-- display robot in RViz -->
+	<arg name="rviz" default="false" /> <!-- display robot in RViz -->
 
 	<!-- URDF model with robot state publisher -->
 	<include file="$(find gigatron_hardware)/launch/xacro.launch" >

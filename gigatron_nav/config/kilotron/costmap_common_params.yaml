@@ -10,7 +10,7 @@ footprint:
 
 inflation_radius: 0.35 # [m] max distance from obstacles at which a cost should be incurred
 
-observation_sources: laser_scan_sensor point_cloud_sensor
+observation_sources: laser_scan_sensor #point_cloud_sensor
 
 laser_scan_sensor: 
   sensor_frame: laser_link

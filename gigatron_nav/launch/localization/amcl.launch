@@ -65,7 +65,7 @@
     <param name="use_map_topic" value="true" />
     <param name="min_particles" value="500" />
     <param name="max_particles" value="5000" />
-    <param name="transform_tolerance" value="0.2" /> 
+    <param name="transform_tolerance" value="1.0" /> 
     <!-- Time with which to post-date the transform that is published, to indicate that this transform is valid into the future. -->
     <param name="gui_publish_rate" value="10.0" /> 
     <!-- Maximum rate (Hz) at which scans and paths are published for visualization, -1.0 to disable. -->
