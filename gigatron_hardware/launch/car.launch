@@ -18,10 +18,9 @@
 
 	<arg name="car" doc="'kilotron' or 'gigatron'?" />
 
-	<arg name="lidar" doc="'rplidar' or 'xvlidar'?" /> 
 	<arg name="gps" doc="using GPS sensor or no?" />
 
-	<arg name="rviz" default="true" /> <!-- display robot in RViz -->
+	<arg name="rviz" default="false" /> <!-- display robot in RViz -->
 
 	<!-- URDF model with robot state publisher -->
 	<include file="$(find gigatron_hardware)/launch/xacro.launch" >
@@ -37,16 +36,10 @@
 	<!-- sensors -->
 
 	<!-- Adafruit 9DOF IMU -->
-	<!-- TODO: replace with URDF -->
 	<include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
 		<arg name="car" value="$(arg car)" />
 		<arg name="frame_id" default="imu_link"/>
 		<arg name="update_rate" default="20" />
-	</include>
-
-	<!-- RPLIDAR or Neato XV LIDAR  -->
-	<include file="$(find gigatron_hardware)/launch/sensors/$(arg lidar).launch" >
-		<arg name="frame_id" default="laser_link" />
 	</include>
 
 	<!-- launch GPS sensor if applicable -->
@@ -58,12 +51,6 @@
 	</group>
 
 	<!-- /sensors -->
-
-
-	<!-- laser filters -->
-	<include file="$(find gigatron_hardware)/launch/laser_filters.launch" >
-		<arg name="range_filter" value="false" /> <!-- turn this off for now -->
-	</include>
 
 	<!-- RViz -->
 	<include if="$(arg rviz)" file="$(find gigatron)/launch/rviz.launch" >
