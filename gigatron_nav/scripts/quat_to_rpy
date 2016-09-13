@@ -13,7 +13,7 @@ from sensor_msgs.msg import Imu
 import tf
 from tf.transformations import euler_from_quaternion
 
-def imu_callback(data):
+def imu_callback(msg):
 # find current orientation of robot based on odometry (quaternion coordinates)
     xOr = msg.orientation.x
     yOr = msg.orientation.y
