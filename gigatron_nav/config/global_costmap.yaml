@@ -1,0 +1,6 @@
+global_costmap:
+  global_frame: /map
+  robot_base_frame: base_link
+  update_frequency: 2.0 # [Hz] frequency of costmap update loop
+  static_map: true # whether or not the costmap should initialize itself based on a map served by the map_server
+  transform_tolerance: 2.0 # [s] the delay in transform (tf) data that is tolerable in seconds

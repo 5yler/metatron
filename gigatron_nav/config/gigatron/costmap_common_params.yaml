@@ -1,0 +1,27 @@
+obstacle_range: 4.9 # [m] max range sensor reading that adds obstacle to costmap
+
+raytrace_range: 5.0 # [m] the range to which we will raytrace freespace given a sensor reading
+
+footprint: # this is including the body
+  - [ 0.65,  0.35]
+  - [ 0.65, -0.35]
+  - [-0.55,  0.35]
+  - [-0.55, -0.35]
+
+inflation_radius: 0.55 # [m] max distance from obstacles at which a cost should be incurred
+
+observation_sources: laser_scan_sensor point_cloud_sensor
+
+laser_scan_sensor: 
+  sensor_frame: laser_link
+  data_type: LaserScan
+  topic: scan
+  marking: true   # sensor can add obstacle information to costmap
+  clearing: true  # sensor can clear obstacle information from costmap
+
+# point_cloud_sensor: 
+#   sensor_frame: frame_name
+#   data_type: PointCloud
+#   topic: topic_name
+#   marking: true
+#   clearing: true

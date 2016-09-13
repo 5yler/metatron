@@ -7,4 +7,5 @@ car_height: 0.127             # [m]
 wheel_diameter: 0.0666        # [m]
 wheel_width: 0.0254           # [m]
 wheelbase_width: 0.1778       # [m]
+wheelbase_length: 0.25        # [m] 
 max_motor_rpm: 200.0

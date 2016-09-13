@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!-- nav.launch
+     Launch file for car navigation
+
+     @author  Syler Wagner      <syler@mit.edu>
+     
+     @date    2016-09-10  syler  creation
+-->
+<launch>
+
+    <arg name="car" doc="'kilotron' or 'gigatron'?" />
+    <arg name="using_bag" default="false" />
+    <arg name="map" default="loop_gmap" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
+    <arg name="teb_planner" default="true" doc="true if using teb_local_planner instead of base_local_planner" />
+
+    <arg name="using_ekf" default="false" doc="use ekf output 'odometry/filtered' instead of raw 'odom' for amcl" />
+
+    <arg name="rviz" default="true" /> <!-- display robot in RViz -->
+
+
+    <!-- initial pose and covariance used to initialize filter with Gaussian distribution -->
+    <arg name="x" default="0" doc="initial x mean estimate [m]" />
+    <arg name="y" default="0" doc="initial y mean estimate [m]" />
+    <arg name="yaw" default="0" doc="initial yaw mean estimate [radians]" />
+    <arg name="cov_xx" default="1" doc="initial pose covariance (x*x) estimate [m]" />
+    <arg name="cov_yy" default="1" doc="Initial pose covariance (y*y) estimate [m]" />
+    <arg name="cov_yaw" default="1" doc="Initial pose covariance (yaw*yaw) estimate [radians]" />
+
+
+    <!--- amcl localization and map server -->
+    <include file="$(find gigatron_nav)/launch/localization/amcl.launch">
+        <arg name="map_server" default="true" />
+        <arg name="map" value="$(arg map)" /> 
+        <arg name="using_bag" value="$(arg using_bag)" />
+        <arg name="using_ekf" value="$(arg using_ekf)" />
+        <!-- initial pose and covariance -->
+        <arg name="x" value="$(arg x)" />
+        <arg name="y" value="$(arg x)" />
+        <arg name="yaw" value="$(arg x)" />
+        <arg name="cov_xx" value="$(arg cov_xx)" />
+        <arg name="cov_yy" value="$(arg cov_yy)" />
+        <arg name="cov_yaw" value="$(arg cov_yaw)" />
+    </include>
+
+    <!-- move_base -->
+    <include file="$(find gigatron_nav)/launch/move_base.launch">
+        <arg name="car" value="$(arg car)" />
+        <arg name="teb_planner" value="$(arg teb_planner)" />
+    </include>
+
+    <!-- RViz -->
+    <include if="$(arg rviz)" file="$(find gigatron)/launch/rviz.launch" >
+        <arg name="config" if="$(arg teb_planner)" value="car_nav_teb" />
+        <arg name="config" unless="$(arg teb_planner)" value="car_map" />
+    </include>
+
+
+</launch>

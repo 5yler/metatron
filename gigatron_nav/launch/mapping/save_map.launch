@@ -10,5 +10,5 @@
 	<arg name="name" doc="filename for the map that is being saved" />
 
 	<!-- gmapping node -->
-	<node pkg="map_server" type="map_saver" name="map_saver" output="screen" args="-f $(find gigatron)/maps/$(arg name)" />
+	<node pkg="map_server" type="map_saver" name="map_saver" output="screen" args="-f $(find gigatron_nav)/maps/$(arg name)" />
 </launch>

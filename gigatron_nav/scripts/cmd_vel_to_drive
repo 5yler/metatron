@@ -1,0 +1,68 @@
+#! /usr/bin/env python
+
+# cmd_vel_to_drive
+# script for converting geometry_msgs/Twist to gigatron/Drive messages
+# 
+# @author  Syler Wagner  <syler@mit.edu>
+# @date    2016-09-11    syler   creation
+
+# Based on cmd_vel_to_ackermann_drive.py from teb_local_planner_tutorials 
+# by christoph.roesmann@tu-dortmund.de
+# see https://github.com/rst-tu-dortmund/teb_local_planner_tutorials/
+
+import rospy, math
+from geometry_msgs.msg import Twist
+from gigatron.msg import Drive
+
+def convert_trans_rot_vel_to_steering_angle(v, omega, wheelbase_length):
+  if omega == 0 or v == 0:
+    return 0
+
+  radius = v / omega
+  return math.atan(wheelbase_length / radius)
+
+
+def split_throttle(v, omega, wheelbase_width):
+  v_left = v - (omega / wheelbase_width)   # left wheel velocity
+  v_right = v + (omega / wheelbase_width)   # right wheel velocity
+  return v_left, v_right
+
+def cmd_callback(data):
+  global wheelbase_length
+  global wheelbase_width
+  global drive_topic
+  global frame_id
+  global pub
+  
+  v = data.linear.x
+  omega = data.angular.z
+  steering = convert_trans_rot_vel_to_steering_angle(v, omega, wheelbase_length)
+  v_left, v_right = split_throttle(v, omega, wheelbase_width)
+
+  msg = Drive()
+  msg.angle = steering
+  msg.vel_left = v_left
+  msg.vel_right = v_right
+
+  pub.publish(msg)
+
+if __name__ == '__main__': 
+  try:
+    
+    rospy.init_node('cmd_vel_to_drive')
+        
+    twist_cmd_topic = rospy.get_param('twist_cmd_topic', '/cmd_vel') 
+    drive_topic = rospy.get_param('~drive_topic', '/command/drive')
+    wheelbase_length = rospy.get_param('car/wheelbase_length', 1.0)
+    wheelbase_width = rospy.get_param('car/wheelbase_length', 1.0)
+    frame_id = rospy.get_param('~frame_id', 'odom')
+    
+    rospy.Subscriber(twist_cmd_topic, Twist, cmd_callback, queue_size=1)
+    pub = rospy.Publisher(drive_topic, Drive, queue_size=1)
+    
+    rospy.loginfo("Node 'cmd_vel_to_drive' started.\nListening to %s, publishing to %s. Frame id: %s, wheelbase length: %f", "/cmd_vel", drive_topic, frame_id, wheelbase_length)
+    
+    rospy.spin()
+    
+  except rospy.ROSInterruptException:
+    pass

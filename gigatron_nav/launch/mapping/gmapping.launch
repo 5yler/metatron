@@ -19,11 +19,17 @@
 	<arg name="using_bag" doc="true if running gmapping on rosbagged data" />
 	<param name="use_sim_time" value="$(arg using_bag)" />
 
+	<arg name="rplidar" doc="true if using rplidar, false if xvlidar" /> 
+
 	<arg name="base_frame" default="base_link" />
 	<arg name="map_frame" default="map" />
 	<arg name="odom_frame" default="odom" />
-	<arg name="laser_max_usable_range" default="4.9" />
-	<arg name="laser_max_range" default="6" />
+
+	<!-- set LIDAR range parameters depending on sensor used -->
+	<arg name="laser_max_usable_range" if="$(arg rplidar)" default="5.5" />
+	<arg name="laser_max_usable_range" unless="$(arg rplidar)" default="4.5" />
+	<arg name="laser_max_range" if="$(arg rplidar)" default="6" />
+	<arg name="laser_max_range" unless="$(arg rplidar)" default="5" />
 
 	<!-- gmapping node -->
 	<node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
