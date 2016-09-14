@@ -48,7 +48,10 @@ class Driver():
         # get some parameters
         self._car_name = rospy.get_param("car/name")
         self._wheelbase_width = rospy.get_param("car/wheelbase_width")
-        self._wheel_radius = rospy.get_param("car/wheel_diameter") / 2.0
+        if rospy.has_param("car/wheel_diameter"):
+            self._wheel_radius = rospy.get_param("car/wheel_diameter") / 2.0
+        else:
+            self._wheel_radius = rospy.get_param("car/wheel_radius")
         self._gear_ratio = rospy.get_param("car/gear_ratio")
         self._steering_angle_range = rospy.get_param("car/steering_angle_range")
         self._max_motor_rpm  = rospy.get_param("car/max_motor_rpm")
