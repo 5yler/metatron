@@ -19,7 +19,7 @@ def convert_trans_rot_vel_to_steering_angle(v, omega, wheelbase_length):
     return 0
 
   radius = v / omega
-  return math.atan(wheelbase / radius)
+  return math.atan(wheelbase_length / radius)
 
 
 def split_throttle(v, omega, wheelbase_width):
@@ -41,15 +41,15 @@ def cmd_callback(data):
 
   msg = Drive()
   msg.angle = steering
-  msg.v_left = v_left
-  msg.v_right = v_right
+  msg.vel_left = v_left
+  msg.vel_right = v_right
 
   pub.publish(msg)
 
 if __name__ == '__main__': 
   try:
     
-    rospy.init_node('cmd_vel_to_ackermann_drive')
+    rospy.init_node('cmd_vel_to_drive')
         
     twist_cmd_topic = rospy.get_param('twist_cmd_topic', '/cmd_vel') 
     drive_topic = rospy.get_param('~drive_topic', '/command/drive')

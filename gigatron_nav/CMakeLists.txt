@@ -5,7 +5,11 @@ project(gigatron_nav)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  roscpp
   gigatron_hardware
+  move_base
+  actionlib
+  geometry_msgs
   tf
 )
 
@@ -101,7 +105,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES gigatron_nav
-#  CATKIN_DEPENDS costmap_2d gigatron_hardware gps_common laser_filters move_base nmea_navsat_driver rosserial_python rplidar_ros rtimulib_ros tf xv_11_laser_driver
+ CATKIN_DEPENDS move_base tf roscpp geometry_msgs actionlib
 #  DEPENDS system_lib
 )
 
@@ -128,15 +132,23 @@ include_directories(
 
 ## Declare a C++ executable
 # add_executable(gigatron_nav_node src/gigatron_nav_node.cpp)
+add_executable(nav_goal_publisher src/nav_goal_publisher.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(gigatron_nav_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(nav_goal_publisher 
+	${catkin_EXPORTED_TARGETS}
+)
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(gigatron_nav_node
 #   ${catkin_LIBRARIES}
 # )
+target_link_libraries(nav_goal_publisher
+	yaml-cpp
+ 	${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
@@ -158,6 +170,12 @@ include_directories(
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
+install(TARGETS 
+  nav_goal_publisher
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/

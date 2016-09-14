@@ -9,7 +9,7 @@
 <launch>
 
 	<arg name="frame_id" default="base_link" />
-	<arg name="rmc" doc="If 'true', fixes will be generated from RMC. If 'false', fixes will be generated based on the GGA sentences. Using GGA sentences allows for approximated covariance output while RMC provides velocity information." />
+	<arg name="rmc" default="false" doc="If 'true', fixes will be generated from RMC. If 'false', fixes will be generated based on the GGA sentences. Using GGA sentences allows for approximated covariance output while RMC provides velocity information." />
 	<arg name="odom" doc="set to 'true' to generate gps-based odometry" />
 
 
@@ -26,6 +26,7 @@
 		<param name="time_ref_source" value="$(arg frame_id)" /> <!-- The value to use as the source in the sensor_msgs/TimeReference. -->
 		<param name="useRMC" value="$(arg rmc)" /> <!-- Whether to generate position fixes from GGA sentences or RMC sentences. -->
 		<remap from="fix" to="gps/fix" />
+		<remap from="vel" to="gps/vel" />
 	</node>
 
 	<!-- utm_odometry_node transforms GPS coordinates into the UTM frame -->
@@ -33,7 +34,7 @@
 		<param name="frame_id" value="utm" />
 		<param name="child_frame_id" value="$(arg frame_id)" /> <!-- I think this is OK? -->
 		<param name="rot_covariance" value="99999" />
-		<remap from="odom" to="utm_odom" />
+		<remap from="odom" to="odometry/utm" />
 		<remap from="fix" to="gps/fix" />
 	</node>
 

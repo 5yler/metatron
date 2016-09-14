@@ -35,7 +35,7 @@
 	<arg name="calibration_file_path" default="$(find gigatron_hardware)/config/$(arg car)/" />
 	<arg name="calibration_file_name" default="imu_calibration" />
 
-	<node pkg="rtimulib_ros" type="rtimulib_ros" name="rtimulib_node" output="screen">
+	<node pkg="rtimulib_ros" type="rtimulib_ros" name="imu_node" output="screen">
 		<param name="frame_id" value="$(arg frame_id)"/> 
 		<param name="update_rate" value="$(arg update_rate)"/>
 		<param name="calibration_file_path" value="$(arg calibration_file_path)"/>

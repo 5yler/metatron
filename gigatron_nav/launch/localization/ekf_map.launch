@@ -7,7 +7,7 @@
          the state of the robot, with the state vector being defined as X position, Y position, Z position,
          roll, pitch, yaw, their respective velocites, and linear acceleration. Units for all measurements are assumed
          to conform to the SI standard as specified in REP-103. -->
-    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization_odom" clear_params="true">
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_map" clear_params="true">
 
       <!-- ======== STANDARD PARAMETERS ======== -->
 
@@ -66,11 +66,10 @@
            TwistStamped, Imu). To add a new one, simply append the next number in the sequence to its base name,
            e.g., odom0, odom1, twist0, twist1, imu0, imu1, imu2, etc. The value should be the topic name. These
            parameters obviously have no default values, and must be specified. -->
-      <param name="odom0" value="odom"/>
-      <!--<param name="odom1" value="example/another_odom"/>-->
+      <param name="odom0" value="odom/ekf"/>
+      <!-- <param name="odom1" value="odometry/gps"/> -->
       <param name="pose0" value="amcl_pose"/>
-      <!-- pose1, gps? -->
-      <!--<param name="twist0" value="example/twist"/>-->
+      <param name="twist0" value="gps/vel"/>
       <param name="imu0" value="imu/data"/>
 
       <!-- Each sensor reading updates some or all of the filter's state. These options give you greater control over
@@ -80,35 +79,42 @@
            message types lack certain variables. For example, a TwistWithCovarianceStamped message has no pose information, so
            the first six values would be meaningless in that case. Each vector defaults to all false if unspecified, effectively
            making this parameter required for each sensor. -->
-      <rosparam param="odom0_config">[true,  true, false,
-                                      true,  true, true,
-                                      true,  false, false,
-                                      false, false, false,
-                                      false, false, false]</rosparam>
+      <!-- wheel odometry -->
+      <rosparam param="odom0_config">[true,  true, false,   <!-- x, y, z -->
+                                      false, false, true,   <!-- roll, pitch, yaw -->
+                                      true,  false, false,  <!-- vx, vy, vz -->
+                                      false, false, true,   <!-- vroll, vpitch, vyaw -->
+                                      false, false, false]  <!-- ax, ay, az -->
+                                    </rosparam>
+                                    <!-- TODO: should vy be false or true? -->
 
 <!--      <rosparam param="odom1_config">[false, false, false,
                                       false, false, false,
                                       true,  false, false,
                                       false, false, false,
                                       false, false, false]</rosparam> -->
+      <!-- amcl_pose -->                               
+      <rosparam param="pose0_config">[true,  true,  false,  <!-- x, y, z -->
+                                      false, false, true,   <!-- roll, pitch, yaw -->
+                                      false, false, false,  <!-- vx, vy, vz -->
+                                      false, false, false,  <!-- vroll, vpitch, vyaw -->
+                                      false, false, false]  <!-- ax, ay, az -->
+                                    </rosparam>
+      <!-- GPS velocity data -->
+      <rosparam param="twist0_config">[false, false, false,  <!-- x, y, z -->
+                                       false, false, false,  <!-- roll, pitch, yaw -->
+                                       true,  true,  false,  <!-- vx, vy, vz -->
+                                       false, false, false,  <!-- vroll, vpitch, vyaw -->
+                                       false, false, false]  <!-- ax, ay, az -->
+                                    </rosparam>
 
-      <rosparam param="pose0_config">[true,  true,  false,
-                                      false, false, false,
-                                      false, false, false,
-                                      false, false, false,
-                                      false, false, false]</rosparam>
-
-<!--      <rosparam param="twist0_config">[false, false, false,
-                                       false, false, false,
-                                       true,  true,  true,
-                                       true,  true,  true,
-                                       false, false, false]</rosparam> -->
-
-      <rosparam param="imu0_config">[false, false, false,
-                                     true,  true,  true,
-                                     false, false, false,
-                                     true,  true,  true,
-                                     true,  true,  true]</rosparam>
+      <!-- IMU -->
+      <rosparam param="imu0_config">[false, false, false, <!-- x, y, z -->
+                                     true,  true,  true,  <!-- roll, pitch, yaw -->
+                                     false, false, false, <!-- vx, vy, vz -->
+                                     true,  true,  true,  <!-- vroll, vpitch, vyaw -->
+                                     true,  true,  true]  <!-- ax, ay, az -->
+                                   </rosparam>
 
       <!-- The best practice for including new sensors in robot_localization's state estimation nodes is to pass in velocity
            measurements and let the nodes integrate them. However, this isn't always feasible, and so the state estimation
@@ -129,15 +135,17 @@
       <param name="odom0_differential" value="true"/> <!-- TODO: set to true? -->
       <!--<param name="odom1_differential" value="false"/>-->
       <param name="pose0_differential" value="false"/>-->
-      <param name="imu0_differential" value="false"/>
+      <param name="imu0_differential" value="false"/> <!-- if you have only one source of
+           absolute orientation data, you should not set the differential parameter to true. -->
 
       <!-- When the node starts, if this parameter is true, then the first measurement is treated as a "zero point" for all
            future measurements. While you can achieve the same effect with the differential paremeter, the key difference is
            that the relative parameter doesn't cause the measurement to be converted to a velocity before integrating it. If
            you simply want your measurements to start at 0 for a given sensor, set this to true. -->
-      <param name="odom0_relative" value="false"/>
+      <param name="odom0_relative" value="true"/>
       <!--<param name="odom1_relative" value="true"/>-->
-      <param name="pose0_relative" value="false"/>
+      <param name="pose0_relative" value="false"/> <!-- TODO: not sure? -->
+      <param name="twist0_relative" value="false"/>      
       <param name="imu0_relative" value="false"/> <!-- TODO: how is this different from 'differential'? -->
 
       <!-- If we're including accelerations in our state estimate, then we'll probably want to remove any acceleration that
@@ -156,22 +164,22 @@
 
       <!-- By default, the subscription queue size for each message type is 1. If you wish to increase that so as not
            miss any messages (even if your frequency is set to a relatively small value), increase these. -->
-      <param name="odom0_queue_size" value="10"/>
+      <param name="odom0_queue_size" value="1"/>
       <!--<param name="odom1_queue_size" value="1"/>-->
-      <param name="pose0_queue_size" value="10"/>
-      <!--<param name="twist0_queue_size" value="3"/>-->
+      <param name="pose0_queue_size" value="1"/>
+      <param name="twist0_queue_size" value="1"/>
       <param name="imu0_queue_size" value="10"/>
 
       <!-- If your data is subject to outliers, use these threshold settings, expressed as Mahalanobis distances, to control
            how far away from the current vehicle state a sensor measurement is permitted to be. Each defaults to
            numeric_limits<double>::max() if unspecified. -->
-      <param name="odom0_pose_rejection_threshold" value="5"/>
-      <param name="odom0_twist_rejection_threshold" value="1"/>
+      <!-- <param name="odom0_pose_rejection_threshold" value="5"/> -->
+      <!-- <param name="odom0_twist_rejection_threshold" value="1"/> -->
       <!--<param name="pose0_rejection_threshold" value="2"/>-->
       <!--<param name="twist0_rejection_threshold" value="1.2"/>-->
-      <param name="imu0_pose_rejection_threshold" value="0.1"/>
-      <param name="imu0_twist_rejection_threshold" value="0.1"/>
-      <param name="imu0_linear_acceleration_rejection_threshold" value="0.1"/>
+      <!-- <param name="imu0_pose_rejection_threshold" value="0.1"/> -->
+      <!-- <param name="imu0_twist_rejection_threshold" value="0.1"/> -->
+      <!-- <param name="imu0_linear_acceleration_rejection_threshold" value="0.1"/> -->
 
       <!-- Debug settings. Not for the faint of heart. Outputs a ludicrous amount of information to the file
            specified by debug_out_file. I hope you like matrices! Defaults to false if unspecified. -->
@@ -220,7 +228,7 @@
 
 
       <!--  Placeholder for output topic remapping -->
-      <remap from="odometry/filtered" to="ekf_map/odom"/>
+      <remap from="odometry/filtered" to="odometry/ekf_map"/>
 
     </node>
 

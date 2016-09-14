@@ -1,0 +1,50 @@
+#! /usr/bin/env python
+
+# drive_test_pub
+#
+# Python script for publishing Drive messages (and optionally 
+# relative altitude messages) with custom frame id
+# 
+# @author   Syler Wagner	<syler@mit.edu>
+#
+# @date	 2016-09-11	  creation
+
+import rospy
+import sys
+from gigatron.msg import Drive   # for sending commands
+
+class DriveTestPub():
+
+	def __init__(self):
+	
+		self.topic = rospy.get_param('~topic', 'command/drive') # 
+		# Drive message publisher
+		drive_test_pub = rospy.Publisher(self.topic, Drive, queue_size=1)
+
+		msg = Drive()
+
+		if len(sys.argv) == 4:
+			msg.angle = float(sys.argv[1])
+			msg.vel_left = float(sys.argv[2]) 
+			msg.vel_right = float(sys.argv[3])
+		else:
+			rospy.logerr('drive_test_pub used with incorrect arguments!')
+			rospy.logerr('Usage:')
+			rospy.logerr('   rosrun gigatron_hardware drive_test_pub <ANGLE> <V_LEFT> <V_RIGHT>')
+			sys.exit(-1)
+			
+		while not rospy.is_shutdown():
+			drive_test_pub.publish(msg)
+			rospy.loginfo('Published angle: %4.1f, vel_left: %4.1f, vel_right: %4.1f', msg.angle, msg.vel_left, msg.vel_right)
+			rospy.sleep(1)
+
+if __name__=="__main__":
+	rospy.init_node('drive_test_pub')
+	
+	try:
+		DriveTestPub()
+	except rospy.ROSInterruptException:
+		print " [!!!] drive_test_pub: ROSInterruptException!"
+		pass
+
+

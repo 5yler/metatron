@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!-- gps_nav.launch
+     Test data collection outdoors on gigatron frame with all sensors
+
+     @author  Syler Wagner      <syler@mit.edu>
+     
+     @date    2016-09-14  syler  creation
+-->
+<launch>
+
+	<arg name="map" doc="map file with UTM transform coordinates defined" />
+	<arg name="using_ekf" default="false" doc="use ekf output 'odometry/filtered' instead of raw 'odom'" />
+    <arg name="colorado" default="false" doc="true if in Colorado, used to account for magnetic declination" />
+
+    <include file="$(find gigatron_nav)/launch/gps_nav.launch" >
+		<arg name="map" value="street_rp" />
+    	<arg name="using_ekf" value="$(arg using_ekf)" />
+    	<arg name="colorado" value="$(arg colorado)" />
+    </include>
+
+    <include file="$(find gigatron_hardware)/launch/gigatron_frame.launch" >
+		<arg name="rviz" value="false" />
+	</include>
+
+	<node pkg="gigatron" type="drive" name="reactive_drive"/>
+
+	<!-- <node pkg="tf" type="static_transform_publisher" name="map_odom_tf_broadcaster" args="0 0 0 0 0 0 map odom 100" /> -->
+
+
+</launch>

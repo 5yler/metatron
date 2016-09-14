@@ -1,11 +1,24 @@
 <?xml version="1.0"?>
-<launch>
-	<!-- launch map server or not -->
+<!-- map_server.launch
+     Launch file for map server and optional static transform publisher from utm to map frame
 
-	<arg name="map_server" default="true"/>
+     @author  Syler Wagner  <syler@mit.edu>
+     
+     @date    2016-08-18    syler   creation
+    -->
+<launch>
+
 	<arg name="map" default="canny_loop"/>
+	<arg name="utm" default="false" doc="'true' to publish static transform from utm to map frame" />
+
 	<arg name="map_location" value="$(find gigatron_nav)/maps/$(arg map).yaml"/> <!-- placeholder for map file loading -->
-		<!-- run the map server with our map -->
-	<node if="$(arg map_server)" name="map_server" pkg="map_server" type="map_server" args="$(arg map_location)" />
+
+	<!-- run the map server with our map -->
+	<node name="map_server" pkg="map_server" type="map_server" args="$(arg map_location)" />
+
+	<!-- static transform publisher from utm to map frame -->
+	<node if="$(arg utm)" pkg="tf" type="static_transform_publisher" name="map_utm_tf_broadcaster" output="screen">
+		<rosparam file="$(find gigatron_nav)/maps/$(arg map).yaml" command="load" />
+	</node>
 
 </launch>

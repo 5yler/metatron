@@ -9,11 +9,14 @@
 	<arg unless="$(arg mac)" name="port" default="/dev/tty.rplidar" /> <!-- Ubuntu -->
 	<arg if="$(arg mac)" name="port" default="/dev/tty.SLAB_USBtoUART" /> <!-- OS X -->
 
+	<arg name="topic" default="scan" />
+
 	<node pkg="rplidar_ros" type="rplidarNode" name="rplidar_node" output="screen">
 		<param name="frame_id" value="$(arg frame_id)" /> <!-- /map is used for debug in RViz, to be replaced by the imu_link -->
 		<param name="serial_port" value="$(arg port)" />  
 		<param name="serial_baudrate" value="$(arg baud)" />
 		<param name="inverted" value="$(arg inverted)" />
 		<param name="angle_compensate" value="$(arg angle_compensate)" />
+		<remap from="scan" to="$(arg topic)" />
 	</node>
 </launch>
