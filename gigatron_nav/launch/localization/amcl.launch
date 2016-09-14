@@ -12,10 +12,10 @@
   <arg name="map_server" doc="launch map_server or no?" />
   <arg name="map" default="loop_gmap" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
 
-  <arg name="using_bag" doc="true if running gmapping on rosbagged data" />
-  <param name="use_sim_time" value="$(arg using_bag)" />
+  <arg name="bag" doc="true if running gmapping on rosbagged data" />
+  <param name="use_sim_time" value="$(arg bag)" />
 
-  <arg name="using_ekf" doc="use ekf output 'odometry/filtered' instead of raw 'odom'" />
+  <arg name="using_ekf" doc="use ekf output 'odom/ekf' instead of raw 'odom'" />
   <arg name="odom_frame_id" if="$(arg using_ekf)" value="odom/ekf" />
   <arg name="odom_frame_id" unless="$(arg using_ekf)" value="odom" />
   <!-- current setup plan: 

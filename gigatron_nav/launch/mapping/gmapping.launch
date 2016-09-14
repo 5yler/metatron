@@ -16,8 +16,8 @@
 -->
 
 <launch>
-	<arg name="using_bag" doc="true if running gmapping on rosbagged data" />
-	<param name="use_sim_time" value="$(arg using_bag)" />
+	<arg name="bag" doc="true if running gmapping on rosbagged data" />
+	<param name="use_sim_time" value="$(arg bag)" />
 
 	<arg name="rplidar" doc="true if using rplidar, false if xvlidar" /> 
 

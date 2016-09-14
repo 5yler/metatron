@@ -9,11 +9,11 @@
 <launch>
 
     <arg name="car" doc="'kilotron' or 'gigatron'?" />
-    <arg name="using_bag" default="false" />
+    <arg name="bag" default="false" />
     <arg name="map" default="loop_gmap" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
     <arg name="teb_planner" default="true" doc="true if using teb_local_planner instead of base_local_planner" />
 
-    <arg name="using_ekf" default="false" doc="use ekf output 'odometry/filtered' instead of raw 'odom' for amcl" />
+    <arg name="using_ekf" default="false" doc="use ekf output 'odom/ekf' instead of raw 'odom' for amcl" />
 
     <arg name="rviz" default="true" /> <!-- display robot in RViz -->
 
@@ -31,7 +31,7 @@
     <include file="$(find gigatron_nav)/launch/localization/amcl.launch">
         <arg name="map_server" default="true" />
         <arg name="map" value="$(arg map)" /> 
-        <arg name="using_bag" value="$(arg using_bag)" />
+        <arg name="bag" value="$(arg bag)" />
         <arg name="using_ekf" value="$(arg using_ekf)" />
         <!-- initial pose and covariance -->
         <arg name="x" value="$(arg x)" />

@@ -34,7 +34,7 @@
 
 <launch>
 
-    <arg name="using_ekf" doc="use ekf output 'odometry/filtered' instead of raw 'odom'" />
+    <arg name="using_ekf" doc="use ekf output 'odom/ekf' instead of raw 'odom'" />
     <arg name="colorado" doc="true if in Colorado, used to account for magnetic declination" />
 
       <!-- Boston

@@ -10,7 +10,7 @@
 
 
 	<arg name="map" doc="map file with UTM transform coordinates defined" />
-	<arg name="using_ekf" default="false" doc="use ekf output 'odometry/filtered' instead of raw 'odom'" />
+	<arg name="using_ekf" default="false" doc="use ekf output 'odom/ekf' instead of raw 'odom'" />
     <arg name="colorado" default="false" doc="true if in Colorado, used to account for magnetic declination" />
 
     <include file="$(find gigatron_nav)/launch/navsat_transform_node.launch" >
