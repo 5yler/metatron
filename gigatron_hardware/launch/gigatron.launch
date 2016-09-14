@@ -31,6 +31,7 @@
     	<arg name="input_topic" value="scan_rp" />
     	<arg name="output_topic" value="scan_front" />
 	</include>
+	<node name="front_scan_relay" type="relay" pkg="topic_tools" args="/scan_front /scan"/>
 
 	<!-- back LIDAR  -->
 	<include file="$(find gigatron_hardware)/launch/sensors/xvlidar.launch" >
@@ -43,4 +44,5 @@
     	<arg name="output_topic" value="scan_back" />
 	</include>
 
+	<node name="back_scan_relay" type="relay" pkg="topic_tools" args="/scan_back /scan"/>	
 </launch>
