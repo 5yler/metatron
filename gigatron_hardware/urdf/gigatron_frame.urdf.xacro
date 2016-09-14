@@ -24,7 +24,11 @@
     <xacro:property name="lidar_z" value="0.27942" /> 
     <xacro:property name="lidar_yaw" value="${M_PI}" />
 
-
+    <!-- Rear LIDAR placement relative to base_link -->
+    <xacro:property name="back_lidar_x" value="-0.4" /> 
+    <xacro:property name="back_lidar_y" value="-0.15" />
+    <xacro:property name="back_lidar_z" value="0" /> 
+    <xacro:property name="back_lidar_yaw" value="0" />
 
     <!-- Physical Material Macros -->
     <material name="Grey">
@@ -185,6 +189,33 @@
         <child link="laser_link"/>
     </joint>
     <link name="laser_link" type="fixed">
+        <inertial>
+            <mass value="0.1"/>
+            <origin xyz="0 0 0.0"/>
+            <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
+        </inertial>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0.02"/>
+            <geometry>
+                <cylinder radius="0.04" length="0.03175"/>
+            </geometry>
+            <material name="DarkGrey"/>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0 0.025"/>
+            <geometry>
+                <box size="0.05 0.05 0.05"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <!-- BACK LIDAR -->
+    <joint name="back_laser_base_mount_joint" type="fixed">
+        <origin xyz="${back_lidar_x} ${back_lidar_y} ${back_lidar_z}" rpy="0 0 ${back_lidar_yaw}" /> 
+        <parent link="base_link"/>
+        <child link="back_laser_link"/>
+    </joint>
+    <link name="back_laser_link" type="fixed">
         <inertial>
             <mass value="0.1"/>
             <origin xyz="0 0 0.0"/>
