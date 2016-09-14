@@ -24,5 +24,7 @@
 
 	<node pkg="gigatron" type="drive" name="reactive_drive"/>
 
+	<node pkg="tf" type="static_transform_publisher" name="map_odom_tf_broadcaster" args="0 0 0 0 0 0 map odom 100">
+
 
 </launch>
