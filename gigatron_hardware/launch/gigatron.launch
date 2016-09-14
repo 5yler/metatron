@@ -24,7 +24,7 @@
 	<!-- front LIDAR  -->
 	<include file="$(find gigatron_hardware)/launch/sensors/rplidar.launch" >
 		<arg name="frame_id" default="laser_link" />
-		<remap from="scan" to="scan_rp" />
+		<arg name="topic" default="scan_rp" />
 	</include>
 	<include file="$(find gigatron_hardware)/launch/laser_angle_filter.launch" >
     	<arg name="filter_name" value="rplidar_angle_filter" />
@@ -36,7 +36,7 @@
 	<!-- back LIDAR  -->
 	<include file="$(find gigatron_hardware)/launch/sensors/xvlidar.launch" >
 		<arg name="frame_id" default="back_laser_link" />
-		<remap from="scan" to="scan_xv" />
+		<arg name="topic" default="scan_xv" />
 	</include>
 	<include file="$(find gigatron_hardware)/launch/laser_angle_filter.launch" >
     	<arg name="filter_name" value="xvlidar_angle_filter" />
