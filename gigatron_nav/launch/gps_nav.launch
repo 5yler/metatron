@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- nav.launch
+     Launch file for car navigation
+
+     @author  Syler Wagner      <syler@mit.edu>
+     
+     @date    2016-09-10  syler  creation
+-->
+<launch>
+
+
+	<arg name="map" doc="map file with UTM transform coordinates defined" />
+	<arg name="using_ekf" default="false" doc="use ekf output 'odometry/filtered' instead of raw 'odom'" />
+    <arg name="colorado" default="false" doc="true if in Colorado, used to account for magnetic declination" />
+
+    <include file="$(find gigatron_nav)/launch/navsat_transform_node.launch" >
+    	<arg name="using_ekf" value="$(arg using_ekf)" />
+    	<arg name="colorado" value="$(arg colorado)" />
+    </include>
+
+		<!-- static transform publisher from utm to map frame -->
+	<node pkg="tf" type="static_transform_publisher" name="map_utm_tf_broadcaster" output="screen">
+		<rosparam file="$(find gigatron_nav)/maps/$(arg map).yaml" command="load" />
+	</node>
+
+
+</launch>

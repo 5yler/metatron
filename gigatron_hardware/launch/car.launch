@@ -22,10 +22,6 @@
 
 	<arg name="rviz" default="false" /> <!-- display robot in RViz -->
 
-	<!-- URDF model with robot state publisher -->
-	<include file="$(find gigatron_hardware)/launch/xacro.launch" >
-		<arg name="car" value="$(arg car)" />
-	</include>
 
 	<!-- Arduino -->
 	<include file="$(find gigatron_hardware)/launch/arduino.launch" >

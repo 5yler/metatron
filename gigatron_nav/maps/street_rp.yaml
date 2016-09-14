@@ -5,3 +5,19 @@ negate: 0
 occupied_thresh: 0.65
 free_thresh: 0.196
 
+
+# map origin GPS coordinates
+lat: 42.342568    # map origin latitude
+lon: -71.056507  # map origin longitude
+
+# parameters for static transform from map to local UTM origin
+frame_id: "map" 
+child_frame_id: "utm" # zone 19N
+x: -330598.1
+y: -4689860.5
+z: 0
+qx: 0
+qy: 0
+qz: 0
+qw: 1
+period: 100

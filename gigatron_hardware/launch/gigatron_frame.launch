@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<!-- gigatron.launch
+<!-- gigatron_testing.launch
      Launch file for Gigatron hardware
 
      @author  Syler Wagner  <syler@mit.edu>
@@ -12,18 +12,17 @@
 
 	<arg name="car" value="gigatron" />
 	<arg name="rviz" default="true" /> <!-- display robot in RViz -->
-	<arg name="gps" default="false" doc="using GPS sensor or no?" />
 
 	<!-- URDF model with robot state publisher -->
 	<include file="$(find gigatron_hardware)/launch/xacro.launch" >
-		<arg name="car" value="$(arg car)" />
+		<arg name="car" value="gigatron_frame" />
 	</include>
 
 	<!-- car launch file -->
 	<include file="$(find gigatron_hardware)/launch/car.launch" >
 		<arg name="car" value="$(arg car)" />
 		<arg name="rviz" value="$(arg rviz)" />
-		<arg name="gps" value="$(arg gps)" />
+		<arg name="gps" value="false" />
 	</include>
 
 	<!-- front LIDAR  -->
@@ -48,6 +47,13 @@
     	<arg name="input_topic" value="scan_xv" />
     	<arg name="output_topic" value="scan_back" />
 	</include>
-
 	<node name="back_scan_relay" type="relay" pkg="topic_tools" args="/scan_back /scan"/>	
+
+	<!-- gps -->
+	<include file="$(find gigatron_hardware)/launch/sensors/gps.launch" >
+		<arg name="rmc" default="false" doc="If 'true', fixes will be generated from RMC. If 'false', fixes will be generated based on the GGA sentences. Using GGA sentences allows for approximated covariance output while RMC provides velocity information." />
+		<arg name="odom" default="true" doc="set to 'true' to generate gps-based odometry" />
+		<arg name="port" value="/dev/ttyUSB0" />
+	</include>
+
 </launch>
