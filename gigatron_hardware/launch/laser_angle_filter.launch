@@ -8,11 +8,12 @@
 -->
     <launch>
 
+    <arg name="filter_name" doc="name of filter node" />
     <arg name="input_topic" doc="scan topic the filter subscribes to" />
     <arg name="output_topic" doc="scan topic the filter publishes to" />
 
     <!-- filter scan to forward 180 degrees -->
-    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_angle_filter" anonymous="true" >
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="$(arg filter_name)" >
         <rosparam command="load" file="$(find gigatron_hardware)/config/sensors/laser_angle_filter_config.yaml" />
         <remap from="input_scan" to="$(arg input_topic)" />
         <remap from="scan_filtered" to="$(arg output_topic)" />

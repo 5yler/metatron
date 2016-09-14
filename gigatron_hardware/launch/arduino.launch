@@ -25,7 +25,7 @@
         <arg if="$(arg mac)" name="port" default="/dev/tty.usbmodem1421" />
 
         <!-- rosserial_python -->
-        <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
+        <node pkg="rosserial_python" type="serial_node.py" name="arduino_node" output="screen">
             <param name="port" value="$(arg port)"/>
             <param name="baud" value="115200"/>
         </node>

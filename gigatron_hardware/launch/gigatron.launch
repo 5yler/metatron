@@ -27,6 +27,7 @@
 		<remap from="scan" to="scan_rp" />
 	</include>
 	<include file="$(find gigatron_hardware)/launch/laser_angle_filter.launch" >
+    	<arg name="filter_name" value="rplidar_angle_filter" />
     	<arg name="input_topic" value="scan_rp" />
     	<arg name="output_topic" value="scan_front" />
 	</include>
@@ -37,6 +38,7 @@
 		<remap from="scan" to="scan_xv" />
 	</include>
 	<include file="$(find gigatron_hardware)/launch/laser_angle_filter.launch" >
+    	<arg name="filter_name" value="xvlidar_angle_filter" />
     	<arg name="input_topic" value="scan_xv" />
     	<arg name="output_topic" value="scan_back" />
 	</include>

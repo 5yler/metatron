@@ -12,7 +12,7 @@
 	<arg unless="$(arg mac)" name="port" default="/dev/tty.xvlidar" /> <!-- Ubuntu -->
 	<arg if="$(arg mac)" name="port" default="/dev/tty.usbmodem12341" /> <!-- OS X -->
 
-	<node pkg="xv_11_laser_driver" type="neato_laser_publisher" name="xv_laser_node" output="screen">
+	<node pkg="xv_11_laser_driver" type="neato_laser_publisher" name="xvlidar_node" output="screen">
 		<param name="frame_id" value="$(arg frame_id)" /> <!-- /map is used for debug in RViz, to be replaced by the imu_link -->
 		<param name="port" value="$(arg port)" />  
 		<param name="baud_rate" value="$(arg baud)" />
