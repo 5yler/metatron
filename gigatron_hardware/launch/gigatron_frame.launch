@@ -53,7 +53,7 @@
 	<include file="$(find gigatron_hardware)/launch/sensors/gps.launch" >
 		<arg name="rmc" default="false" doc="If 'true', fixes will be generated from RMC. If 'false', fixes will be generated based on the GGA sentences. Using GGA sentences allows for approximated covariance output while RMC provides velocity information." />
 		<arg name="odom" default="true" doc="set to 'true' to generate gps-based odometry" />
-		<arg name="port" value="/dev/ttyUSB0" />
+		<arg name="port" value="/dev/ttyUSB1" />
 	</include>
 
 </launch>
