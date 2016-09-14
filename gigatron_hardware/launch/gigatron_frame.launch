@@ -29,6 +29,7 @@
 	<include file="$(find gigatron_hardware)/launch/sensors/rplidar.launch" >
 		<arg name="frame_id" default="laser_link" />
 		<arg name="topic" default="scan_rp" />
+		<arg name="port" value="/dev/ttyUSB0" />
 	</include>
 	<include file="$(find gigatron_hardware)/launch/laser_angle_filter.launch" >
     	<arg name="filter_name" value="rplidar_angle_filter" />
