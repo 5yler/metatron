@@ -29,6 +29,7 @@
 	<include file="$(find gigatron_hardware)/launch/laser_angle_filter.launch" >
     	<arg name="input_topic" value="scan" />
     	<arg name="output_topic" value="scan_front" />
+    	<arg name="filter_name" value="$(arg lidar)_angle_filter" />
 	</include>
 
 </launch>
