@@ -144,11 +144,11 @@
            future measurements. While you can achieve the same effect with the differential paremeter, the key difference is
            that the relative parameter doesn't cause the measurement to be converted to a velocity before integrating it. If
            you simply want your measurements to start at 0 for a given sensor, set this to true. -->
-      <param name="odom0_relative" value="true"/>
+      <param name="odom0_relative" value="false"/>
       <!--<param name="odom1_relative" value="true"/>-->
-      <param name="pose0_relative" value="false"/> <!-- TODO: not sure? -->
+      <param name="pose0_relative" value="true"/> <!-- TODO: not sure? -->
       <param if="$(arg using_gps_vel)" name="twist0_relative" value="false"/>      
-      <param name="imu0_relative" value="false"/> <!-- TODO: how is this different from 'differential'? -->
+      <param name="imu0_relative" value="true"/> <!-- TODO: how is this different from 'differential'? -->
 
       <!-- If we're including accelerations in our state estimate, then we'll probably want to remove any acceleration that
            is due to gravity for each IMU. If you don't want to, then set this to false. Defaults to false if unspecified. -->
