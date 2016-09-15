@@ -15,6 +15,7 @@
     <launch>
 
         <arg name="car" default="gigatron" /> <!-- Kilotron or Gigatron? -->
+        <arg name="broadcast_odom_base_link_tf" />
 
         <!-- load car platform parameters into "car" namespace -->
         <rosparam file="$(find gigatron_hardware)/config/$(arg car)_platform.yaml" ns="car" command="load" /> 
@@ -39,6 +40,7 @@
             <param name="rate" value="200" />
             <param name="odom_topic" value="/odom" />
             <param name="state_topic" value="/state" />
+            <param name="broadcast_tf" value="$(arg broadcast_odom_base_link_tf)" />
         </node> 
 
     </launch>

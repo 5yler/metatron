@@ -14,12 +14,14 @@
 	<arg name="lidar" default="xvlidar" doc="'rplidar' or 'xvlidar'?" /> 
 	<arg name="rviz" default="true" /> <!-- display robot in RViz -->
 	<arg name="gps" default="true" doc="using GPS sensor or no?" />
+	<arg name="broadcast_odom_base_link_tf" default="true" />
 
 	<!-- car launch file -->
 	<include file="$(find gigatron_hardware)/launch/car.launch" >
 		<arg name="car" value="$(arg car)" />
 		<arg name="rviz" value="$(arg rviz)" />
 		<arg name="gps" value="$(arg gps)" />
+		<arg name="broadcast_odom_base_link_tf" value="$(arg broadcast_odom_base_link_tf)" />
 	</include>
 
 	<!-- RPLIDAR or Neato XV LIDAR  -->

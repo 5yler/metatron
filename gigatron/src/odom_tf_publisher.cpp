@@ -24,6 +24,7 @@
 double left_wheel_velocity_ = 0.0;
 double right_wheel_velocity_ = 0.0;
 
+bool broadcast_tf_;
 std::string odom_topic_;
 std::string state_topic_;
 int rate_;
@@ -40,10 +41,10 @@ int main(int argc, char** argv) {
   ros::init(argc, argv, "odom_tf_publisher");
 
   ros::NodeHandle n("~");
-  tf::TransformBroadcaster odom_broadcaster;
 
   //$ load parameters
   n.param("rate", rate_, 200); //$ default rate 200 Hz
+  n.param("broadcast_tf", broadcast_tf_, true);
   n.param<std::string>("odom_topic", odom_topic_, "odom");
   n.param<std::string>("state_topic", state_topic_, "state");
 
@@ -64,6 +65,10 @@ int main(int argc, char** argv) {
     ros::shutdown();
   }
 
+  if (broadcast_tf_) 
+  {
+    tf::TransformBroadcaster odom_broadcaster;
+  }
 
   //$ initialize publishers and subscribers
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>(odom_topic_, 5);
@@ -92,17 +97,20 @@ int main(int argc, char** argv) {
 
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(theta);
 
-    geometry_msgs::TransformStamped odom_trans;
-    odom_trans.header.stamp = current_time;
-    odom_trans.header.frame_id = "odom";
-    odom_trans.child_frame_id = "base_link";
+    if (broadcast_tf_) 
+    {
+      geometry_msgs::TransformStamped odom_trans;
+      odom_trans.header.stamp = current_time;
+      odom_trans.header.frame_id = "odom";
+      odom_trans.child_frame_id = "base_link";
 
-    odom_trans.transform.translation.x = x;
-    odom_trans.transform.translation.y = y;
-    odom_trans.transform.translation.z = 0.0;
-    odom_trans.transform.rotation = odom_quat;
+      odom_trans.transform.translation.x = x;
+      odom_trans.transform.translation.y = y;
+      odom_trans.transform.translation.z = 0.0;
+      odom_trans.transform.rotation = odom_quat;
 
-    odom_broadcaster.sendTransform(odom_trans);
+      odom_broadcaster.sendTransform(odom_trans);
+    }
 
     nav_msgs::Odometry odom;
     odom.header.stamp = current_time;

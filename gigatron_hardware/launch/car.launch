@@ -17,6 +17,7 @@
 
 
 	<arg name="car" doc="'kilotron' or 'gigatron'?" />
+	<arg name="broadcast_odom_base_link_tf" />
 
 	<arg name="gps" doc="using GPS sensor or no?" />
 
@@ -26,6 +27,7 @@
 	<!-- Arduino -->
 	<include file="$(find gigatron_hardware)/launch/arduino.launch" >
 		<arg name="car" value="$(arg car)" />
+		<arg name="broadcast_odom_base_link_tf" value="$(arg broadcast_odom_base_link_tf)" />
 	</include>
 
 
