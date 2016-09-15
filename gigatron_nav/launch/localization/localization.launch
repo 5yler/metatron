@@ -33,7 +33,7 @@
         <arg name="map_server" default="true" />
         <arg name="map" value="$(arg map)" /> 
         <arg name="bag" value="$(arg bag)" />
-        <arg name="using_ekf" value="$(arg ekf_odom)" />
+        <arg name="ekf_odom" value="$(arg ekf_odom)" />
         <!-- initial pose and covariance -->
         <arg name="x" value="$(arg x)" />
         <arg name="y" value="$(arg x)" />
@@ -48,6 +48,7 @@
 
     <!-- ekf in map frame -->
     <include if="$(arg ekf_map)" file="$(find gigatron_nav)/launch/localization/ekf_map.launch" >
+        <arg name="ekf_odom" value="$(arg ekf_odom)" />
     	<arg name="using_gps_vel" value="$(arg gps)" />
     </include>
 
