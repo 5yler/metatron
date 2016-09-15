@@ -131,7 +131,8 @@
       <param name="odom0_differential" value="false"/>
       <!--<param name="odom1_differential" value="false"/>-->
       <!--<param name="pose0_differential" value="true"/>-->
-      <param name="imu0_differential" value="false"/>
+      <param name="imu0_differential" value="false"/> <!-- if you have only one source of
+           absolute orientation data, you should not set the differential parameter to true. -->
 
       <!-- When the node starts, if this parameter is true, then the first measurement is treated as a "zero point" for all
            future measurements. While you can achieve the same effect with the differential paremeter, the key difference is

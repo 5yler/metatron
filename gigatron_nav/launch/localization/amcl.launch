@@ -12,10 +12,11 @@
   <arg name="map_server" doc="launch map_server or no?" />
   <arg name="map" default="loop_gmap" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
 
-  <arg name="bag" doc="true if running gmapping on rosbagged data" />
+  <arg name="bag" doc="true if running on rosbagged data" />
   <param name="use_sim_time" value="$(arg bag)" />
 
-  <arg name="using_ekf" doc="use ekf output 'odom/ekf' instead of raw 'odom'" />
+  <arg name="using_ekf" doc="use ekf output 'odom/ekf' instead of raw 'odom' for amcl" />
+
   <arg name="odom_frame_id" if="$(arg using_ekf)" value="odom/ekf" />
   <arg name="odom_frame_id" unless="$(arg using_ekf)" value="odom" />
   <!-- current setup plan: 
@@ -82,7 +83,6 @@
 
     <!-- odometry model parameters -->
     <!-- current setup plan: one robot_localization node fuses the encoders with the IMU in the odom frame, then an amcl node uses this first node's output, the LIDAR, and the map to generate a PoseEstimateWithCovarianceStamped in the map frame, then a second robot_localization node fuses the amcl pose estimate with the encoders, the IMU, and possibly the GPS. -->
-    <param name="odom_frame_id" value="odom" />
     <param name="odom_frame_id" value="$(arg odom_frame_id)" />
     <param name="odom_model_type" value="diff" /> 
     <!-- Which model to use, either "diff", "omni", "diff-corrected" or "omni-corrected". If ~odom_model_type is "diff" then we use the sample_motion_model_odometry algorithm from Probabilistic Robotics, p136; this model uses the noise parameters odom_alpha_1 through odom_alpha4, as defined in the book. -->

@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!-- localization.launch
+     Launch file for car localization
+
+     @author  Syler Wagner      <syler@mit.edu>
+     
+     @date    2016-09-14  syler  creation
+-->
+<launch>
+	<!-- general settings -->
+	<arg name="bag" default="true" doc="true if running gmapping on rosbagged data" />
+	<arg name="map" default="street_rp" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
+	<arg name="rviz" default="false" /> <!-- display robot in RViz -->
+	
+	<!-- specify which localization nodes to run -->
+    <arg name="ekf_odom" default="false" doc="use ekf output 'odom/ekf' instead of raw 'odom' for amcl" />
+    <arg name="ekf_map" default="false" doc="use ekf in map frame" />
+    <!-- fuse GPS velocity data or no? -->
+    <arg if="$(arg ekf_map)" name="gps" doc="true if using 'gps/vel' Twist messages for ekf in map frame" />
+
+    <!-- initial pose and covariance used to initialize amcl -->
+    <arg name="x" default="0" doc="initial x mean estimate [m]" />
+    <arg name="y" default="0" doc="initial y mean estimate [m]" />
+    <arg name="yaw" default="0" doc="initial yaw mean estimate [radians]" />
+    <arg name="cov_xx" default="1" doc="initial pose covariance (x*x) estimate [m]" />
+    <arg name="cov_yy" default="1" doc="Initial pose covariance (y*y) estimate [m]" />
+    <arg name="cov_yaw" default="1" doc="Initial pose covariance (yaw*yaw) estimate [radians]" />
+
+	<param name="use_sim_time" value="$(arg bag)" />
+
+	<!--- amcl localization and map server -->
+    <include file="$(find gigatron_nav)/launch/localization/amcl.launch">
+        <arg name="map_server" default="true" />
+        <arg name="map" value="$(arg map)" /> 
+        <arg name="bag" value="$(arg bag)" />
+        <arg name="using_ekf" value="$(arg ekf_odom)" />
+        <!-- initial pose and covariance -->
+        <arg name="x" value="$(arg x)" />
+        <arg name="y" value="$(arg x)" />
+        <arg name="yaw" value="$(arg x)" />
+        <arg name="cov_xx" value="$(arg cov_xx)" />
+        <arg name="cov_yy" value="$(arg cov_yy)" />
+        <arg name="cov_yaw" value="$(arg cov_yaw)" />
+    </include>
+
+    <!-- ekf in odom frame -->
+    <include if="$(arg ekf_odom)" file="$(find gigatron_nav)/launch/localization/ekf_odom.launch" />
+
+    <!-- ekf in map frame -->
+    <include if="$(arg ekf_map)" file="$(find gigatron_nav)/launch/localization/ekf_map.launch" >
+    	<arg name="using_gps_vel" value="$(arg gps)" />
+    </include>
+
+    <!-- RViz -->
+    <include if="$(arg rviz)" file="$(find gigatron)/launch/rviz.launch" >
+        <arg name="config" value="localization" />
+    </include>
+
+</launch>
