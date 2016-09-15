@@ -67,9 +67,9 @@
     <!-- Time with which to post-date the transform that is published, to indicate that this transform is valid into the future. -->
     <param name="gui_publish_rate" value="10.0" /> 
     <!-- Maximum rate (Hz) at which scans and paths are published for visualization, -1.0 to disable. -->
-    <param name="update_min_d" value="0.2" /> 
+    <param name="update_min_d" value="0.1" /> 
     <!-- Translational movement required before performing a filter update. -->
-    <param name="update_min_a" value="0.5" /> 
+    <param name="update_min_a" value="0.1" /> 
     <!-- Rotational movement required before performing a filter update. -->
     <param name="resample_interval" value="1" />
     <!-- Number of filter updates required before resampling. -->
@@ -86,14 +86,14 @@
     <param name="odom_frame_id" value="$(arg odom_frame_id)" />
     <param name="odom_model_type" value="diff" /> 
     <!-- Which model to use, either "diff", "omni", "diff-corrected" or "omni-corrected". If ~odom_model_type is "diff" then we use the sample_motion_model_odometry algorithm from Probabilistic Robotics, p136; this model uses the noise parameters odom_alpha_1 through odom_alpha4, as defined in the book. -->
-    <param name="odom_alpha1" value="0.2" /> 
+    <param name="odom_alpha1" value="2" /> 
     <!-- Specifies the expected noise in odometry's rotation estimate from the rotational component of the robot's motion. -->
-    <param name="odom_alpha2" value="0.2" /> 
+    <param name="odom_alpha2" value="2" /> 
     <!-- Specifies the expected noise in odometry's rotation estimate from translational component of the robot's motion. -->
     <!-- translation std dev, m -->
-    <param name="odom_alpha3" value="0.8" /> 
+    <param name="odom_alpha3" value="2" /> 
     <!-- Specifies the expected noise in odometry's translation estimate from the translational component of the robot's motion. -->
-    <param name="odom_alpha4" value="0.2" /> 
+    <param name="odom_alpha4" value="2" /> 
     <!-- Specifies the expected noise in odometry's translation estimate from the rotational component of the robot's motion. -->
     <!-- <param name="odom_alpha5" value="0.1" /> --> 
     <!-- Translation-related noise parameter (only used if model is "omni"). -->

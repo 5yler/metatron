@@ -9,12 +9,12 @@
 <launch>
 	<!-- general settings -->
 	<arg name="bag" default="true" doc="true if running gmapping on rosbagged data" />
-	<arg name="map" default="street_rp" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
+	<arg name="map" default="loop_gmap" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
 	<arg name="rviz" default="false" /> <!-- display robot in RViz -->
 	
 	<!-- specify which localization nodes to run -->
     <arg name="ekf_odom" default="false" doc="use ekf output 'odom/ekf' instead of raw 'odom' for amcl" />
-    <arg name="ekf_map" default="false" doc="use ekf in map frame" />
+    <arg name="ekf_map" default="true" doc="use ekf in map frame" />
     <!-- fuse GPS velocity data or no? -->
     <arg if="$(arg ekf_map)" name="gps" doc="true if using 'gps/vel' Twist messages for ekf in map frame" />
 
@@ -22,9 +22,9 @@
     <arg name="x" default="0" doc="initial x mean estimate [m]" />
     <arg name="y" default="0" doc="initial y mean estimate [m]" />
     <arg name="yaw" default="0" doc="initial yaw mean estimate [radians]" />
-    <arg name="cov_xx" default="1" doc="initial pose covariance (x*x) estimate [m]" />
-    <arg name="cov_yy" default="1" doc="Initial pose covariance (y*y) estimate [m]" />
-    <arg name="cov_yaw" default="1" doc="Initial pose covariance (yaw*yaw) estimate [radians]" />
+    <arg name="cov_xx" default="3" doc="initial pose covariance (x*x) estimate [m]" />
+    <arg name="cov_yy" default="3" doc="Initial pose covariance (y*y) estimate [m]" />
+    <arg name="cov_yaw" default="3" doc="Initial pose covariance (yaw*yaw) estimate [radians]" />
 
 	<param name="use_sim_time" value="$(arg bag)" />
 
