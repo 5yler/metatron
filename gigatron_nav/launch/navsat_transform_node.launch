@@ -34,7 +34,7 @@
 
 <launch>
 
-    <arg name="using_ekf" doc="use ekf output 'odom/ekf' instead of raw 'odom'" />
+    <arg name="ekf_map" doc="use ekf output 'odometry/ekf_map' instead of raw 'odom'" />
     <arg name="colorado" doc="true if in Colorado, used to account for magnetic declination" />
 
       <!-- Boston
@@ -88,7 +88,7 @@
 
       <!-- If this is true, the transform world_frame->utm transform is broadcast
            for use by other nodes. Defaults to false. -->
-      <param name="broadcast_utm_transform" value="true"/> 
+      <param name="broadcast_utm_transform" value="false"/> 
 
       <!-- If this is true, all received odometry data is converted back to a lat/lon
            and published as a NavSatFix message as /gps/filtered. Defaults to false. -->
@@ -117,8 +117,8 @@
 
       <!-- Placeholders for input remapping. Set your topic names as the "to" values. -->
       <!-- <remap from="/imu/data" to=""/> -->
-      <remap if="$(arg using_ekf)" from="/odometry/filtered" to="odom/ekf"/>
-      <remap unless="$(arg using_ekf)" from="/odometry/filtered" to="odom"/>
+      <remap if="$(arg ekf_map)" from="/odometry/filtered" to="odometry/ekf_map"/>
+      <remap unless="$(arg ekf_map)" from="/odometry/filtered" to="odom"/>
       <!-- <remap from="/gps/fix" to=""/> -->
      
 
