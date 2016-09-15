@@ -23,7 +23,7 @@
     <arg name="ekf_odom" default="false" doc="use ekf output 'odom/ekf' instead of raw 'odom' for amcl" />
     <arg name="ekf_map" default="true" doc="use ekf in map frame" />
     <!-- fuse GPS velocity data or no? -->
-    <arg if="$(arg ekf_map)" name="gps_vel" default="false" doc="true if using 'gps/vel' Twist messages for ekf in map frame" />
+    <arg if="$(arg ekf_map)" name="gps_vel" default="true" doc="true if using 'gps/vel' Twist messages for ekf in map frame" />
     <arg if="$(arg gps)" name="gps_odom" default="true" doc="true if using navsat_transform_node and ekf in map frame" />
 
     <!-- initial pose and covariance used to initialize amcl -->

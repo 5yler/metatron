@@ -3,7 +3,6 @@
 
 <launch>
 
-    <arg name="gps_vel" doc="true if using 'gps/vel' Twist messages" />
     <arg name="gps_odom" doc="true if using output of navsat_transform_node" />
 
     <arg name="ekf_odom" doc="use ekf output 'odom/ekf' instead of raw 'odom'" />
@@ -15,7 +14,6 @@
     <arg name="odom0_differential" value="true" />
     <arg name="odom1_differential" value="false" if="$(arg gps_odom)" />
     <arg name="pose0_differential" value="false" />
-    <arg name="twist0_differential" value="false" />
     <arg name="imu0_differential" value="true" />
 
     <arg name="odom0_relative" value="false" />
@@ -89,7 +87,6 @@
       <param name="odom0" value="$(arg odom0)"/>
       <param if="$(arg gps_odom)" name="odom1" value="$(arg odom1)"/>
       <param name="pose0" value="amcl_pose"/>
-      <param if="$(arg gps_vel)" name="twist0" value="gps/vel"/>
       <param name="imu0" value="imu/data"/>
 
       <!-- Each sensor reading updates some or all of the filter's state. These options give you greater control over
@@ -121,13 +118,6 @@
                                       false, false, false,  <!-- vx, vy, vz -->
                                       false, false, false,  <!-- vroll, vpitch, vyaw -->
                                       false, false, false]  <!-- ax, ay, az -->
-                                    </rosparam>
-      <!-- GPS velocity data -->
-      <rosparam if="$(arg gps_vel)" param="twist0_config">[false, false, false,  <!-- x, y, z -->
-                                       false, false, false,  <!-- roll, pitch, yaw -->
-                                       true,  true,  false,  <!-- vx, vy, vz -->
-                                       false, false, false,  <!-- vroll, vpitch, vyaw -->
-                                       false, false, false]  <!-- ax, ay, az -->
                                     </rosparam>
 
       <!-- IMU -->
@@ -167,9 +157,8 @@
            <!-- It is similar to the _differential parameter, but instead of removing the measurement at time t+ -->
       <param if="$(arg odom0_relative)" name="odom0_relative" value="false"/>
       <!--<param name="odom1_relative" value="true"/>-->
-      <param if="$(arg pose0_relative)" name="pose0_relative" value="false"/> <!-- TODO: not sure? -->
-      <!-- <param if="$(arg twist0_relative)" name="twist0_relative" value="false"/>       -->
-      <param if="$(arg imu0_relative)" name="imu0_relative" value="false"/> <!-- TODO: how is this different from 'differential'? -->
+      <param if="$(arg pose0_relative)" name="pose0_relative" value="false"/>
+      <param if="$(arg imu0_relative)" name="imu0_relative" value="false"/> 
 
       <!-- If we're including accelerations in our state estimate, then we'll probably want to remove any acceleration that
            is due to gravity for each IMU. If you don't want to, then set this to false. Defaults to false if unspecified. -->
@@ -190,7 +179,6 @@
       <param name="odom0_queue_size" value="1"/>
       <!--<param name="odom1_queue_size" value="1"/>-->
       <param name="pose0_queue_size" value="1"/>
-      <param if="$(arg gps_vel)" name="twist0_queue_size" value="1"/>
       <param name="imu0_queue_size" value="10"/>
 
       <!-- If your data is subject to outliers, use these threshold settings, expressed as Mahalanobis distances, to control
