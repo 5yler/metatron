@@ -3,6 +3,8 @@
 
 <launch>
 
+    <arg name="using_gps_vel" default="true" doc="true if using 'gps/vel' Twist messages" />
+
     <!-- This node will take in measurements from odometry, IMU, stamped pose, and stamped twist messages. It tracks
          the state of the robot, with the state vector being defined as X position, Y position, Z position,
          roll, pitch, yaw, their respective velocites, and linear acceleration. Units for all measurements are assumed
@@ -69,7 +71,7 @@
       <param name="odom0" value="odom"/>
       <!--<param name="odom1" value="example/another_odom"/>-->
       <!--<param name="pose0" value="amcl_pose"/>-->
-      <!--<param name="twist0" value="example/twist"/>-->
+      <param if="$(arg using_gps_vel)" name="twist0" value="gps/vel"/>
       <param name="imu0" value="imu/data"/>
 
       <!-- Each sensor reading updates some or all of the filter's state. These options give you greater control over
@@ -79,6 +81,8 @@
            message types lack certain variables. For example, a TwistWithCovarianceStamped message has no pose information, so
            the first six values would be meaningless in that case. Each vector defaults to all false if unspecified, effectively
            making this parameter required for each sensor. -->
+
+      <!-- wheel odometry -->
       <rosparam param="odom0_config">[true,  true, false,   <!-- x, y, z -->
                                       false, false, true,   <!-- roll, pitch, yaw -->
                                       true,  false, false,  <!-- vx, vy, vz -->
@@ -99,12 +103,15 @@
                                       false, false, false,
                                       false, false, false]</rosparam> -->
 
-<!--      <rosparam param="twist0_config">[false, false, false,
-                                       false, false, false,
-                                       true,  true,  true,
-                                       true,  true,  true,
-                                       false, false, false]</rosparam> -->
+      <!-- GPS velocity data -->
+      <rosparam if="$(arg using_gps_vel)" param="twist0_config">[false, false, false,  <!-- x, y, z -->
+                                       false, false, false,  <!-- roll, pitch, yaw -->
+                                       true,  true,  false,  <!-- vx, vy, vz -->
+                                       false, false, false,  <!-- vroll, vpitch, vyaw -->
+                                       false, false, false]  <!-- ax, ay, az -->
+                                    </rosparam>
 
+      <!-- IMU -->
       <rosparam param="imu0_config">[false, false, false, <!-- x, y, z -->
                                      true,  true,  true,  <!-- roll, pitch, yaw -->
                                      false, false, false, <!-- vx, vy, vz -->
@@ -141,6 +148,7 @@
       <param name="odom0_relative" value="false"/>
       <!--<param name="odom1_relative" value="true"/>-->
       <!--<param name="pose0_relative" value="false"/>-->
+      <param if="$(arg using_gps_vel)" name="twist0_relative" value="false"/>      
       <param name="imu0_relative" value="true"/>
 
       <!-- If we're including accelerations in our state estimate, then we'll probably want to remove any acceleration that
@@ -159,17 +167,18 @@
 
       <!-- By default, the subscription queue size for each message type is 1. If you wish to increase that so as not
            miss any messages (even if your frequency is set to a relatively small value), increase these. -->
-      <param name="odom0_queue_size" value="2"/>
+      <param name="odom0_queue_size" value="1"/>
       <!--<param name="odom1_queue_size" value="1"/>-->
-      <param name="pose0_queue_size" value="10"/>
+      <!-- <param name="pose0_queue_size" value="10"/> -->
       <!--<param name="twist0_queue_size" value="3"/>-->
+      <param if="$(arg using_gps_vel)" name="twist0_queue_size" value="1"/>
       <param name="imu0_queue_size" value="10"/>
 
       <!-- If your data is subject to outliers, use these threshold settings, expressed as Mahalanobis distances, to control
            how far away from the current vehicle state a sensor measurement is permitted to be. Each defaults to
            numeric_limits<double>::max() if unspecified. -->
-      <param name="odom0_pose_rejection_threshold" value="5"/>
-      <param name="odom0_twist_rejection_threshold" value="1"/>
+      <!-- <param name="odom0_pose_rejection_threshold" value="5"/> -->
+      <!-- <param name="odom0_twist_rejection_threshold" value="1"/> -->
       <!--<param name="pose0_rejection_threshold" value="2"/>-->
       <!--<param name="twist0_rejection_threshold" value="1.2"/>-->
       <!-- maybe? <param name="imu0_pose_rejection_threshold" value="2.8"/>

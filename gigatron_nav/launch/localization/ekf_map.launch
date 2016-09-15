@@ -81,7 +81,7 @@
            message types lack certain variables. For example, a TwistWithCovarianceStamped message has no pose information, so
            the first six values would be meaningless in that case. Each vector defaults to all false if unspecified, effectively
            making this parameter required for each sensor. -->
-      <!-- wheel odometry -->
+      <!-- ekf odometry -->
       <rosparam param="odom0_config">[true,  true, false,   <!-- x, y, z -->
                                       false, false, true,   <!-- roll, pitch, yaw -->
                                       true,  false, false,  <!-- vx, vy, vz -->
