@@ -8,15 +8,21 @@
 -->
 <launch>
 	<!-- general settings -->
-	<arg name="bag" default="true" doc="true if running gmapping on rosbagged data" />
-	<arg name="map" default="loop_gmap" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
+	<arg name="bag" default="true" doc="true if running on rosbagged data" />
 	<arg name="rviz" default="false" /> <!-- display robot in RViz -->
-	
+    <arg name="map" default="avc" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
+
+    <arg name="gps" doc="fusing data from GPS or no?" default="true" />
+
+    <arg if="$(arg gps)" name="colorado" default="false" doc="true if in Colorado, used to account for magnetic declination" />
+
+
 	<!-- specify which localization nodes to run -->
     <arg name="ekf_odom" default="false" doc="use ekf output 'odom/ekf' instead of raw 'odom' for amcl" />
     <arg name="ekf_map" default="true" doc="use ekf in map frame" />
-    <!-- fuse GPS velocity data or no? -->
-    <arg if="$(arg ekf_map)" name="gps" doc="true if using 'gps/vel' Twist messages for ekf in map frame" />
+    
+    <!-- fuse GPS data  -->
+    <arg if="$(arg gps)" name="gps_odom" default="true" doc="true if using navsat_transform_node and ekf in map frame" />
 
     <!-- initial pose and covariance used to initialize amcl -->
     <arg name="x" default="0" doc="initial x mean estimate [m]" />
@@ -49,7 +55,13 @@
     <!-- ekf in map frame -->
     <include if="$(arg ekf_map)" file="$(find gigatron_nav)/launch/localization/ekf_map.launch" >
         <arg name="ekf_odom" value="$(arg ekf_odom)" />
-    	<arg name="using_gps_vel" value="$(arg gps)" />
+        <arg name="gps_odom" value="$(arg gps_odom)" />
+    </include>
+
+    <!-- navsat_transform_node -->
+    <include if="$(arg gps_odom)" file="$(find gigatron_nav)/launch/navsat_transform_node.launch" >
+        <arg name="ekf_map" value="$(arg ekf_map)" />
+        <arg name="colorado" value="$(arg colorado)" />
     </include>
 
     <!-- RViz -->
