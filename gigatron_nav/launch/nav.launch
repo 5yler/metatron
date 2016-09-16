@@ -46,8 +46,7 @@
 
     <!-- RViz -->
     <include if="$(arg rviz)" file="$(find gigatron)/launch/rviz.launch" >
-        <arg name="config" if="$(arg teb_planner)" value="car_nav_teb" />
-        <arg name="config" unless="$(arg teb_planner)" value="car_map" />
+        <arg name="config" value="nav" />
     </include>
 
 </launch>
