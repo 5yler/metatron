@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- goal_pub.launch
+     Launch file for nav_goal_publisher to successively send goals in a planned route
+
+     @author  Sarah Pohorecky     <spohorec@mit.edu>
+     @author  Syler Wagner		  <syler@mit.edu>
+     
+     @date    2016-09-12  spohorec  creation
+-->
+
+<launch>
+	<arg name="plan" default="template_route" />
+
+	<node pkg="gigatron_nav" type="nav_goal_publisher" name="nav_goal_publisher" output="screen">
+		<param name="plan_file" value="$(find gigatron_nav)/maps/plans/$(arg plan).yaml" />
+	</node>
+</launch>
