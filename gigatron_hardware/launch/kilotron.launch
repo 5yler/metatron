@@ -10,10 +10,16 @@
 
 <launch>
 
-<arg name="car" value="kilotron" />
-	<arg name="lidar" default="xvlidar" doc="'rplidar' or 'xvlidar'?" /> 
-	<arg name="rviz" default="true" /> <!-- display robot in RViz -->
+	<arg name="car" value="kilotron" />
+	<arg name="lidar" default="rplidar" doc="'rplidar' or 'xvlidar'?" /> 
+	<arg name="rviz" default="false" /> <!-- display robot in RViz -->
 	<arg name="gps" default="true" doc="using GPS sensor or no?" />
+
+	<!-- URDF model with robot state publisher -->
+	<include file="$(find gigatron_hardware)/launch/xacro.launch" >
+		<arg name="car" value="$(arg car)" />
+	</include>
+
 
 	<!-- car launch file -->
 	<include file="$(find gigatron_hardware)/launch/car.launch" >
