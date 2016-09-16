@@ -1,3 +1,4 @@
+name: "Template Route"
 loop: false
 goals: 
 - {x: 1.0, y: 0.0, yaw: 0.0}

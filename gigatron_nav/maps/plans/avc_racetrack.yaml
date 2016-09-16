@@ -1,0 +1,6 @@
+name: "AVC 2016 Racetrack Route"
+loop: false
+goals: 
+- {x:  -9.076, y: -20.276, yaw: -2.253}
+- {x: -10.823, y:  -8.146, yaw:  1.838}
+- {x:   2.083, y:  -1.644, yaw: -0.709}
