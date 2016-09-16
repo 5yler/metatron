@@ -24,9 +24,9 @@
 	<!-- car launch file -->
 	<include file="$(find gigatron_hardware)/launch/car.launch" >
 		<arg name="car" value="$(arg car)" />
-		<arg name="broadcast_odom_base_link_tf" value="$(arg broadcast_odom_base_link_tf)" />
 		<arg name="rviz" value="$(arg rviz)" />
 		<arg name="gps" value="$(arg gps)" />
+		<arg name="broadcast_odom_base_link_tf" value="$(arg broadcast_odom_base_link_tf)" />
 	</include>
 
 	<!-- front LIDAR  -->
