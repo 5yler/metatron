@@ -9,3 +9,7 @@ TrajectoryPlannerROS: # parameters for Gigatron
   acc_lim_y: 2.5
 
   holonomic_robot: false
+
+  xy_goal_tolerance: 2
+  yaw_goal_tolerance: 6.9 # don't really care which direction it's pointing
+  free_goal_vel: true # ?
