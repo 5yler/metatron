@@ -60,7 +60,7 @@
 
 
 
-    <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="screen">
+    <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="log">
       <!-- Frequency of the main run loop. -->
       <param name="frequency" value="30"/>
 

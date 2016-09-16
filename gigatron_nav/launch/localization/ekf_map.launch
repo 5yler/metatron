@@ -4,11 +4,11 @@
 <launch>
 
     <arg name="gps_odom" doc="true if using output of navsat_transform_node" />
-
     <arg name="ekf_odom" doc="use ekf output 'odom/ekf' instead of raw 'odom'" />
-    <arg name="odom0" if="$(arg ekf_odom)" value="odom/ekf" />
-    <arg name="odom0" unless="$(arg ekf_odom)" value="odom" />
-    <arg name="odom1" if="$(arg gps_odom)" value="odometry/gps" />
+
+    <arg name="odom0" value="odom/ekf" if="$(arg ekf_odom)" />
+    <arg name="odom0" value="odom" unless="$(arg ekf_odom)" />
+    <arg name="odom1" value="odometry/gps" if="$(arg gps_odom)" />
 
     <!-- uncomment to set parameters are relative/differential -->
     <arg name="odom0_differential" value="true" />

@@ -8,38 +8,34 @@
 -->
 <launch>
 
-    <arg name="car" doc="'kilotron' or 'gigatron'?" />
-    <arg name="bag" default="false" />
-    <arg name="map" default="loop_gmap" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
-    <arg name="teb_planner" default="true" doc="true if using teb_local_planner instead of base_local_planner" />
+    <arg name="bag" doc="true if running on rosbagged data" />
+    <arg name="map" default="avc" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
 
-    <arg name="using_ekf" default="false" doc="use ekf output 'odom/ekf' instead of raw 'odom' for amcl" />
+    <!-- move_base config -->
+    <arg name="car" default="gigatron" doc="'kilotron' or 'gigatron'?" />
+    <arg name="teb_planner"  doc="true if using teb_local_planner instead of base_local_planner" />
 
-    <arg name="rviz" default="true" /> <!-- display robot in RViz -->
+    <!-- specify how to run localization -->
+    <arg name="ekf_map" default="true" doc="use ekf in map frame" />
+    <arg name="gps" default="true" doc="fusing data from GPS or no?" />
+    <arg name="colorado" default="true" doc="true if in Colorado, used to account for magnetic declination" />
 
+    <arg name="rviz" default="false" /> <!-- display robot in RViz -->
 
-    <!-- initial pose and covariance used to initialize filter with Gaussian distribution -->
+    <!-- initial pose and covariance used to initialize amcl -->
     <arg name="x" default="0" doc="initial x mean estimate [m]" />
     <arg name="y" default="0" doc="initial y mean estimate [m]" />
     <arg name="yaw" default="0" doc="initial yaw mean estimate [radians]" />
-    <arg name="cov_xx" default="1" doc="initial pose covariance (x*x) estimate [m]" />
-    <arg name="cov_yy" default="1" doc="Initial pose covariance (y*y) estimate [m]" />
-    <arg name="cov_yaw" default="1" doc="Initial pose covariance (yaw*yaw) estimate [radians]" />
-
 
     <!--- amcl localization and map server -->
-    <include file="$(find gigatron_nav)/launch/localization/amcl.launch">
-        <arg name="map_server" default="true" />
+    <include file="$(find gigatron_nav)/launch/localization/localization.launch">
         <arg name="map" value="$(arg map)" /> 
         <arg name="bag" value="$(arg bag)" />
-        <arg name="using_ekf" value="$(arg using_ekf)" />
-        <!-- initial pose and covariance -->
+        <arg name="ekf_map" value="$(arg ekf_map)" />
+        <arg name="gps" value="$(arg gps)" />
         <arg name="x" value="$(arg x)" />
         <arg name="y" value="$(arg x)" />
         <arg name="yaw" value="$(arg x)" />
-        <arg name="cov_xx" value="$(arg cov_xx)" />
-        <arg name="cov_yy" value="$(arg cov_yy)" />
-        <arg name="cov_yaw" value="$(arg cov_yaw)" />
     </include>
 
     <!-- move_base -->
@@ -53,6 +49,5 @@
         <arg name="config" if="$(arg teb_planner)" value="car_nav_teb" />
         <arg name="config" unless="$(arg teb_planner)" value="car_map" />
     </include>
-
 
 </launch>
