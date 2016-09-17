@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!-- avc.launch
+     Launch file for nav_goal_publisher to successively send goals in a planned route
+
+     @author  Sarah Pohorecky     <spohorec@mit.edu>
+     @author  Syler Wagner		  <syler@mit.edu>
+     
+     @date    2016-09-12  spohorec  creation
+-->
+
+<launch>
+	<arg name="plan" default="avc_race" />
+	<arg name="waypoint_timeout" default="180.0" />
+
+	<node pkg="gigatron_nav" type="nav_goal_publisher" name="nav_goal_publisher" output="screen">
+		<param name="plan_file" value="$(find gigatron_nav)/maps/plans/$(arg plan).yaml" />
+		<param name="waypoint_timeout" value="$(arg waypoint_timeout)" />
+	</node>
+</launch>
