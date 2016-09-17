@@ -9,10 +9,12 @@
 <launch>
 
 	<arg name="max" default="5" doc="maximum forward velocity in m/s" />
+	<arg name="inverted_laser" doc="true if laser is rotated 180 degrees"/>
 
 	<!-- reactive drive controller -->
 	<node pkg="gigatron" type="drive" name="reactive_drive">
 		<param name="v_max" value="$(arg max)" />
+		<param name="inverted_laser" value="$(arg inverted_laser)" />
 	</node>
 
 </launch>
