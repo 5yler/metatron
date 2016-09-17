@@ -23,7 +23,7 @@
     <!-- IMU placement relative to base_link -->
     <xacro:property name="imu_x" value="0" /> 
     <xacro:property name="imu_y" value="0" />
-    <xacro:property name="imu_z" value="-.5" /> <!-- TODO: Update this value. This one is temporary. --> 
+    <xacro:property name="imu_z" value="-0.0254" /> 
 
     <!-- LIDAR placement relative to base_link -->
     <xacro:property name="lidar_x" value=".5588" /> 
