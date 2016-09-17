@@ -8,8 +8,8 @@
 -->
 <launch>
 	<!-- general settings -->
-	<arg name="bag" default="true" doc="true if running on rosbagged data" />
-	<arg name="rviz" default="false" /> <!-- display robot in RViz -->
+	<arg name="bag" default="false" doc="true if running on rosbagged data" />
+	<arg name="rviz" default="true" /> <!-- display robot in RViz -->
     <arg name="map" default="avc" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
 
     <arg name="gps" doc="fusing data from GPS or no?" default="true" />
