@@ -10,7 +10,7 @@
 
 <launch>
 	<arg name="plan" default="avc_race" />
-	<arg name="waypoint_timeout" default="180.0" />
+	<arg name="waypoint_timeout" default="40.0" />
 
 	<node pkg="gigatron_nav" type="nav_goal_publisher" name="nav_goal_publisher" output="screen">
 		<param name="plan_file" value="$(find gigatron_nav)/maps/plans/$(arg plan).yaml" />

@@ -20,7 +20,7 @@
     <arg name="gps" default="true" doc="fusing data from GPS or no?" />
     <arg name="colorado" default="true" doc="true if in Colorado, used to account for magnetic declination" />
 
-    <arg name="rviz" default="false" /> <!-- display robot in RViz -->
+    <arg name="rviz" default="true" /> <!-- display robot in RViz -->
 
     <!-- initial pose and covariance used to initialize amcl -->
     <arg name="x" default="0" doc="initial x mean estimate [m]" />
