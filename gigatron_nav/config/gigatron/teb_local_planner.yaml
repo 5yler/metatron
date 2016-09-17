@@ -28,7 +28,7 @@ TebLocalPlannerROS: # parameters for Gigatron with race body
  # GoalTolerance
     
  xy_goal_tolerance: 2
- yaw_goal_tolerance: 6.9 # don't really care which direction it's pointing
+ yaw_goal_tolerance: 3.69 # don't really care which direction it's pointing
  free_goal_vel: true # ?
     
  # Obstacles
