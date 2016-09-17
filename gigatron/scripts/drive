@@ -63,8 +63,8 @@ class Driver():
         self._abs_max_steering_angle = 0.5 * self._steering_angle_range
         self._v_max = self._max_motor_rpm * self._rpm_to_vel * self._gear_ratio
 
-        if rospy.has_param("car/max_auto_velocity"):
-            self._v_max = rospy.get_param("car/max_auto_velocity")
+        if rospy.has_param("v_max"):
+            self._v_max = rospy.get_param("v_max")
             rospy.logerr("SETTING MAX AUTO VELOCITY TO %4.2f m/s", self._v_max)
 
         self._v_faster = self._v_max

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- drive.launch
+     Launch file for reactive drive controller
+
+     @author  Syler Wagner  <syler@mit.edu>
+     
+     @date    2016-09-17   syler   creation
+    -->
+<launch>
+
+	<arg name="max" default="5" doc="maximum forward velocity in m/s" />
+
+	<!-- reactive drive controller -->
+	<node pkg="gigatron" type="drive" name="reactive_drive">
+		<param name="v_max" value="$(arg max)" />
+	</node>
+
+</launch>
