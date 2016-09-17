@@ -29,7 +29,7 @@
     <xacro:property name="lidar_x" value=".5588" /> 
     <xacro:property name="lidar_y" value="0" />
     <xacro:property name="lidar_z" value="0.2286" /> 
-    <xacro:property name="lidar_yaw" value="${M_PI}" />
+    <xacro:property name="lidar_yaw" value="0" />
 
     <!-- Rear LIDAR placement relative to base_link -->
     <xacro:property name="back_lidar_x" value="-0.5334" /> 
