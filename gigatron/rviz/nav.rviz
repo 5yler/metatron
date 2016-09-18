@@ -12,6 +12,7 @@ Panels:
         - /Odometry1
         - /EKF Map Odometry1
         - /Global Footprint Polygon1
+        - /UTM Odometry1
       Splitter Ratio: 0.5
     Tree Height: 436
   - Class: rviz/Selection
@@ -32,7 +33,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: Scan Forward 180
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -64,6 +65,46 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        back_laser_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        back_left_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        back_right_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_left_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_right_wheel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        laser_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
       Name: Robot Model
       Robot Description: robot_description
       TF Prefix: ""
@@ -305,6 +346,16 @@ Visualization Manager:
       Topic: /move_base/global_costmap/footprint
       Unreliable: false
       Value: true
+    - Angle Tolerance: 0.1
+      Class: rviz/Odometry
+      Color: 74; 88; 218
+      Enabled: true
+      Keep: 0
+      Length: 1
+      Name: UTM Odometry
+      Position Tolerance: 0.2
+      Topic: /odometry/utm
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -337,11 +388,11 @@ Visualization Manager:
         Value: false
       Name: Current View
       Near Clip Distance: 0.01
-      Scale: 16.689
+      Scale: 16.1228
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
-      X: -4.42862
-      Y: -7.98369
+      X: -8.90914
+      Y: -9.36701
     Saved: ~
 Window Geometry:
   Displays:
