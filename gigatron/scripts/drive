@@ -60,9 +60,14 @@ def sign(x):
 class Points():
     
     def __init__(self, point_list):
-        self.angles = point_list[0]
-        self.ranges = point_list[1]
-        self.intensities = point_list[2]
+        if len(points_list) != 0:
+            self.angles = point_list[0]
+            self.ranges = point_list[1]
+            self.intensities = point_list[2]
+        else:
+            self.angles = []
+            self.ranges = []
+            self.intensities = []
         
     def num_points(self):
         print str(len(self.ranges))+" valid points"
