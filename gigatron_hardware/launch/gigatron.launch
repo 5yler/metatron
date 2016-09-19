@@ -32,17 +32,12 @@
 		<arg name="frame_id" default="laser_link" />
 		<arg name="topic" default="scan_rp" />
 	</include>
-	<!-- <include file="$(find gigatron_hardware)/launch/laser_angle_filter.launch" >
+	<!-- the laser angle filter unfortunately does not work at removing the middle part of a laser scan, so it won't work on inverted LIDAR -->
+	<include file="$(find gigatron_hardware)/launch/laser_angle_filter.launch" >
     	<arg name="filter_name" value="rplidar_angle_filter" />
-    	<arg name="filter_type" value="inverted_laser_angle_filter" />
+    	<arg name="filter_type" value="laser_angle_filter" />
     	<arg name="input_topic" value="scan_rp" />
     	<arg name="output_topic" value="scan_front" /> 
-	</include> -->
-	<include file="$(find gigatron_hardware)/launch/laser_range_filter.launch" >
-		<arg name="filter_name" value="front_range_filter" />
-    	<arg name="input_topic" value="scan_rp" />
-    	<arg name="output_topic" value="scan_front" /> 
-
 	</include>
 	<node name="front_scan_relay" type="relay" pkg="topic_tools" args="/scan_front /scan"/>
 
@@ -54,11 +49,10 @@
 		</include>
 		<include file="$(find gigatron_hardware)/launch/laser_angle_filter.launch" >
 	    	<arg name="filter_name" value="xvlidar_angle_filter" />
-	    	<arg name="filter_type" value="inverted_laser_angle_filter" />
+	    	<arg name="filter_type" value="laser_angle_filter" />
 	    	<arg name="input_topic" value="scan_xv" />
 	    	<arg name="output_topic" value="scan_back" />
 		</include>
-
 		<node name="back_scan_relay" type="relay" pkg="topic_tools" args="/scan_back /scan"/>
 	</group>
 
