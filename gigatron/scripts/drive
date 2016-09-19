@@ -94,6 +94,7 @@ class Driver():
         # get some parameters
         self._car_name = rospy.get_param("car/name")
         self._wheelbase_width = rospy.get_param("car/wheelbase_width")
+        self._wheelbase_length = rospy.get_param("car/wheelbase_length")
         if rospy.has_param("car/wheel_diameter"):
             self._wheel_radius = rospy.get_param("car/wheel_diameter") / 2.0
         else:
@@ -243,17 +244,19 @@ class Driver():
         return v
 
     def split_throttle(self, steer_angle, v):
-        # v = control_speed
-        omega = (v * math.tan(steer_angle)) / self._wheelbase_width
+        # omega = angular velocity
+        omega = (v * math.tan(steer_angle)) / self._wheelbase_length
 
-        # TODO: test on Gigatron and see if it's actually worth using
-        if self._car_name == "Kilotron":
-            k_split = 0.25
-        else:
-            k_split = 1
+        # v = center velocity
+        # omega is the same for the entire car, but the outer wheel will have a higher
+        # velocity during the turn because the radius is higher
 
-        v_left = v - k_split * (omega / self._wheelbase_width)   # left wheel velocity
-        v_right = v + k_split * (omega / self._wheelbase_width)   # right wheel velocity
+        # v = r * omega
+        # v_left = (r_center - 0.5 * wheelbase_width) * omega
+        # r_center = v / omega
+        v_left = v - 0.5 * self._wheelbase_width * omega
+        v_right = v + 0.5 * self._wheelbase_width * omega
+      
         return v_left, v_right
 
     def proportional_throttle(self, steer_angle, ranges, intensities):
