@@ -212,7 +212,6 @@ class Driver():
 
     def steer(self, ranges, intensities, theta_min=-math.pi/2, theta_max=math.pi/2):
         narrow = self.generate_narrow_fov_points(ranges, intensities, theta_min, theta_max)
-        rospy.logwarn("steer: len(narrow): %d", len(narrow[0]))
         if len(narrow) !=0 and len(narrow[0]) != 0:
            drive_angle = self.polar_integrate(narrow)
         else:
