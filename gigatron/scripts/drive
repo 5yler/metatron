@@ -149,9 +149,14 @@ class Driver():
     # helper functions
     def point_ok(self, point):
         r, theta, intensity = point[0], point[1], point[2]
+
+        if math.isnan(r): # check for inf
+            return False
         if r < 0:
             return False
-        elif intensity == 0.0: # this might not be necessary
+        elif intensity <= 0.0: # this might not be necessary
+            return False
+        elif r < self._range_min or r > self._range_max: 
             return False
         else:
             return True
