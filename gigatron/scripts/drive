@@ -60,8 +60,6 @@ def sign(x):
 class Points():
     
     def __init__(self, point_list):
-        if debug:
-            print point_list
         self.angles = point_list[0]
         self.ranges = point_list[1]
         self.intensities = point_list[2]
@@ -70,10 +68,16 @@ class Points():
         print str(len(self.ranges))+" valid points"
         return len(self.ranges)
 
+    def is_empty(self):
+        if len(self.ranges) == 0:
+            return True
+        else:
+            return False
+
 class Driver():
 
     def __init__(self):
-        
+
         # control publisher
         print "Init'ing Publisher"
         self._pub = rospy.Publisher('/command/drive', Drive, queue_size=5)
@@ -124,14 +128,16 @@ class Driver():
 
         rospy.spin()
 
+
+
     # laser scan callback method
     def callback(self, scan):
 
         if not self._got_laser_parameters:
             self.initialize_laser_parameters(scan)
 
-        ranges = scan.ranges
-        intensities = scan.intensities
+        drive_angle = self.steer(scan, yaw_offset=self._laser_yaw, yaw_min=-math.pi/2, yaw_max=math.pi/2)
+
         control = Drive()
      
         # if self.ahead_clear(scan): #if clear, go fast!
@@ -139,7 +145,6 @@ class Driver():
         #     control.vel_left = self._v_max
         #     control.vel_right = self._v_max
         # else: #drive normally
-        drive_angle = self.steer(ranges, intensities)
         v = self.throttle(drive_angle)
         v_left, v_right = self.split_throttle(drive_angle, v)
         # drive_angle, v_left, v_right = proportional_throttle(steer_angle, ranges, intensities)
@@ -200,48 +205,31 @@ class Driver():
 
     def narrow_fov(self, points, yaw_min, yaw_max):
         # return points with yaw in specified range
-        #narrow = [p for p in zip(points[0], points[1], points[2]) if yaw_min < p[1] < yaw_max]
-
-        #TODO won't this mess up if it has enough invalid points by offsetting by their angles?
-        #I would expect to need to insert some placeholder point at min or max range, or 
-        #somehow otherwise indicate that their spot has unknown value, but maybe since they 
-        #all have an associated yaw value this is unnecessary?
-
-        # return self.narrow_fov(points, yaw_min + (self._angle_max - self._angle_min), yaw_max + (self._angle_max - self._angle_min))
-
-        narrow = [p for p in zip(points[0], points[1], points[2]) if yaw_min < p[0] < yaw_max and self.point_ok(p)]
-        #$ removed angle filtering because we're just using an angle filtered scan now
-        # narrow = [p for p in zip(points[0], points[1], points[2]) if self.point_ok(p)]
-        return [list(n) for n in zip(*narrow)]
-
-    def generate_narrow_fov_points(self, ranges, intensities, yaw_min=-math.pi/2, yaw_max=math.pi/2):
-
-        angles = self.generate_scan_angles(self._angle_min, self._angle_max, self._angle_increment, self._laser_yaw)
-
-        points = [angles, ranges, intensities]
-        rospy.loginfo("len(points): %d", len(points))
-        return self.narrow_fov(points, yaw_min, yaw_max)
+        narrow = [p for p in zip(points.angles, points.ranges, points.intensities) if yaw_min < p[0] < yaw_max and self.point_ok(p)]
+        return Points([list(n) for n in zip(*narrow)])
 
     def polar_integrate(self, narrow):
         integral = 0;
         dirintegral = 0;
-        for p in zip(narrow[0], narrow[1], narrow[2]):
+        for p in zip(narrow.angles, narrow.ranges, narrow.intensities):
             yaw = p[0]
             r = p[1]
-            
-            dirintegral += sign(yaw) * (1/r) * math.cos(yaw)
+            # use -= because we want to steer away from points
+            dirintegral -= sign(yaw) * (1/r) * math.cos(yaw)
             integral += (1/r) * math.cos(yaw)
             #print r, yaw
         rospy.logerr("integral %4.1f, dirintegral %4.1f, dirintegral/integral %4.1f", integral, dirintegral, dirintegral/integral) 
-
         return dirintegral/integral
 
-    def steer(self, ranges, intensities, yaw_min=-math.pi/2, yaw_max=math.pi/2):
-        narrow = self.generate_narrow_fov_points(ranges, intensities, yaw_min, yaw_max)
-        if len(narrow) !=0 and len(narrow[0]) != 0:
-           drive_angle = self.polar_integrate(narrow)
-        else:
+    def steer(self, scan, yaw_offset, yaw_min=-math.pi/2, yaw_max=math.pi/2):
+        angles = self.generate_scan_angles(self._angle_min, self._angle_max, self._angle_increment, yaw_offset=self._laser_yaw)
+        scan_points = Points([angles, scan.ranges, scan.intensities])
+        narrow_points = self.narrow_fov(scan_points, yaw_min, yaw_max)
+        if narrow_points.is_empty():
             drive_angle = 0 
+        else:
+            drive_angle = self.polar_integrate(narrow_points)
+        
         return drive_angle
 
     def throttle(self, steer_angle):
@@ -264,7 +252,7 @@ class Driver():
         return v_left, v_right
 
     def proportional_throttle(self, steer_angle, ranges, intensities):
-        v = throttle(steer_angle)
+        v = self.throttle(steer_angle)
         points_ahead = self.generate_narrow_fov_points(ranges, intensities, (steer_angle - math.pi/8), (steer_angle + math.pi/8))
         ranges_ahead = []
         rospy.logwarn("proportional_throttle v: %4.1f", v)
