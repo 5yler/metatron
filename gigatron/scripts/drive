@@ -36,6 +36,40 @@ fast_dist = 5   #Assumes with 5m of clearance ahead we can go as fast as possibl
 
 inf = float('nan')
 
+# wrap angle to interval [-pi, pi]
+def wrap_angle(angle):
+    while angle > math.pi:
+        angle -= 2*math.pi
+    while angle < -math.pi:
+        angle += 2*math.pi
+    # sanity check
+    assert angle > -math.pi and angle < math.pi
+    return angle
+
+# get sign of a number
+def sign(x):
+    if x > 0:
+        return 1
+    elif x < 0:
+        return -1
+    elif x == 0:
+        return 0
+    else: # this covers NaN values
+        return x
+
+class Points():
+    
+    def __init__(self, point_list):
+        if debug:
+            print point_list
+        self.angles = point_list[0]
+        self.ranges = point_list[1]
+        self.intensities = point_list[2]
+        
+    def num_points(self):
+        print str(len(self.ranges))+" valid points"
+        return len(self.ranges)
+
 class Driver():
 
     def __init__(self):
@@ -122,19 +156,12 @@ class Driver():
         self._pub.publish(control)
 
     def initialize_laser_parameters(self, scan):
-        if self._car_name == "Gigatron":
-            # hardcoded RPLIDAR parameters that worked
-            self._angle_min = 3.14159274101
-            self._angle_max = -3.12413907051
-            self._angle_increment = -0.0174532923847
-            self._range_min = 0.15000000596
-            self._range_max = 6.0
-        else:
-            self._angle_min = scan.angle_min
-            self._angle_max = scan.angle_max
-            self._angle_increment = scan.angle_increment
-            self._range_min = scan.range_min
-            self._range_max = scan.range_max
+
+        self._angle_min = scan.angle_min
+        self._angle_max = scan.angle_max
+        self._angle_increment = scan.angle_increment
+        self._range_min = scan.range_min
+        self._range_max = scan.range_max
         # try: # try to look up transform between base_link and laser_link
         #     (trans, rot) = listener.lookupTransform('base_link', 'laser_link' rospy.Time(0))
         #     (roll, pitch, yaw) = tf.transformations.euler_from_quaternion(rot)
@@ -145,10 +172,19 @@ class Driver():
 
         self._got_laser_parameters = True
 
+    # generate an array with the scan angles associated with sequential points in a laser scan
+    def generate_scan_angles(self, angle_min, angle_max, angle_increment, yaw_offset=0):
+        n_points = int(round((angle_max - angle_min + angle_increment)/angle_increment))
+        angles = []
+        for i in xrange(n_points):
+            angle = wrap_angle(angle_min + i*angle_increment + yaw_offset)
+            angles.append(angle)
+        return angles
+
 
     # helper functions
     def point_ok(self, point):
-        r, theta, intensity = point[0], point[1], point[2]
+        angle, r, intensity = point[0], point[1], point[2]
 
         if math.isnan(r): # check for inf
             return False
@@ -162,56 +198,46 @@ class Driver():
             return True
 
 
-    def narrow_fov(self, points, theta_min, theta_max):
-        # return points with theta in specified range
-        #narrow = [p for p in zip(points[0], points[1], points[2]) if theta_min < p[1] < theta_max]
+    def narrow_fov(self, points, yaw_min, yaw_max):
+        # return points with yaw in specified range
+        #narrow = [p for p in zip(points[0], points[1], points[2]) if yaw_min < p[1] < yaw_max]
 
         #TODO won't this mess up if it has enough invalid points by offsetting by their angles?
         #I would expect to need to insert some placeholder point at min or max range, or 
         #somehow otherwise indicate that their spot has unknown value, but maybe since they 
-        #all have an associated theta value this is unnecessary?
+        #all have an associated yaw value this is unnecessary?
 
-        # return self.narrow_fov(points, theta_min + (self._angle_max - self._angle_min), theta_max + (self._angle_max - self._angle_min))
+        # return self.narrow_fov(points, yaw_min + (self._angle_max - self._angle_min), yaw_max + (self._angle_max - self._angle_min))
 
-        narrow = [p for p in zip(points[0], points[1], points[2]) if theta_min < p[1] < theta_max and self.point_ok(p)]
+        narrow = [p for p in zip(points[0], points[1], points[2]) if yaw_min < p[0] < yaw_max and self.point_ok(p)]
         #$ removed angle filtering because we're just using an angle filtered scan now
         # narrow = [p for p in zip(points[0], points[1], points[2]) if self.point_ok(p)]
         return [list(n) for n in zip(*narrow)]
 
-    def generate_narrow_fov_points(self, ranges, intensities, theta_min=-math.pi/2, theta_max=math.pi/2):
-        theta = []
-        for i in xrange(360):
-            if (follow_syler):
-                theta.append(self._angle_min + i*self._angle_increment)
-            else:
-                theta.append(self._angle_max - i*self._angle_increment)
+    def generate_narrow_fov_points(self, ranges, intensities, yaw_min=-math.pi/2, yaw_max=math.pi/2):
 
-        if self._inverted_laser: # TODO: replace with transform lookup and actual math
-            ranges = ranges[180:len(ranges)] + ranges[0:180]
-            intensities = intensities[180:len(intensities)] + intensities[0:180]
+        angles = self.generate_scan_angles(self._angle_min, self._angle_max, self._angle_increment, self._laser_yaw)
 
-        points = [ranges, theta, intensities]
+        points = [angles, ranges, intensities]
         rospy.loginfo("len(points): %d", len(points))
-        return self.narrow_fov(points, theta_min, theta_max)
+        return self.narrow_fov(points, yaw_min, yaw_max)
 
     def polar_integrate(self, narrow):
         integral = 0;
         dirintegral = 0;
         for p in zip(narrow[0], narrow[1], narrow[2]):
-            r = p[0]
-            theta = p[1]
-            if theta >= 0:
-                dirintegral -= (1/r) * math.cos(theta)
-            elif theta < 0:
-                dirintegral += (1/r) * math.cos(theta)
-            integral += (1/r) * math.cos(theta)
-            #print r, theta
+            yaw = p[0]
+            r = p[1]
+            
+            dirintegral += sign(yaw) * (1/r) * math.cos(yaw)
+            integral += (1/r) * math.cos(yaw)
+            #print r, yaw
         rospy.logerr("integral %4.1f, dirintegral %4.1f, dirintegral/integral %4.1f", integral, dirintegral, dirintegral/integral) 
 
         return dirintegral/integral
 
-    def steer(self, ranges, intensities, theta_min=-math.pi/2, theta_max=math.pi/2):
-        narrow = self.generate_narrow_fov_points(ranges, intensities, theta_min, theta_max)
+    def steer(self, ranges, intensities, yaw_min=-math.pi/2, yaw_max=math.pi/2):
+        narrow = self.generate_narrow_fov_points(ranges, intensities, yaw_min, yaw_max)
         if len(narrow) !=0 and len(narrow[0]) != 0:
            drive_angle = self.polar_integrate(narrow)
         else:
