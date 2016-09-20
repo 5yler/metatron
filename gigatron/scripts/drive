@@ -13,11 +13,7 @@
 from __future__ import division
 
 import rospy
-from std_msgs.msg import String   # for switching Jetson/RC mode
-import sys, select, termios, tty
-
-from matplotlib import pyplot as plt
-import matplotlib.patches as mpatches
+import sys
 import numpy as np
 import math
 from sensor_msgs.msg import LaserScan   # for switching Jetson/RC mode
@@ -84,11 +80,9 @@ class Driver():
     def __init__(self):
 
         # control publisher
-        print "Init'ing Publisher"
         self._pub = rospy.Publisher('/command/drive', Drive, queue_size=5)
 
         # scan subscriber
-        print "Init'ing Subscriber"
         rospy.Subscriber('/scan_rp', LaserScan, self.callback)
 
         # get some parameters
@@ -103,8 +97,6 @@ class Driver():
         self._steering_angle_range = rospy.get_param("car/steering_angle_range")
         self._max_motor_rpm  = rospy.get_param("car/max_motor_rpm")
 
-        print "Got parameters!"
-
         self._rpm_to_vel = (2 * math.pi * self._wheel_radius) / 60.0
 
         self._abs_max_steering_angle = 0.5 * self._steering_angle_range
@@ -118,45 +110,43 @@ class Driver():
         self._v_forward = 0.5 * self._v_max
         self._v_slowest = 0.25 * self._v_max
 
-        self._got_laser_parameters = False
+        rospy.logwarn("Got parameters for car: %s", self._car_name)
 
-        self._laser_yaw = 0
-        # self._listener = tf.TransformListener()
-        # if rospy.has_param("laser_yaw"):
-        #     self._laser_yaw = rospy.get_param("laser_yaw")
-        # else:
-        #     self._laser_yaw = 0
-        self._inverted_laser = rospy.get_param("~inverted_laser")
-        if self._inverted_laser:
-            self._laser_yaw = math.pi
+        self._got_lidar_parameters = False
 
-        rospy.logerr("LASER YAW OFFSET IS %4.2f RADIANS", self._laser_yaw)
+        self._lidar_yaw = 0
+
+        # note: this will be overridden by tf information if available
+        if rospy.has_param("~lidar_yaw"):
+            self._lidar_yaw = rospy.get_param("~lidar_yaw")
+        self._ignore_tf = rospy.get_param("~ignore_tf", False)
 
         rospy.spin()
-
-
 
     # laser scan callback method
     def callback(self, scan):
 
-        if not self._got_laser_parameters:
+        if not self._got_lidar_parameters:
             self.initialize_laser_parameters(scan)
 
-        drive_angle = self.steer(scan, yaw_offset=self._laser_yaw, yaw_min=-math.pi/2, yaw_max=math.pi/2)
-
-        control = Drive()
+        drive_angle = self.steer(scan, yaw_offset=self._lidar_yaw, yaw_min=-math.pi/2, yaw_max=math.pi/2)
      
-        # if self.ahead_clear(scan): #if clear, go fast!
-        #     control.angle = 0.0
-        #     control.vel_left = self._v_max
-        #     control.vel_right = self._v_max
-        # else: #drive normally
+        '''
+        if self.ahead_clear(scan): #if clear, go fast!
+            control.angle = 0.0
+            control.vel_left = self._v_max
+            control.vel_right = self._v_max
+        else: #drive normally
+        '''
         v = self.throttle(drive_angle)
         v_left, v_right = self.split_throttle(drive_angle, v)
         # drive_angle, v_left, v_right = proportional_throttle(steer_angle, ranges, intensities)
+    
 
         if abs(drive_angle) > self._abs_max_steering_angle:
             drive_angle = drive_angle * (self._abs_max_steering_angle / abs(drive_angle))
+
+        control = Drive()
 
         # set velocity commands
         control.angle = drive_angle  # driving angle 
@@ -173,15 +163,22 @@ class Driver():
         self._angle_increment = scan.angle_increment
         self._range_min = scan.range_min
         self._range_max = scan.range_max
-        # try: # try to look up transform between base_link and laser_link
-        #     (trans, rot) = listener.lookupTransform('base_link', 'laser_link' rospy.Time(0))
-        #     (roll, pitch, yaw) = tf.transformations.euler_from_quaternion(rot)
-        #     self._laser_yaw += yaw
-        # except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException), e:
-        #     continue
-        rospy.logwarn("Laser yaw offset: %4.2f radians", self._laser_yaw)
 
-        self._got_laser_parameters = True
+
+        if not self._ignore_tf:
+            listener = tf.TransformListener()
+            try: # try to look up transform between base_link and laser frame
+                (trans, rot) = listener.lookupTransform('base_link', scan.header.frame_id, rospy.Time(0))
+                (roll, pitch, yaw) = tf.transformations.euler_from_quaternion(rot)
+                self._lidar_yaw = yaw
+            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException), e:
+                rospy.logerr("Could not get transform between base_link and %s!", scan.header.frame_id)
+                pass
+
+        rospy.logerr("LIDAR YAW OFFSET IS %4.2f RADIANS", self._lidar_yaw)
+        rospy.loginfo("Got LIDAR parameters.")
+
+        self._got_lidar_parameters = True
 
     # generate an array with the scan angles associated with sequential points in a laser scan
     def generate_scan_angles(self, angle_min, angle_max, angle_increment, yaw_offset=0):
@@ -191,7 +188,6 @@ class Driver():
             angle = wrap_angle(angle_min + i*angle_increment + yaw_offset)
             angles.append(angle)
         return angles
-
 
     # helper functions
     def point_ok(self, point):
@@ -208,9 +204,8 @@ class Driver():
         else:
             return True
 
-
+    # return OK points with yaw in specified range
     def narrow_fov(self, points, yaw_min, yaw_max):
-        # return points with yaw in specified range
         narrow = [p for p in zip(points.angles, points.ranges, points.intensities) if yaw_min < p[0] < yaw_max and self.point_ok(p)]
         return Points([list(n) for n in zip(*narrow)])
 
@@ -223,12 +218,10 @@ class Driver():
             # use -= because we want to steer away from points
             dirintegral -= sign(yaw) * (1/r) * math.cos(yaw)
             integral += (1/r) * math.cos(yaw)
-            #print r, yaw
-        rospy.logerr("integral %4.1f, dirintegral %4.1f, dirintegral/integral %4.1f", integral, dirintegral, dirintegral/integral) 
         return dirintegral/integral
 
     def steer(self, scan, yaw_offset, yaw_min=-math.pi/2, yaw_max=math.pi/2):
-        angles = self.generate_scan_angles(self._angle_min, self._angle_max, self._angle_increment, yaw_offset=self._laser_yaw)
+        angles = self.generate_scan_angles(self._angle_min, self._angle_max, self._angle_increment, yaw_offset=self._lidar_yaw)
         scan_points = Points([angles, scan.ranges, scan.intensities])
         narrow_points = self.narrow_fov(scan_points, yaw_min, yaw_max)
         if narrow_points.is_empty():
@@ -238,11 +231,13 @@ class Driver():
         
         return drive_angle
 
+    # adjust forward velocity to be lower when steering
     def throttle(self, steer_angle):
         v = self._v_forward * (self._abs_max_steering_angle - abs(steer_angle)) / self._abs_max_steering_angle
         v = max(v, self._v_slowest) # so it doesn't stop at the extremes of turning range
         return v
 
+    # get individual drive wheel velocities from center velocity and steering angle
     def split_throttle(self, steer_angle, v):
         # omega = angular velocity
         omega = (v * math.tan(steer_angle)) / self._wheelbase_length
@@ -259,6 +254,7 @@ class Driver():
       
         return v_left, v_right
 
+    '''
     def proportional_throttle(self, steer_angle, ranges, intensities):
         v = self.throttle(steer_angle)
         points_ahead = self.generate_narrow_fov_points(ranges, intensities, (steer_angle - math.pi/8), (steer_angle + math.pi/8))
@@ -284,6 +280,7 @@ class Driver():
         
         return angle, v_left, v_right
 
+
     def ahead_clear(self, scan_unfiltered):
         Projector = LaserProjection()
         cloud = Projector.projectLaser(scan) #gets PointCloud2
@@ -292,6 +289,7 @@ class Driver():
             if abs(p[1]) <= self._wheelbase_width / 2 and p[0] > 0: #is the point in the way?
                 return False
         return True
+    '''
 
 if __name__=="__main__":
     

@@ -9,12 +9,12 @@
 <launch>
 
 	<arg name="max" default="5" doc="maximum forward velocity in m/s" />
-	<arg name="inverted_laser" doc="true if laser is rotated 180 degrees"/>
+	<arg name="ignore_tf" doc="true if laser frame tf infomation should be ignored"/>
 
 	<!-- reactive drive controller -->
 	<node pkg="gigatron" type="drive" name="reactive_drive">
 		<param name="v_max" value="$(arg max)" />
-		<param name="inverted_laser" value="$(arg inverted_laser)" />
+		<param name="ignore_tf" value="$(arg ignore_tf)" />
 	</node>
 
 </launch>
