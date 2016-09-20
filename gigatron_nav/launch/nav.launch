@@ -20,8 +20,6 @@
     <arg name="gps" default="true" doc="fusing data from GPS or no?" />
     <arg name="colorado" default="true" doc="true if in Colorado, used to account for magnetic declination" />
 
-    <arg name="rviz" default="true" /> <!-- display robot in RViz -->
-
     <!-- initial pose and covariance used to initialize amcl -->
     <arg name="x" default="0" doc="initial x mean estimate [m]" />
     <arg name="y" default="0" doc="initial y mean estimate [m]" />
@@ -42,11 +40,6 @@
     <include file="$(find gigatron_nav)/launch/move_base.launch">
         <arg name="car" value="$(arg car)" />
         <arg name="teb_planner" value="$(arg teb_planner)" />
-    </include>
-
-    <!-- RViz -->
-    <include if="$(arg rviz)" file="$(find gigatron)/launch/rviz.launch" >
-        <arg name="config" value="nav" />
     </include>
 
 </launch>
