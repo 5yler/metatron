@@ -1,0 +1,17 @@
+<class_libraries>
+  <!-- <library path="lib/liblaser_scan_filters"> -->
+  <library path="lib/libscan_filters">
+    <class name="scan_filters/LaserScanAngleFilter" type="scan_filters::LaserScanAngleFilter" 
+	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+	This is a filter which filters sensor_msgs::LaserScan messages based on range
+      </description>
+    </class>
+    <class name="scan_filters/LaserScanSunlightFilter" type="scan_filters::LaserScanSunlightFilter" 
+	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+	This is a filter which filters points from a laser scan that look like the veiling effect.
+      </description>
+    </class>
+  </library>
+</class_libraries>
