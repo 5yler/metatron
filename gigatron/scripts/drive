@@ -82,8 +82,11 @@ class Driver():
         # control publisher
         self._pub = rospy.Publisher('/command/drive', Drive, queue_size=5)
 
+        scan_topic = rospy.get_param('~scan_topic', 'scan_front')
+
         # scan subscriber
-        rospy.Subscriber('/scan_rp', LaserScan, self.callback)
+        rospy.Subscriber(scan_topic, LaserScan, self.callback)
+        rospy.logwarn("Subscribing to scan topic: %s", scan_topic)
 
         # get some parameters
         self._car_name = rospy.get_param("car/name")
