@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!-- filter.launch
+
+     @author  Syler Wagner  <syler@mit.edu>
+
+     @date    2016-09-20    syler   creation
+    -->
+
+<launch>
+
+    <arg name="filter_name" doc="name of filter node" />
+    <arg name="config" doc="name of filter config file in scan_filters/config without .yaml extension" />
+    <arg name="input_topic" default="scan" doc="scan topic the filter subscribes to" />
+    <arg name="output_topic" default="scan_filtered" doc="scan topic the filter publishes to" />
+
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="$(arg filter_name)" >
+        <rosparam command="load" file="$(find scan_filters)/config/$(arg config).yaml" />
+        <remap from="scan" to="$(arg input_topic)" />
+        <remap from="scan_filtered" to="$(arg output_topic)" />
+    </node>
+</launch>
