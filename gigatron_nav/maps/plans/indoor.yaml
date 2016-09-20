@@ -1,0 +1,6 @@
+name: "Hallway Test Route"
+loop: false
+goals: 
+- {x: 10.178,  y:  0.835,  yaw:  0.09}
+- {x:  6.556,  y: -7.102,  yaw: -2.69}
+- {x:  0.069,  y: -4.039,  yaw:  1.58}

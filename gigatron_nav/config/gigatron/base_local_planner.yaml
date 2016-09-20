@@ -1,6 +1,6 @@
-TrajectoryPlannerROS:
-  max_vel_x: 0.45
-  min_vel_x: 0.1
+TrajectoryPlannerROS: # parameters for Gigatron 
+  max_vel_x: 8
+  min_vel_x: 0.5
   max_vel_theta: 1.0
   min_in_place_vel_theta: 0
 
@@ -9,3 +9,7 @@ TrajectoryPlannerROS:
   acc_lim_y: 2.5
 
   holonomic_robot: false
+
+  xy_goal_tolerance: 2
+  yaw_goal_tolerance: 3.69 # don't really care which direction it's pointing
+  free_goal_vel: true # ?

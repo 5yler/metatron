@@ -126,7 +126,7 @@ public:
     l_wheel_marker_.type = visualization_msgs::Marker::ARROW;
     l_wheel_marker_.action = 0; //$ 0 add/modify an object
     l_wheel_marker_.pose.position.x = - 2 * _car_length;
-    l_wheel_marker_.pose.position.y = - _wheelbase_width;
+    l_wheel_marker_.pose.position.y = _wheelbase_width;
     l_wheel_marker_.pose.position.z = _car_height / 2;
     l_wheel_marker_.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
     l_wheel_marker_.scale.x = 0;
@@ -143,7 +143,7 @@ public:
     r_wheel_marker_.type = visualization_msgs::Marker::ARROW;
     r_wheel_marker_.action = 0; //$ 0 add/modify an object
     r_wheel_marker_.pose.position.x = - 2 * _car_length;
-    r_wheel_marker_.pose.position.y = _wheelbase_width;
+    r_wheel_marker_.pose.position.y = - _wheelbase_width;
     r_wheel_marker_.pose.position.z = _car_height / 2;
     r_wheel_marker_.pose.orientation = tf::createQuaternionMsgFromYaw(0.0);
     r_wheel_marker_.scale.x = 0;

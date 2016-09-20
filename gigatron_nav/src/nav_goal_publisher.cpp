@@ -14,9 +14,11 @@ typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseCl
 std::string plan_frame_id;
 double waypoint_timeout;
 std::string plan_file;
+std::string plan_name;
 
 std::vector<geometry_msgs::PoseStamped> goals;
-int goal_counter = 0;
+int plan_length;
+int failed = 0;
 
 bool loop;
 
@@ -30,9 +32,15 @@ bool LoadPlan(std::string file_name)
  //$ dump contents to debug
   std::cout << YAML::Dump(plan) << std::endl;
 
+  if (plan["name"])
+  {
+    plan_name = plan["name"].as<std::string>();
+    ROS_WARN("Loading plan %s", plan_name.c_str());
+  }
+
   if (plan["goals"])
   {
-    int plan_length = static_cast<int>(plan["goals"].size());
+    plan_length = static_cast<int>(plan["goals"].size());
 
     for(unsigned int i = 0; i < plan_length; i++)
     {
@@ -71,7 +79,7 @@ bool LoadPlan(std::string file_name)
       waypoint.header.stamp = ros::Time::now();
 
       goals.push_back(waypoint);
-      ROS_INFO("Added waypoint %d with x: %4.1f, y: %4.1f, yaw: %4.1f", i, waypoint.pose.position.x, waypoint.pose.position.y, yaw);
+      ROS_INFO("Added waypoint %d with x: %4.1f, y: %4.1f, yaw: %4.1f", i+1, waypoint.pose.position.x, waypoint.pose.position.y, yaw);
 
     }
 
@@ -102,10 +110,10 @@ int main(int argc, char** argv){
 
   n.param<std::string>("plan_frame_id", plan_frame_id, "map");
   n.param<std::string>("plan_file", plan_file, "ERROR");
-  n.param("waypoint_timeout", waypoint_timeout, 120.0);
+  n.param("waypoint_timeout", waypoint_timeout, 60.0);
 
   //$ load plan from YAML file
-  if(!LoadPlan(plan_file))
+  if (!LoadPlan(plan_file))
   {
     return false;
   }  
@@ -121,21 +129,23 @@ int main(int argc, char** argv){
       ROS_INFO("Waiting for the move_base action server");
     }
 
-    for(unsigned int i = 0; i < goals.size(); i++)
+    for (int i = 0; i < goals.size(); i++)
     {
       
       move_base_msgs::MoveBaseGoal goal;
       //Define goal
 
       goal.target_pose = goals[i];
-      ROS_INFO("Sending goal %d.", i);
+      ROS_INFO("Sending goal %d.", i+1);
       ac.sendGoal(goal);
 
       ac.waitForResult(ros::Duration(waypoint_timeout));
 
-      if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED) 
+      actionlib::SimpleClientGoalState goal_state = ac.getState();
+
+      if(goal_state == actionlib::SimpleClientGoalState::SUCCEEDED) 
       {
-        ROS_INFO("Goal Reached!");
+        ROS_INFO("Goal reached!");
 
         //$ reset counter to zero
         if (i == goals.size()-1) 
@@ -143,6 +153,8 @@ int main(int argc, char** argv){
           if (loop == true) 
           {
             i = 0;
+            ROS_WARN("Looping enabled, resetting to first goal point in plan.");
+
           } 
           else 
           {
@@ -153,7 +165,14 @@ int main(int argc, char** argv){
       } 
       else 
       {
-        ROS_WARN("Issue reaching goal.");
+        std::string state_string = goal_state.toString();
+        ROS_ERROR("Goal state %s after %4.1f seconds", state_string.c_str(), waypoint_timeout);
+        failed++;
+        if (failed > plan_length)
+        {
+          ROS_ERROR("Failed to reach any of %d points in plan. I give up.", plan_length);
+          ros::shutdown();
+        }
       }
     }
   }

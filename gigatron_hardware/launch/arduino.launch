@@ -41,4 +41,9 @@
             <param name="state_topic" value="/state" />
         </node> 
 
+
+        <!-- convert cmd_vel Twist messages to Drive -->
+        <node pkg="gigatron_nav" type="cmd_vel_to_drive" name="cmd_vel_to_drive" />
+
+
     </launch>

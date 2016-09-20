@@ -9,7 +9,7 @@
 <launch>
 
     <arg name="car" doc="'kilotron' or 'gigatron'?" />
-    <arg name="teb_planner" doc="true if using teb_local_planner instead of base_local_planner" default="true" />
+    <arg name="teb_planner" doc="true if using teb_local_planner instead of base_local_planner" />
 
     <!-- specify which planner to use -->
     <arg if="$(arg teb_planner)" name="planner" default="teb" />
@@ -25,6 +25,7 @@
         <rosparam file="$(find gigatron_nav)/config/$(arg car)/$(arg planner)_local_planner.yaml" command="load" />
         <!-- additional parameter if using teb -->
         <param if="$(arg teb_planner)" name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS" />
+        <param unless="$(arg teb_planner)" name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS" />
         <param name="controller_frequency" value="10.0" />
         <param name="clearing_rotation_allowed" value="false" /> <!-- Our carlike robot is not able to rotate in place -->
     </node>

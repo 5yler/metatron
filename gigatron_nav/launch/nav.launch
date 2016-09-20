@@ -8,19 +8,19 @@
 -->
 <launch>
 
-    <arg name="bag" doc="true if running on rosbagged data" />
+    <arg name="bag" default="false" doc="true if running on rosbagged data" />
     <arg name="map" default="avc" /> <!-- map file name in gigatron/maps, without the .yaml extension  -->
 
     <!-- move_base config -->
     <arg name="car" default="gigatron" doc="'kilotron' or 'gigatron'?" />
-    <arg name="teb_planner"  doc="true if using teb_local_planner instead of base_local_planner" />
+    <arg name="teb_planner" default="true" doc="true if using teb_local_planner instead of base_local_planner" />
 
     <!-- specify how to run localization -->
     <arg name="ekf_map" default="true" doc="use ekf in map frame" />
     <arg name="gps" default="true" doc="fusing data from GPS or no?" />
     <arg name="colorado" default="true" doc="true if in Colorado, used to account for magnetic declination" />
 
-    <arg name="rviz" default="false" /> <!-- display robot in RViz -->
+    <arg name="rviz" default="true" /> <!-- display robot in RViz -->
 
     <!-- initial pose and covariance used to initialize amcl -->
     <arg name="x" default="0" doc="initial x mean estimate [m]" />
@@ -46,8 +46,7 @@
 
     <!-- RViz -->
     <include if="$(arg rviz)" file="$(find gigatron)/launch/rviz.launch" >
-        <arg name="config" if="$(arg teb_planner)" value="car_nav_teb" />
-        <arg name="config" unless="$(arg teb_planner)" value="car_map" />
+        <arg name="config" value="nav" />
     </include>
 
 </launch>
