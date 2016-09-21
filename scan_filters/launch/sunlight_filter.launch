@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- angle_filter.launch
+
+     @author  Syler Wagner  <syler@mit.edu>
+
+     @date    2016-09-20    syler   creation
+    -->
+
+<launch>
+
+    <arg name="filter_name" default="sunlight_filter" />
+    <arg name="config" default="scan_sunlight_filter" doc="name of filter config file in scan_filters/config without .yaml extension" />
+    <arg name="input_topic" default="scan" doc="scan topic the filter subscribes to" />
+    <arg name="output_topic" default="scan_filtered" doc="scan topic the filter publishes to" />
+
+	<include file="$(find scan_filters)/launch/filter.launch" >
+    	<arg name="filter_name" value="$(arg filter_name)" />
+	    <arg name="config" value="$(arg config)" />
+    	<arg name="input_topic" value="$(arg input_topic)" />
+    	<arg name="output_topic" value="$(arg output_topic)" /> 
+	</include>
+</launch>
