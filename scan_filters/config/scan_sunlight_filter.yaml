@@ -1,0 +1,6 @@
+scan_filter_chain:
+- name: sunlight_noise_filter
+  type: LaserScanSunlightFilter
+  params:
+    tolerance: 0.25
+    window: 2
