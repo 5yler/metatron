@@ -14,18 +14,19 @@
 	<arg name="lidar" default="rplidar" doc="'rplidar' or 'xvlidar'?" /> 
 	<arg name="rviz" default="false" /> <!-- display robot in RViz -->
 	<arg name="gps" default="true" doc="using GPS sensor or no?" />
+	<arg name="zed" default="true" doc="using ZED sensor or no?" />
 
 	<!-- URDF model with robot state publisher -->
 	<include file="$(find gigatron_hardware)/launch/xacro.launch" >
 		<arg name="car" value="$(arg car)" />
 	</include>
 
-
 	<!-- car launch file -->
 	<include file="$(find gigatron_hardware)/launch/car.launch" >
 		<arg name="car" value="$(arg car)" />
 		<arg name="rviz" value="$(arg rviz)" />
 		<arg name="gps" value="$(arg gps)" />
+		<arg name="zed" value="$(arg zed)" />
 	</include>
 
 	<!-- RPLIDAR or Neato XV LIDAR  -->
