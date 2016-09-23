@@ -3,8 +3,9 @@
 
      
   <!-- Choose between RGB-D and stereo -->      
-  <arg name="stereo"          default="false"/>
- 
+  <arg name="stereo"                  default="false"/>
+  <arg name="camera_namespace"        default="zed"/>
+
   <!-- Choose visualization -->
   <arg name="rtabmapviz"              default="true" /> 
   <arg name="rviz"                    default="false" />
