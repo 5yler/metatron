@@ -27,8 +27,8 @@
     <!-- ZED placement relative to base_link -->
     <xacro:property name="zed_x" value="0.1778" /> 
     <xacro:property name="zed_y" value="0" />
-    <xacro:property name="zed_z" value="0" /> <!-- or 0.0381 up from wheel axis? -->
-
+    <xacro:property name="zed_z" value="0" /> 
+    <xacro:property name="zed_cam_separation" value="0.12065" /> 
 
     <!-- Physical Material Macros -->
     <material name="Grey">
@@ -51,7 +51,6 @@
         <child link="base_link" />
         <origin xyz="0 0 ${car_height/2+0.0508-wheel_radius}" rpy="0 0 0" />
     </joint>  
-
 
     <!-- Main body -->
     <link name="base_link">
@@ -272,11 +271,62 @@
     </link>
     <!-- optical rotation -->
     <joint name="zed_optical_joint" type="fixed">
-        <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
+        <origin xyz="${0.0381/2} 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
         <parent link="zed_link"/>
         <child link="zed_optical_frame"/>
     </joint>
     <link name="zed_optical_frame" type="fixed">
+        <inertial>
+            <mass value="0.0001" />
+            <origin xyz="0 0 0" />
+            <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001" />
+        </inertial>
+    </link>
+    <!-- left camera -->
+    <joint name="zed_left_camera_joint" type="fixed">
+        <origin xyz="${0.0381/2} ${zed_cam_separation/2} 0" rpy="0 0 0" />
+        <parent link="zed_link"/>
+        <child link="left_camera_link"/>
+    </joint>
+    <link name="left_camera_link" type="fixed">
+        <inertial>
+            <mass value="0.0001" />
+            <origin xyz="0 0 0" />
+            <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001" />
+        </inertial>
+    </link>
+    <joint name="left_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
+        <parent link="left_camera_link"/>
+        <child link="left_optical_frame"/>
+    </joint>
+    <link name="left_optical_frame" type="fixed">
+        <inertial>
+            <mass value="0.0001" />
+            <origin xyz="0 0 0" />
+            <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001" />
+        </inertial>
+    </link>
+
+    <!-- right camera -->
+    <joint name="zed_right_camera_joint" type="fixed">
+        <origin xyz="${0.0381/2} -${zed_cam_separation/2} 0" rpy="0 0 0" />
+        <parent link="zed_link"/>
+        <child link="right_camera_link"/>
+    </joint>
+    <link name="right_camera_link" type="fixed">
+        <inertial>
+            <mass value="0.0001" />
+            <origin xyz="0 0 0" />
+            <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001" />
+        </inertial>
+    </link>
+    <joint name="right_optical_joint" type="fixed">
+        <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
+        <parent link="right_camera_link"/>
+        <child link="right_optical_frame"/>
+    </joint>
+    <link name="right_optical_frame" type="fixed">
         <inertial>
             <mass value="0.0001" />
             <origin xyz="0 0 0" />
