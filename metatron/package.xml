@@ -30,6 +30,8 @@
 
   <run_depend>gigatron</run_depend>
   <run_depend>gigatron_hardware</run_depend>
+  <run_depend>gigatron_nav</run_depend>
+  <run_depend>scan_filters</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
