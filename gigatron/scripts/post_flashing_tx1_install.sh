@@ -8,11 +8,11 @@
 # 
 # @date     2016-09-23       creation
 
-sudo apt-get install nano -y --force-yes # Install Nano
+sudo apt-get -y --force-yes install nano # Install Nano
 echo "export EDITOR='nano' # use nano as default text editor"  >> ~/.bashrc
 
-sudo apt-get install samba -y --force-yes # for networked drives
-sudo apt-get install tmux -y --force-yes # tmux for splitting terminal into panes
+sudo apt-get -y --force-yes install samba # for networked drives
+sudo apt-get -y --force-yes install tmux # tmux for splitting terminal into panes
 
 sudo ntpdate ntp.ubuntu.com # set ubuntu date server
 # This will ensure that your machine polls the ubuntu server to get the right time and date for your timezone. 
@@ -20,22 +20,23 @@ sudo ntpdate ntp.ubuntu.com # set ubuntu date server
 #####################################################################################
 ## Get OpenNI 2 for RGBD Sensors ####################################################
 
-sudo apt-get install ros-indigo-rgbd-launch ros-indigo-openni2-camera ros-indigo-openni2-launch -y --force-yes
-sudo apt-get install ros-indigo-rqt ros-indigo-rqt-common-plugins ros-indigo-rqt-robot-plugins -y --force-yes
+sudo apt-get -y --force-yes install ros-indigo-rgbd-launch ros-indigo-openni2-camera ros-indigo-openni2-launch
 
 #####################################################################################
 ## Install Arduino IDE  #############################################################
 
-sudo apt-get install arduino arduino-core -y --force-yes
+sudo apt-get -y --force-yes install arduino arduino-core
 
 # Configure ROS Serial Communication With Arduino 
-sudo apt-get install ros-indigo-rosserial-arduino -y --force-yes
-sudo apt-get install ros-indigo-rosserial -y --force-yes
+sudo apt-get -y --force-yes install ros-indigo-rosserial-arduino
+sudo apt-get -y --force-yes install ros-indigo-rosserial
 
 #####################################################################################
-## Configure Neato XV Lidar #########################################################
+## Configure LIDAR sensors ##########################################################
 
-sudo apt-get install ros-indigo-xv-11-laser-driver ros-indigo-rplidar-ros -y --force-yes
+sudo apt-get -y --force-yes install ros-indigo-xv-11-laser-driver ros-indigo-rplidar-ros
+sudo apt-get -y --force-yes install ros-indigo-laser-pipeline ros-indigo-pointcloud-to-laserscan ros-indigo-depthimage-to-laserscan 
+
 
 # Details: http://wiki.ros.org/xv_11_laser_driver
 
@@ -59,33 +60,40 @@ sudo apt-mark hold libpcre3
 sudo apt-mark hold libpcre3-dev
 sudo apt-mark hold libpcrecpp0
 
-sudo apt-get install ros-indigo-rviz-* ros-indigo-rqt-* -y --force-yes
+sudo apt-get -y --force-yes install ros-indigo-rviz-* ros-indigo-rqt-*
 
 #####################################################################################
 ## GPS and Localization/Navigation ##################################################
 
-sudo apt-get install ros-indigo-nmea-navsat-driver -y --force-yes
+sudo apt-get -y --force-yes install ros-indigo-nmea-navsat-driver
 
-sudo apt-get install ros-indigo-gps-common -y --force-yes
-sudo apt-get install ros-indigo-robot-localization -y --force-yes
-sudo apt-get install ros-indigo-navigation ros-indigo-teb-local-planner -y --force-yes
+sudo apt-get -y --force-yes install ros-indigo-gps-common
+sudo apt-get -y --force-yes install ros-indigo-robot-localization
+sudo apt-get -y --force-yes install ros-indigo-navigation ros-indigo-teb-local-planner
 
 # SLAM
-sudo apt-get install ros-indigo-hector-slam ros-indigo-gmapping ros-indigo-rtabmap-ros -y --force-yes
-# URDF Model
-sudo apt-get install liburdfdom-tools ros-indigo-xacro ros-indigo-robot-state-publisher -y --force-yes # urdf
+sudo apt-get -y --force-yes install ros-indigo-hector-slam ros-indigo-gmapping ros-indigo-rtabmap-ros
 
 
+#####################################################################################
+## Hardware/URDF Models #############################################################
+
+sudo apt-get -y --force-yes install liburdfdom-tools ros-indigo-xacro ros-indigo-robot-state-publisher # urdf
 
 #####################################################################################
 ## IMU Configuration (Partial) ######################################################
 
-sudo apt-get install cmake-curses-gui -y --force-yes # for cmake configuration of IMU
+sudo apt-get -y --force-yes install cmake-curses-gui # for cmake configuration of IMU
 
 # IMU visualizer for demo
-sudo apt-get install ros-indigo-razor-imu-9dof -y --force-yes
-sudo apt-get install python-visual -y --force-yes
-sudo apt-get install python-wxtools -y --force-yes
+sudo apt-get -y --force-yes install ros-indigo-razor-imu-9dof
+sudo apt-get -y --force-yes install python-visual
+sudo apt-get -y --force-yes install python-wxtools
+
+sudo apt-get -y --force-yes install libi2c-dev i2c-tools
+
+# add udev rule so i2c devices aren't only owned by root
+sudo sh -c 'echo "KERNEL==\"i2c-[0-7]\",MODE=\"0666\"" > /etc/udev/rules.d/90-i2c.rules'
 
 cd ~
 git clone git@github.com:jetsonhacks/RTIMULib.git
