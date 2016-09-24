@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
     geometry_msgs::TransformStamped odom_trans;
     odom_trans.header.stamp = current_time;
     odom_trans.header.frame_id = "odom";
-    odom_trans.child_frame_id = "base_link";
+    odom_trans.child_frame_id = "base_footprint";
 
     odom_trans.transform.translation.x = x;
     odom_trans.transform.translation.y = y;
@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
     //TODO: For the robot_localization ekf nodes
     //odom.pose.covariance[35] = ???;
 
-    odom.child_frame_id = "base_link";
+    odom.child_frame_id = "base_footprint";
     odom.twist.twist.linear.x = center_velocity;
     odom.twist.twist.linear.y = 0.0;
     odom.twist.twist.angular.z = (right_wheel_velocity_ - left_wheel_velocity_) / _wheelbase_width;

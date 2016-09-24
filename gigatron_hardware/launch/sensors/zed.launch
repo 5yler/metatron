@@ -51,7 +51,7 @@
       <param name="cloud_frame_id"        value="/zed_tracked_frame" />
 
       <param name="odometry_topic"                value="odom" />
-      <param name="odometry_frame_id"             value="/$(arg camera)_initial_frame" />
+      <param name="odometry_frame_id"             value="/odom" />
       <param name="odometry_transform_frame_id"   value="/$(arg camera)_tracked_frame" />
 
 

@@ -25,6 +25,7 @@
 		<arg name="car" value="$(arg car)" />
 		<arg name="rviz" value="$(arg rviz)" />
 		<arg name="gps" value="$(arg gps)" />
+		<arg name="zed" default="true" doc="using ZED sensor or no?" />
 	</include>
 
 	<!-- front LIDAR  -->
