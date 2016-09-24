@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!-- pointcloud_to_scan.launch
+     Transform ZED point cloud to laser scan in laser_link frame
+
+     @author  Syler Wagner  <syler@mit.edu>
+     
+     @date    2016-09-24    syler   creation
+    -->
+<launch>
+
+    <arg name="camera" default="zed" />
+
+    <!-- run pointcloud_to_laserscan node -->
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="cloud_to_scan">
+
+        <remap from="cloud_in" to="$(arg camera)/point_cloud/cloud"/>
+        <remap from="scan" to="$(arg camera)/scan"/>
+        <rosparam>
+            target_frame: laser_link 
+                # If provided, transform the pointcloud into this frame before converting to a laser scan; otherwise, laser scan will be generated in the same frame as the input point cloud.
+
+            transform_tolerance: 0.015
+            min_height: 0.0     # minimum height to sample in the point cloud [m]
+            max_height: 1.0     # maximum height to sample in the point cloud [m]
+
+            angle_min: -1.5708      # -M_PI/2
+            angle_max: 1.5708       # M_PI/2
+            angle_increment: 0.087  # M_PI/360.0 resolution of laser scan in [radians per ray]
+            scan_time: 0.3333       # scan rate in seconds
+            range_min: 0.45         # minimum range value to return [m]
+            range_max: 20.0         # maximum ranges to return [m]
+            
+            use_inf: true
+                # If disabled, report infinite range (no obstacle) as range_max + 1. Otherwise report infinite range as +inf. Associated with the inf_is_valid parameter for costmap_2d obstacle layers.
+
+            concurrency_level: 1    
+                # Number of threads to use for processing pointclouds. If 0, automatically detect number of cores and use the equivalent number of threads. Input queue size for pointclouds is tied to this parameter. In nodelet form, number of threads is capped by the nodelet manager configuration.
+                # 0 : Detect number of cores
+                # 1 : Single threaded
+                # 2 to inf : Parallelism level
+            # TODO: should we use 192/256 as per the number of CUDA cores on the TK1/TX1?
+        </rosparam>
+
+    </node>
+</launch>
