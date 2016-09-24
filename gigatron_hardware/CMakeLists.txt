@@ -109,7 +109,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES gigatron_hardware
-  CATKIN_DEPENDS message_runtime roscpp std_msgs geometry_msgs 
+  CATKIN_DEPENDS message_runtime roscpp std_msgs geometry_msgs gigatron
 #  DEPENDS system_lib
 )
 
