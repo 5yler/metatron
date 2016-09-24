@@ -91,7 +91,6 @@ sudo apt-get -y --force-yes install python-rosinstall -y
 ## Get OpenNI 2 for RGBD Sensors ####################################################
 
 sudo apt-get -y --force-yes install ros-indigo-rgbd-launch ros-indigo-openni2-camera ros-indigo-openni2-launch
-sudo apt-get -y --force-yes install ros-indigo-rqt ros-indigo-rqt-common-plugins ros-indigo-rqt-robot-plugins
 
 #####################################################################################
 ## Install Arduino IDE  #############################################################
@@ -103,9 +102,10 @@ sudo apt-get -y --force-yes install ros-indigo-rosserial-arduino
 sudo apt-get -y --force-yes install ros-indigo-rosserial
 
 #####################################################################################
-## Configure Neato XV Lidar #########################################################
+## Configure LIDAR sensors ##########################################################
 
-sudo apt-get -y --force-yes install ros-indigo-xv-11-laser-driver 
+sudo apt-get -y --force-yes install ros-indigo-xv-11-laser-driver ros-indigo-rplidar-ros
+sudo apt-get -y --force-yes install ros-indigo-laser-pipeline ros-indigo-pointcloud-to-laserscan ros-indigo-depthimage-to-laserscan 
 
 # Details: http://wiki.ros.org/xv_11_laser_driver
 
@@ -129,6 +129,8 @@ sudo apt-mark hold libpcre3
 sudo apt-mark hold libpcre3-dev
 sudo apt-mark hold libpcrecpp0
 
+sudo apt-get -y --force-yes install ros-indigo-rviz-* ros-indigo-rqt-*
+
 #####################################################################################
 ## GPS and Localization/Navigation ##################################################
 
@@ -136,12 +138,16 @@ sudo apt-get -y --force-yes install ros-indigo-nmea-navsat-driver
 
 sudo apt-get -y --force-yes install ros-indigo-gps-common
 sudo apt-get -y --force-yes install ros-indigo-robot-localization
-sudo apt-get -y --force-yes install ros-indigo-navigation
+sudo apt-get -y --force-yes install ros-indigo-navigation ros-indigo-teb-local-planner
 
-# Hector SLAM
-sudo apt-get -y --force-yes install ros-indigo-hector-slam
-# URDF Model
-sudo apt-get -y --force-yes install liburdfdom-tools # need this for check_urdf
+# SLAM
+sudo apt-get -y --force-yes install ros-indigo-hector-slam ros-indigo-gmapping ros-indigo-rtabmap-ros
+
+
+#####################################################################################
+## Hardware/URDF Models #############################################################
+
+sudo apt-get -y --force-yes install liburdfdom-tools ros-indigo-xacro ros-indigo-robot-state-publisher # urdf
 
 #####################################################################################
 ## IMU Configuration (Partial) ######################################################
@@ -152,6 +158,11 @@ sudo apt-get -y --force-yes install cmake-curses-gui # for cmake configuration o
 sudo apt-get -y --force-yes install ros-indigo-razor-imu-9dof
 sudo apt-get -y --force-yes install python-visual
 sudo apt-get -y --force-yes install python-wxtools
+
+sudo apt-get -y --force-yes install libi2c-dev i2c-tools 
+
+# add udev rule so i2c devices aren't only owned by root
+sudo sh -c 'echo "KERNEL==\"i2c-[0-7]\",MODE=\"0666\"" > /etc/udev/rules.d/90-i2c.rules'
 
 #####################################################################################
 ## Create Catkin Workspace ##########################################################
@@ -178,7 +189,6 @@ source devel/setup.bash
 
 sudo apt-get -y --force-yes update        # Fetches the list of available updates
 sudo apt-get -y --force-yes upgrade       # Strictly upgrades the current packages
-sudo apt-get -y --force-yes dist-upgrade  # Installs updates (new ones)
 
 #####################################################################################
 ## Additional Setup Notes ###########################################################
