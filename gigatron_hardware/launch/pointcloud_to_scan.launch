@@ -16,10 +16,10 @@
         <remap from="cloud_in" to="$(arg camera)/point_cloud/cloud"/>
         <remap from="scan" to="$(arg camera)/scan"/>
         <rosparam>
-            target_frame: laser_link 
-                # If provided, transform the pointcloud into this frame before converting to a laser scan; otherwise, laser scan will be generated in the same frame as the input point cloud.
+            target_frame: zed_optical_frame 
+            # If provided, transform the pointcloud into this frame before converting to a laser scan; otherwise, laser scan will be generated in the same frame as the input point cloud.
 
-            transform_tolerance: 0.015
+            transform_tolerance: 0.1
             min_height: 0.0     # minimum height to sample in the point cloud [m]
             max_height: 1.0     # maximum height to sample in the point cloud [m]
 
@@ -31,13 +31,13 @@
             range_max: 20.0         # maximum ranges to return [m]
             
             use_inf: true
-                # If disabled, report infinite range (no obstacle) as range_max + 1. Otherwise report infinite range as +inf. Associated with the inf_is_valid parameter for costmap_2d obstacle layers.
+            # If disabled, report infinite range (no obstacle) as range_max + 1. Otherwise report infinite range as +inf. Associated with the inf_is_valid parameter for costmap_2d obstacle layers.
 
-            concurrency_level: 1    
-                # Number of threads to use for processing pointclouds. If 0, automatically detect number of cores and use the equivalent number of threads. Input queue size for pointclouds is tied to this parameter. In nodelet form, number of threads is capped by the nodelet manager configuration.
-                # 0 : Detect number of cores
-                # 1 : Single threaded
-                # 2 to inf : Parallelism level
+            concurrency_level: 256    
+            # Number of threads to use for processing pointclouds. If 0, automatically detect number of cores and use the equivalent number of threads. Input queue size for pointclouds is tied to this parameter. In nodelet form, number of threads is capped by the nodelet manager configuration.
+            # 0 : Detect number of cores
+            # 1 : Single threaded
+            # 2 to inf : Parallelism level
             # TODO: should we use 192/256 as per the number of CUDA cores on the TK1/TX1?
         </rosparam>
 
