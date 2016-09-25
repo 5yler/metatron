@@ -14,7 +14,7 @@
     <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="cloud_to_scan">
 
         <remap from="cloud_in" to="$(arg camera)/point_cloud/cloud"/>
-        <remap from="scan" to="$(arg camera)/scan"/>
+   <!--     <remap from="scan" to="$(arg camera)/scan"/>-->
         <rosparam>
             target_frame: zed_optical_frame 
             # If provided, transform the pointcloud into this frame before converting to a laser scan; otherwise, laser scan will be generated in the same frame as the input point cloud.

@@ -13,7 +13,7 @@
   <arg name="pi/2" value="1.5707963267948966" />
   <arg name="optical_rotate" value="0 0 0 -$(arg pi/2) 0 -$(arg pi/2)" />
 
-<node pkg="tf2_ros" type="static_transform_publisher" name="$(arg camera)_base_initial_link" args="0 0 0 0 0 0 1 $(arg camera)_optical_frame $(arg camera)_initial_frame" /> 
+<!-- <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg camera)_base_initial_link" args="0 0 0 0 0 0 1 $(arg camera)_optical_frame $(arg camera)_initial_frame" />  -->
 
 <!--  <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg camera)_initial_tracked_link"
     args="$(arg optical_rotate) $(arg tf_prefix)/$(arg camera)_initial_frame $(arg tf_prefix)/$(arg camera)_optical_frame" />
@@ -50,7 +50,7 @@
       <param name="cloud_frame_id"        value="$(arg camera)_optical_frame" />
 
       <param name="odometry_topic"                value="odom" />
-      <param name="odometry_frame_id"             value="/$(arg camera)_initial_frame" />
+      <param name="odometry_frame_id"             value="/odom" />
       <param name="odometry_transform_frame_id"   value="/$(arg camera)_tracked_frame" />
 
 
