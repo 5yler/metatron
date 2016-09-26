@@ -19,7 +19,7 @@
 <!-- max, min height parameters, output scan topic name, and output frame_id -->
 
     <!-- run pointcloud_to_laserscan node -->
-    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="cloud_to_$(scan_topic)">
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="cloud_to_$(arg scan_topic)">
 
         <remap from="cloud_in" to="$(arg camera)/point_cloud/cloud"/>
         <remap from="scan" to="$(arg scan_topic)"/>
