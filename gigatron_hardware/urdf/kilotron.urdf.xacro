@@ -3,8 +3,8 @@
     xmlns:xacro="http://www.ros.org/wiki/xacro"
     name="kilotron">
 
-    <!-- Physical Constant Macros -->
-    <xacro:property name="M_PI" value="3.1415926535897931" />
+    <xacro:include filename="$(find gigatron_hardware)/urdf/common.urdf.xacro" />
+    <xacro:include filename="$(find gigatron_hardware)/urdf/sensors/zed.urdf.xacro" />
 
     <!-- Dimension Macros -->
     <xacro:property name="car_length" value="0.254" /> <!-- 10" -->
@@ -29,20 +29,6 @@
     <xacro:property name="zed_y" value="0" />
     <xacro:property name="zed_z" value="0" /> 
     <xacro:property name="zed_cam_separation" value="0.12065" /> 
-
-    <!-- Physical Material Macros -->
-    <material name="Grey">
-        <color rgba="0 0 0 0.4"/>
-    </material>
-    <material name="Blue">
-        <color rgba="0 0.3 0.9 0.3"/>
-    </material>
-    <material name="Black">
-        <color rgba="0 0 0 0.9"/>
-    </material>
-    <material name="DarkGrey">
-        <color rgba="0.5 0 0.05 0.75"/>
-    </material>
 
     <!-- base_footprint (ground) to base_link -->
     <link name="base_footprint" />
@@ -242,97 +228,9 @@
         </collision>
     </link>
 
-
     <!-- ZED -->
-    <joint name="zed_joint" type="fixed">
-        <origin xyz="${zed_x} ${zed_y} ${zed_z}" rpy="0 0 0" />
-        <parent link="base_link"/>
-        <child link="zed_link"/>
-    </joint>
-    <link name="zed_link" type="fixed">
-        <inertial>
-            <mass value="0.2" />
-            <origin xyz="0 0 0" /> 
-            <inertia  ixx="0.2" ixy="0.0"  ixz="0.0"  iyy="0.2"  iyz="0.0"  izz="0.2" />
-        </inertial>
-        <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <geometry>
-                <box size="0.0381 0.1717 0.0317" /> <!-- IMU dimensions -->
-            </geometry>
-            <material name="Blue"/>
-        </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <geometry>
-                <box size="${car_length} ${wheelbase_width} ${car_height}" />
-            </geometry>
-        </collision>
-    </link>
-    <!-- optical rotation -->
-    <joint name="zed_optical_joint" type="fixed">
-        <origin xyz="${0.0381/2} 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
-        <parent link="zed_link"/>
-        <child link="zed_optical_frame"/>
-    </joint>
-    <link name="zed_optical_frame" type="fixed">
-        <inertial>
-            <mass value="0.0001" />
-            <origin xyz="0 0 0" />
-            <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001" />
-        </inertial>
-    </link>
-    <!-- left camera -->
-    <joint name="zed_left_camera_joint" type="fixed">
-        <origin xyz="${0.0381/2} ${zed_cam_separation/2} 0" rpy="0 0 0" />
-        <parent link="zed_link"/>
-        <child link="left_camera_link"/>
-    </joint>
-    <link name="left_camera_link" type="fixed">
-        <inertial>
-            <mass value="0.0001" />
-            <origin xyz="0 0 0" />
-            <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001" />
-        </inertial>
-    </link>
-    <joint name="left_optical_joint" type="fixed">
-        <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
-        <parent link="left_camera_link"/>
-        <child link="left_optical_frame"/>
-    </joint>
-    <link name="left_optical_frame" type="fixed">
-        <inertial>
-            <mass value="0.0001" />
-            <origin xyz="0 0 0" />
-            <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001" />
-        </inertial>
-    </link>
-
-    <!-- right camera -->
-    <joint name="zed_right_camera_joint" type="fixed">
-        <origin xyz="${0.0381/2} -${zed_cam_separation/2} 0" rpy="0 0 0" />
-        <parent link="zed_link"/>
-        <child link="right_camera_link"/>
-    </joint>
-    <link name="right_camera_link" type="fixed">
-        <inertial>
-            <mass value="0.0001" />
-            <origin xyz="0 0 0" />
-            <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001" />
-        </inertial>
-    </link>
-    <joint name="right_optical_joint" type="fixed">
-        <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
-        <parent link="right_camera_link"/>
-        <child link="right_optical_frame"/>
-    </joint>
-    <link name="right_optical_frame" type="fixed">
-        <inertial>
-            <mass value="0.0001" />
-            <origin xyz="0 0 0" />
-            <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001" />
-        </inertial>
-    </link>
-
+    <xacro:zed_v0 name="zed" parent="base_link">
+        <origin xyz="${zed_x} ${zed_y} ${zed_z}" rpy="0 0 0" /> 
+    </xacro:zed_v0>
 
 </robot>

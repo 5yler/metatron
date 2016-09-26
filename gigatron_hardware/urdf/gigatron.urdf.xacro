@@ -3,6 +3,8 @@
     xmlns:xacro="http://www.ros.org/wiki/xacro"
     name="gigatron">
 
+    <xacro:include filename="$(find gigatron_hardware)/urdf/sensors/zed.urdf.xacro" />
+
     <!-- Note: Base Link is the center of the robot, right under the batteries. -->
 
     <!-- Physical Constant Macros -->
@@ -36,6 +38,11 @@
     <xacro:property name="back_lidar_y" value="0" />
     <xacro:property name="back_lidar_z" value="0.3048" /> 
     <xacro:property name="back_lidar_yaw" value="0" />
+
+    <!-- ZED placement relative to base_link -->
+    <xacro:property name="zed_x" value="-0.0254" /> 
+    <xacro:property name="zed_y" value="0.0" />
+    <xacro:property name="zed_z" value="0.27942" /> 
 
 
     <!-- Physical Material Macros -->
@@ -271,5 +278,9 @@
         </visual>
     </link>
 
+    <!-- ZED -->
+    <xacro:zed_v0 name="zed" parent="base_link">
+        <origin xyz="${zed_x} ${zed_y} ${zed_z}" rpy="0 0 0" /> 
+    </xacro:zed_v0>
 
 </robot>
