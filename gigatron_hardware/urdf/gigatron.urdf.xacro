@@ -35,7 +35,7 @@
     <xacro:property name="xvlidar_x" value="${wheelbase_length/2 + 0.19}" /> 
     <xacro:property name="xvlidar_y" value="0" />
     <xacro:property name="xvlidar_z" value="-0.3" /> 
-    <xacro:property name="xvlidar_roll" value="${M_PI/2}" />
+    <xacro:property name="xvlidar_roll" value="${M_PI}" />
     <xacro:property name="xvlidar_pitch" value="0" />
     <xacro:property name="xvlidar_yaw" value="0" />
 

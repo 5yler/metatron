@@ -13,8 +13,8 @@
 	<arg name="car" value="gigatron" />
 	<arg name="rviz" default="false" /> <!-- display robot in RViz -->
 	<arg name="gps" default="true" doc="using GPS sensor or no?" />
-	<arg name="back_lidar" default="false" doc="using rear LIDAR or no?"/>
-
+<!-- 	<arg name="back_lidar" default="false" doc="using rear LIDAR or no?"/>
+ -->
 	<!-- URDF model with robot state publisher -->
 	<include file="$(find gigatron_hardware)/launch/xacro.launch" >
 		<arg name="car" value="$(arg car)" />
@@ -29,32 +29,32 @@
 	</include>
 
 	<!-- front LIDAR  -->
-	<include file="$(find gigatron_hardware)/launch/sensors/rplidar.launch" >
-		<arg name="frame_id" default="laser_link" />
+<!-- 	<include file="$(find gigatron_hardware)/launch/sensors/rplidar.launch" >
+		<arg name="frame_id" default="rplidar_link" />
 		<arg name="topic" default="scan_rp" />
 	</include>
-	<!-- the laser angle filter unfortunately does not work at removing the middle part of a laser scan, so it won't work on inverted LIDAR -->
-	<include file="$(find gigatron_hardware)/launch/laser_angle_filter.launch" >
+ -->	<!-- the laser angle filter unfortunately does not work at removing the middle part of a laser scan, so it won't work on inverted LIDAR -->
+<!-- 	<include file="$(find gigatron_hardware)/launch/laser_angle_filter.launch" >
     	<arg name="filter_name" value="rplidar_angle_filter" />
     	<arg name="filter_type" value="laser_angle_filter" />
     	<arg name="input_topic" value="scan_rp" />
     	<arg name="output_topic" value="scan_front" /> 
 	</include>
 	<node name="front_scan_relay" type="relay" pkg="topic_tools" args="/scan_front /scan"/>
-
+  -->
 	<!-- back LIDAR  -->
-	<group if="$(arg back_lidar)">
+	<!-- <group if="$(arg back_lidar)"> -->
 		<include file="$(find gigatron_hardware)/launch/sensors/xvlidar.launch" >
-			<arg name="frame_id" default="back_laser_link" />
+			<arg name="frame_id" default="xvlidar_link" />
 			<arg name="topic" default="scan_xv" />
 		</include>
 		<include file="$(find gigatron_hardware)/launch/laser_angle_filter.launch" >
 	    	<arg name="filter_name" value="xvlidar_angle_filter" />
 	    	<arg name="filter_type" value="laser_angle_filter" />
 	    	<arg name="input_topic" value="scan_xv" />
-	    	<arg name="output_topic" value="scan_back" />
+	    	<arg name="output_topic" value="scan_front" />
 		</include>
-		<node name="back_scan_relay" type="relay" pkg="topic_tools" args="/scan_back /scan"/>
-	</group>
+		<node name="back_scan_relay" type="relay" pkg="topic_tools" args="/scan_front /scan"/>
+	<!-- </group> -->
 
 </launch>
