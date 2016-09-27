@@ -5,6 +5,8 @@
 
     <xacro:include filename="$(find gigatron_hardware)/urdf/common.urdf.xacro" />
     <xacro:include filename="$(find gigatron_hardware)/urdf/sensors/zed.urdf.xacro" />
+    <xacro:include filename="$(find gigatron_hardware)/urdf/sensors/bno055_imu.urdf.xacro" />
+    <xacro:include filename="$(find gigatron_hardware)/urdf/sensors/rplidar.urdf.xacro" />
 
     <!-- Dimension Macros -->
     <xacro:property name="car_length" value="0.254" /> <!-- 10" -->
@@ -202,31 +204,9 @@
     </link>
 
     <!-- IMU -->
-    <joint name="imu_mount_joint" type="fixed">
-        <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="0 0 0" />
-        <parent link="base_link"/>
-        <child link="imu_link"/>
-    </joint>
-    <link name="imu_link" type="fixed">
-        <inertial>
-            <mass value="0.01" />
-            <origin xyz="0 0 0" /> 
-            <inertia  ixx="0.2" ixy="0.0"  ixz="0.0"  iyy="0.2"  iyz="0.0"  izz="0.2" />
-        </inertial>
-        <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <geometry>
-                <box size="0.02 0.027 0.004" /> <!-- IMU dimensions -->
-            </geometry>
-            <material name="Blue"/>
-        </visual>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <geometry>
-                <box size="${car_length} ${wheelbase_width} ${car_height}" />
-            </geometry>
-        </collision>
-    </link>
+    <xacro:bno055_imu_v0 name="imu" parent="base_link">
+        <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="0 0 0" /> 
+    </xacro:bno055_imu_v0>
 
     <!-- ZED -->
     <xacro:zed_v0 name="zed" parent="base_link">

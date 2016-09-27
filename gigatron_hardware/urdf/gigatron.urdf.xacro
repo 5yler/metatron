@@ -4,6 +4,9 @@
     name="gigatron">
 
     <xacro:include filename="$(find gigatron_hardware)/urdf/sensors/zed.urdf.xacro" />
+    <xacro:include filename="$(find gigatron_hardware)/urdf/common.urdf.xacro" />
+    <xacro:include filename="$(find gigatron_hardware)/urdf/sensors/bno055_imu.urdf.xacro" />
+    <xacro:include filename="$(find gigatron_hardware)/urdf/sensors/rplidar.urdf.xacro" />
 
     <!-- Note: Base Link is the center of the robot, right under the batteries. -->
 
@@ -43,21 +46,6 @@
     <xacro:property name="zed_x" value="-0.0254" /> 
     <xacro:property name="zed_y" value="0.0" />
     <xacro:property name="zed_z" value="0.27942" /> 
-
-
-    <!-- Physical Material Macros -->
-    <material name="Grey">
-        <color rgba="0 0 0 0.4"/>
-    </material>
-    <material name="Blue">
-        <color rgba="0 0.3 0.9 0.3"/>
-    </material>
-    <material name="Black">
-        <color rgba="0 0 0 0.9"/>
-    </material>
-    <material name="DarkGrey">
-        <color rgba="0.5 0 0.05 0.75"/>
-    </material>
 
 
     <!-- Main body -->
@@ -258,25 +246,9 @@
     </link>
 
     <!-- IMU -->
-    <joint name="imu_mount_joint" type="fixed">
-        <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="0 0 0" />
-        <parent link="base_link"/>
-        <child link="imu_link"/>
-    </joint>
-    <link name="imu_link" type="fixed">
-        <inertial>
-            <mass value="0.01" />
-            <origin xyz="0 0 0" /> 
-            <inertia  ixx="0.2" ixy="0.0"  ixz="0.0"  iyy="0.2"  iyz="0.0"  izz="0.2" />
-        </inertial>
-        <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <geometry>
-                <box size="0.02 0.027 0.004" /> <!-- IMU dimensions -->
-            </geometry>
-            <material name="Blue"/>
-        </visual>
-    </link>
+    <xacro:bno055_imu_v0 name="imu" parent="base_link">
+        <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="0 0 0" /> 
+    </xacro:bno055_imu_v0>
 
     <!-- ZED -->
     <xacro:zed_v0 name="zed" parent="base_link">
