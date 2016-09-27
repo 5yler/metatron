@@ -176,7 +176,7 @@
         </collision>
     </link>
 
-    <!-- XV LIDAR -->
+    <!-- RPLIDAR -->
     <xacro:rplidar_v0 
         name="rplidar" 
         parent="base_link">
