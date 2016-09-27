@@ -37,7 +37,7 @@
     <xacro:property name="xvlidar_z" value="-0.3" /> 
     <xacro:property name="xvlidar_roll" value="${M_PI}" />
     <xacro:property name="xvlidar_pitch" value="0" />
-    <xacro:property name="xvlidar_yaw" value="0" />
+    <xacro:property name="xvlidar_yaw" value="${M_PI}" />
 
     <!--RPLIDAR placement relative to base_link --> <!-- TODO: are we even using this? -->
 <!--     
