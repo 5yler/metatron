@@ -176,41 +176,31 @@
         </collision>
     </link>
 
-    <!-- LIDAR -->
-    <joint name="laser_base_mount_joint" type="fixed">
-        <origin xyz="${lidar_x} ${lidar_y} ${lidar_z}" rpy="0 0 ${lidar_yaw}" /> 
-        <parent link="base_link"/>
-        <child link="laser_link"/>
-    </joint>
-    <link name="laser_link" type="fixed">
-        <inertial>
-            <mass value="0.1"/>
-            <origin xyz="0 0 0.0"/>
-            <inertia ixx="0.1" ixy="0" ixz="0" iyy="0.1" iyz="0" izz="0.1"/>
-        </inertial>
-        <visual>
-            <origin rpy="0 0 0" xyz="0 0 0.02"/>
-            <geometry>
-                <cylinder radius="0.04" length="0.03175"/>
-            </geometry>
-            <material name="DarkGrey"/>
-        </visual>
-        <collision>
-            <origin rpy="0 0 0" xyz="0 0 0.025"/>
-            <geometry>
-                <box size="0.05 0.05 0.05"/>
-            </geometry>
-        </collision>
-    </link>
+    <!-- XV LIDAR -->
+    <xacro:rplidar_v0 
+        name="rplidar" 
+        parent="base_link">
+        <origin 
+            xyz="${lidar_x} ${lidar_y} ${lidar_z}" 
+            rpy="0 0 ${lidar_yaw}" /> 
+    </xacro:rplidar_v0>
 
     <!-- IMU -->
-    <xacro:bno055_imu_v0 name="imu" parent="base_link">
-        <origin xyz="${imu_x} ${imu_y} ${imu_z}" rpy="0 0 0" /> 
+    <xacro:bno055_imu_v0 
+        name="imu" 
+        parent="base_link">
+        <origin 
+            xyz="${imu_x} ${imu_y} ${imu_z}" 
+            rpy="0 0 0" /> 
     </xacro:bno055_imu_v0>
 
     <!-- ZED -->
-    <xacro:zed_v0 name="zed" parent="base_link">
-        <origin xyz="${zed_x} ${zed_y} ${zed_z}" rpy="0 0 0" /> 
+    <xacro:zed_v0 
+        name="zed" 
+        parent="base_link">
+        <origin 
+            xyz="${zed_x} ${zed_y} ${zed_z}" 
+            rpy="0 0 0" /> 
     </xacro:zed_v0>
 
 </robot>
