@@ -1,0 +1,6 @@
+scan_filter_chain:
+- name: forward_180_angle_filter
+  type: LaserScanAngleFilter
+  params:
+    upper_angle: 1.5707963267948966
+    lower_angle: -1.5707963267948966
