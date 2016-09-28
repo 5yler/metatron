@@ -40,14 +40,14 @@
     <xacro:property name="xvlidar_yaw" value="${M_PI}" />
 
     <!--RPLIDAR placement relative to base_link --> <!-- TODO: are we even using this? -->
-<!--     
+     
     <xacro:property name="rplidar_x" value=".5588" /> 
     <xacro:property name="rplidar_y" value="0" />
     <xacro:property name="rplidar_z" value="0.2286" /> 
     <xacro:property name="rplidar_roll" value="0" />
     <xacro:property name="rplidar_pitch" value="0" />
-    <xacro:property name="rplidar_yaw" value="0" /> 
--->
+    <xacro:property name="rplidar_yaw" value="0" /> <!-- ${M_PI} -->
+
 
     <!-- ZED placement relative to base_link -->
     <xacro:property name="zed_x" value="0.19" /> 
@@ -200,13 +200,13 @@
 
 
     <!-- RPLIDAR -->
-<!--     <xacro:rplidar_v0 
+    <xacro:rplidar_v0 
         name="rplidar" 
         parent="base_link">
         <origin 
             xyz="${rplidar_x} ${rplidar_y} ${rplidar_z}" 
             rpy="${rplidar_roll} ${rplidar_pitch} ${rplidar_yaw}" /> 
-    </xacro:rplidar_v0> -->
+    </xacro:rplidar_v0>
 
     <!-- XV LIDAR -->
     <xacro:xvlidar_v0 
