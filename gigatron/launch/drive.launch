@@ -8,7 +8,7 @@
     -->
 <launch>
 
-	<arg name="scan_topic" default="scan_rp" />
+	<arg name="scan_topic" default="scan_zed" />
 	<arg name="ignore_tf" default="false" doc="true if laser frame tf infomation should be ignored"/>
 	<arg name="inverted_lidar" default="false" doc="true if LIDAR is rotated 180 degrees" />
 	<arg name="max" default="5" doc="maximum forward velocity in m/s" />

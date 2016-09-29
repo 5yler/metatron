@@ -82,9 +82,11 @@ class Driver():
         # control publisher
         self._pub = rospy.Publisher('/command/drive', Drive, queue_size=5)
 
-        scan_topic = rospy.get_param('~scan_topic', 'scan_front')
+        scan_topic = rospy.get_param('~scan_topic', 'scan')
 
         # scan subscriber
+        self._ignore_tf = rospy.get_param("~ignore_tf", False)
+
         rospy.Subscriber(scan_topic, LaserScan, self.callback)
         rospy.logwarn("Subscribing to scan topic: %s", scan_topic)
 
@@ -122,7 +124,6 @@ class Driver():
         # note: this will be overridden by tf information if available
         if rospy.has_param("~lidar_yaw"):
             self._lidar_yaw = rospy.get_param("~lidar_yaw")
-        self._ignore_tf = rospy.get_param("~ignore_tf", False)
 
         rospy.spin()
 
