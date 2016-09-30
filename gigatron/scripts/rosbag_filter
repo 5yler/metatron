@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# rosbag_exclude
+# rosbag_filter
 #
 # Bash script for removing navigation stack output from a rosbag
 # 
@@ -32,8 +32,9 @@ TF_EXCLUDE='topic == "/tf" and m.transforms[0].header.frame_id != "/map" and m.t
 echo '       - '$TF_EXCLUDE
 
 EXCLUDE=$EXCLUDE'topic != "/tf") or ('$TF_EXCLUDE')'
-echo 
+echo ''
 echo 'rosbag filter' $INBAG $OUTBAG \'$EXCLUDE\'
-rosbag filter $INBAG $OUTBAG \'$EXCLUDE\'
+
+rosbag filter '$INBAG $OUTBAG \'$EXCLUDE\''
 
 echo ' [>>>] Done.'
