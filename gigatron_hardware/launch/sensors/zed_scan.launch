@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!-- zed_scan.launch
+     Launch file for Stereolabs ZED camera laser scans
+
+     @author  Syler Wagner      <syler@mit.edu>
+     
+     @date    2016-09-30  syler  creation
+-->
+<launch>
+
+  <arg name="camera" default="zed"/>
+  <arg name="cloud_topic" value="point_cloud/cloud" />
+
+  <!-- pointcloud to laserscan -->
+  <group ns="$(arg camera)">
+    <include file="$(find gigatron_hardware)/launch/pointcloud_to_scan.launch">
+      <arg name="cloud_topic"    value="$(arg cloud_topic)" />
+      <arg name="scan_topic"     value="scan"           doc="output scan topic" />
+      <arg name="scan_frame_id"  value="base_link" />
+      <arg name="min_height"     value="0.5"     doc="min height to sample in point cloud" />
+      <arg name="max_height"     value="1.5"     doc="max height to sample in point cloud" />
+    </include>
+    <include file="$(find gigatron_hardware)/launch/pointcloud_to_scan.launch">
+      <arg name="cloud_topic"    value="$(arg cloud_topic)" />
+      <arg name="scan_topic"     value="scan_low"           doc="output scan topic" />
+      <arg name="scan_frame_id"  value="base_footprint" />
+      <arg name="min_height"     value="0.0"     doc="min height to sample in point cloud" />
+      <arg name="max_height"     value="0.5"     doc="max height to sample in point cloud" />
+    </include>
+  </group>
+
+</launch>

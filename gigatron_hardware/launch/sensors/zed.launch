@@ -8,8 +8,6 @@
 -->
 <launch>
 
-  <arg name="scan" default="true" doc="true if generating laser scans from point cloud" />
-
   <arg name="camera" default="zed"/>
   <arg name="tf_prefix" default="" />
   <arg name="pi/2" value="1.5707963267948966" />
@@ -57,24 +55,6 @@
       <param name="odometry_transform_frame_id"   value="$(arg camera)_tracked_frame" />
     </node>
 
-    <!-- pointcloud to laserscan -->
-    <group if="$(arg scan)">
-      <include file="$(find gigatron_hardware)/launch/pointcloud_to_scan.launch">
-        <arg name="cloud_topic"    value="$(arg cloud_topic)" />
-        <arg name="scan_topic"     value="scan"           doc="output scan topic" />
-        <arg name="scan_frame_id"  value="base_link" />
-        <arg name="min_height"     value="0.5"     doc="min height to sample in point cloud" />
-        <arg name="max_height"     value="1.5"     doc="max height to sample in point cloud" />
-      </include>
-      <include file="$(find gigatron_hardware)/launch/pointcloud_to_scan.launch">
-        <arg name="cloud_topic"    value="$(arg cloud_topic)" />
-        <arg name="scan_topic"     value="scan_low"           doc="output scan topic" />
-        <arg name="scan_frame_id"  value="base_footprint" />
-        <arg name="min_height"     value="0.0"     doc="min height to sample in point cloud" />
-        <arg name="max_height"     value="0.5"     doc="max height to sample in point cloud" />
-      </include>
-    </group>
-    
   </group>
 
 </launch>
