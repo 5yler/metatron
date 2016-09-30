@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# exclude_bag_nav
+# rosbag_filter
 #
 # Bash script for removing navigation stack output from a rosbag
 # 
@@ -26,13 +26,15 @@ EXCLUDE='('
 while read line; do 
 	EXCLUDE=$EXCLUDE'topic != "'$line'" and '; 
 	echo '       - '$line
-done < `rospack find gigatron`/config/rosbag_exclude_nav_topics.yaml
+done < `rospack find gigatron`/config/rosbag_exclude/$3'.yaml'
 
 TF_EXCLUDE='topic == "/tf" and m.transforms[0].header.frame_id != "/map" and m.transforms[0].child_frame_id != "/odom"'
 echo '       - '$TF_EXCLUDE
 
 EXCLUDE=$EXCLUDE'topic != "/tf") or ('$TF_EXCLUDE')'
-echo \'$EXCLUDE\'
-rosbag filter $INBAG $OUTBAG \'$EXCLUDE\'
+echo ''
+echo 'rosbag filter' $INBAG $OUTBAG \'$EXCLUDE\'
+
+rosbag filter '$INBAG $OUTBAG \'$EXCLUDE\''
 
 echo ' [>>>] Done.'

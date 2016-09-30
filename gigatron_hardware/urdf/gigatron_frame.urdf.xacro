@@ -66,7 +66,13 @@
             </geometry>
         </collision>
     </link>
-    
+    <!-- base_footprint (ground) to base_link -->
+    <link name="base_footprint" />
+    <joint name="base_link_footprint_joint" type="fixed" >
+        <parent link="base_footprint" />
+        <child link="base_link" />
+        <origin xyz="0 0 ${car_height/2-wheel_radius}" rpy="0 0 0" />
+    </joint>  
 
     <!-- the front left wheel -->
     <joint name="front_left_wheel_joint" type="revolute" >

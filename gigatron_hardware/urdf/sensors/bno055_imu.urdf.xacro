@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- BNO055 IMU sensor macro -->
+  <xacro:macro name="bno055_imu_v0" params="name parent *origin">
+  
+    <!-- ZED -->
+    <joint name="${name}_joint" type="fixed">
+        <insert_block name="origin" />
+        <parent link="${parent}"/>
+        <child link="${name}_link"/>
+    </joint>
+    <link name="${name}_link" type="fixed">
+                <inertial>
+            <mass value="0.01" />
+            <origin xyz="0 0 0" /> 
+            <inertia  ixx="0.2" ixy="0.0"  ixz="0.0"  iyy="0.2"  iyz="0.0"  izz="0.2" />
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="0.02 0.027 0.004" /> <!-- IMU dimensions -->
+            </geometry>
+            <material name="Blue"/>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="0.02 0.027 0.004" /> 
+            </geometry>
+        </collision>
+    </link>
+    
+  </xacro:macro>
+
+</robot>

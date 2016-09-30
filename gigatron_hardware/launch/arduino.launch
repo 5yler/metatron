@@ -22,9 +22,9 @@
         <!-- Arduino port setting -->
         <arg name="mac" value="$(optenv OS_X false)" /> <!-- auto detect operating system -->
         <arg unless="$(arg mac)" name="port" default="/dev/tty.arduino" />
-        <!-- <arg if="$(arg mac)" name="port" default="/dev/tty.usbmodem1421" /> -->
-        <arg if="$(arg mac)" name="port" default="/dev/tty.usbmodem14221" />
-
+        <arg if="$(arg mac)" name="port" default="$(optenv ARDUINO_PORT)" />
+<!--         <arg if="$(arg mac)" name="port" default="/dev/tty.usbmodem14221" />
+ -->
         <!-- rosserial_python -->
         <node pkg="rosserial_python" type="serial_node.py" name="arduino_node" output="screen">
             <param name="port" value="$(arg port)"/>

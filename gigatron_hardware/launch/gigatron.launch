@@ -10,11 +10,13 @@
 
 <launch>
 
+	<arg name="semiautomatic" default="true" doc="true for autonomous steering with RC throttle" />
+
 	<arg name="car" value="gigatron" />
 	<arg name="rviz" default="false" /> <!-- display robot in RViz -->
 	<arg name="gps" default="true" doc="using GPS sensor or no?" />
-	<arg name="back_lidar" default="false" doc="using rear LIDAR or no?"/>
-
+<!-- 	<arg name="back_lidar" default="false" doc="using rear LIDAR or no?"/>
+ -->
 	<!-- URDF model with robot state publisher -->
 	<include file="$(find gigatron_hardware)/launch/xacro.launch" >
 		<arg name="car" value="$(arg car)" />
@@ -23,37 +25,37 @@
 	<!-- car launch file -->
 	<include file="$(find gigatron_hardware)/launch/car.launch" >
 		<arg name="car" value="$(arg car)" />
+		<arg name="semiautomatic" value="$(arg semiautomatic)" />
 		<arg name="rviz" value="$(arg rviz)" />
 		<arg name="gps" value="$(arg gps)" />
+		<arg name="zed" default="true" doc="using ZED sensor or no?" />
 	</include>
 
 	<!-- front LIDAR  -->
 	<include file="$(find gigatron_hardware)/launch/sensors/rplidar.launch" >
-		<arg name="frame_id" default="laser_link" />
 		<arg name="topic" default="scan_rp" />
 	</include>
 	<!-- the laser angle filter unfortunately does not work at removing the middle part of a laser scan, so it won't work on inverted LIDAR -->
-	<include file="$(find gigatron_hardware)/launch/laser_angle_filter.launch" >
+	<include file="$(find scan_filters)/launch/angle_filter.launch" >
     	<arg name="filter_name" value="rplidar_angle_filter" />
-    	<arg name="filter_type" value="laser_angle_filter" />
+    	<arg name="config" value="inverted_laser_angle_filter_forward_180_degrees" />
     	<arg name="input_topic" value="scan_rp" />
-    	<arg name="output_topic" value="scan_front" /> 
+    	<arg name="output_topic" value="scan_rp/front_180" /> 
 	</include>
-	<node name="front_scan_relay" type="relay" pkg="topic_tools" args="/scan_front /scan"/>
-
+	<node name="front_scan_relay" type="relay" pkg="topic_tools" args="/scan_rp/front_180 /scan"/>
+ 
 	<!-- back LIDAR  -->
-	<group if="$(arg back_lidar)">
-		<include file="$(find gigatron_hardware)/launch/sensors/xvlidar.launch" >
-			<arg name="frame_id" default="back_laser_link" />
-			<arg name="topic" default="scan_xv" />
-		</include>
-		<include file="$(find gigatron_hardware)/launch/laser_angle_filter.launch" >
-	    	<arg name="filter_name" value="xvlidar_angle_filter" />
-	    	<arg name="filter_type" value="laser_angle_filter" />
-	    	<arg name="input_topic" value="scan_xv" />
-	    	<arg name="output_topic" value="scan_back" />
-		</include>
-		<node name="back_scan_relay" type="relay" pkg="topic_tools" args="/scan_back /scan"/>
-	</group>
+	<!-- <group if="$(arg back_lidar)"> -->
+	<include file="$(find gigatron_hardware)/launch/sensors/xvlidar.launch" >
+		<arg name="topic" default="scan_xv" />
+	</include>
+	<include file="$(find scan_filters)/launch/angle_filter.launch" >
+    	<arg name="filter_name" value="xvlidar_angle_filter" />
+    	<arg name="config" value="laser_angle_filter_forward_180_degrees" />
+    	<arg name="input_topic" value="scan_xv" />
+    	<arg name="output_topic" value="scan_xv/front_180" />
+	</include>
+	<node name="back_scan_relay" type="relay" pkg="topic_tools" args="/scan_xv/front_180 /scan"/>
+	<!-- </group> -->
 
 </launch>

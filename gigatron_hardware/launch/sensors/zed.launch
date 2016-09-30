@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!-- gps.launch
+     Launch file for Stereolabs ZED camera
+
+     @author  Syler Wagner      <syler@mit.edu>
+     
+     @date    2016-09-22  syler  creation
+-->
+<launch>
+
+  <arg name="camera" default="zed"/>
+  <arg name="tf_prefix" default="" />
+  <arg name="pi/2" value="1.5707963267948966" />
+  <arg name="optical_rotate" value="0 0 0 -$(arg pi/2) 0 -$(arg pi/2)" />
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="odom_$(arg camera)_initial_link" args="0.197, 0.000, 0.081 -0.500, 0.500, -0.500, 0.500 odom $(arg camera)_initial_frame" /> 
+
+  <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="$(arg camera)_initial_tracked_link" args="$(arg optical_rotate) odom $(arg camera)_optical_frame" /> -->
+
+  <arg name="svo_file" default=""/>
+  
+  <!-- ZED node -->
+  <group ns="$(arg camera)">
+    <node name="camera_node" pkg="zed_wrapper" type="zed_wrapper_node" args="$(arg svo_file)" output="screen">
+
+      <param name="resolution"            value="3" />  <!-- '0': HD2K '1': HD1080 '2': HD720 '3': VGA -->
+      <param name="quality"               value="1" />  <!-- '0': NONE '1': PERFORMANCE '2': MEDIUM '3': QUALITY -->
+      <param name="sensing_mode"          value="1" />  <!-- depth sensing mode '0': FILL '1': STANDARD -->
+      <param name="frame_rate"            value="10" />
+      <param name="odometry_DB"           value="" />
+      <param name="openni_depth_mode"     value="0" />
+
+      <param name="rgb_topic"             value="rgb/image_rect_color" />
+      <param name="rgb_cam_info_topic"    value="rgb/camera_info" />
+      <param name="rgb_frame_id"          value="$(arg camera)_optical_frame" />
+
+      <param name="left_topic"            value="left/image_rect_color" />
+      <param name="left_cam_info_topic"   value="left/camera_info" />
+      <param name="left_frame_id"         value="left_optical_frame" />
+
+      <param name="right_topic"           value="right/image_rect_color" />
+      <param name="right_cam_info_topic"  value="right/camera_info" />
+      <param name="right_frame_id"        value="right_optical_frame" />
+
+      <param name="depth_topic"           value="depth/image_rect_color" />
+      <param name="depth_cam_info_topic"  value="depth/camera_info" />
+      <param name="depth_frame_id"        value="$(arg camera)_optical_frame" />
+
+      <param name="point_cloud_topic"     value="point_cloud/cloud" />
+      <param name="cloud_frame_id"        value="$(arg camera)_link" />
+
+      <param name="odometry_topic"                value="odom" />
+      <param name="odometry_frame_id"             value="$(arg camera)_initial_frame" />
+      <param name="odometry_transform_frame_id"   value="$(arg camera)_tracked_frame" />
+    </node>
+  </group>
+
+  <!-- pointcloud to laserscan -->
+  <include file="$(find gigatron_hardware)/launch/pointcloud_to_scan.launch">
+    <arg name="scan_topic"     value="scan_zed"           doc="output scan topic" />
+    <arg name="scan_frame_id"  value="base_link" />
+    <arg name="min_height"     value="0.5"     doc="min height to sample in point cloud" />
+    <arg name="max_height"     value="1.5"     doc="max height to sample in point cloud" />
+  </include>
+  <include file="$(find gigatron_hardware)/launch/pointcloud_to_scan.launch">
+    <arg name="scan_topic"     value="scan_zed_low"           doc="output scan topic" />
+    <arg name="scan_frame_id"  value="base_footprint" />
+    <arg name="min_height"     value="0.0"     doc="min height to sample in point cloud" />
+    <arg name="max_height"     value="0.5"     doc="max height to sample in point cloud" />
+  </include>
+
+</launch>

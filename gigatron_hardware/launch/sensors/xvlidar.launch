@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-	<arg name="frame_id" default="laser_link" />  
+	<arg name="frame_id" default="xvlidar_link" />  
 
 	<arg name="baud" default="115200" />
 	<arg name="firmware_version" default="2" /> <!-- kilotron's LIDAR appears to need firmware V2. -->
