@@ -31,31 +31,33 @@
 		<arg name="zed" default="true" doc="using ZED sensor or no?" />
 	</include>
 
+	<group ns="zed">
+		<node name="scan_relay" type="relay" pkg="topic_tools" args="scan /scan"/>
+	</group>
+
 	<!-- front LIDAR  -->
-	<include file="$(find gigatron_hardware)/launch/sensors/rplidar.launch" >
-		<arg name="topic" default="scan_rp" />
-	</include>
+	<group ns="rplidar">
+	<include file="$(find gigatron_hardware)/launch/sensors/rplidar.launch" />
 	<!-- the laser angle filter unfortunately does not work at removing the middle part of a laser scan, so it won't work on inverted LIDAR -->
 	<include file="$(find scan_filters)/launch/angle_filter.launch" >
-    	<arg name="filter_name" value="rplidar_angle_filter" />
+    	<arg name="filter_name" value="angle_filter" />
     	<arg name="config" value="inverted_laser_angle_filter_forward_180_degrees" />
-    	<arg name="input_topic" value="scan_rp" />
-    	<arg name="output_topic" value="scan_rp/front_180" /> 
+    	<arg name="input_topic" value="scan" />
+    	<arg name="output_topic" value="scan/forward" /> 
 	</include>
-	<node name="front_scan_relay" type="relay" pkg="topic_tools" args="/scan_rp/front_180 /scan"/>
+	<node name="scan_relay" type="relay" pkg="topic_tools" args="scan/forward /scan"/>
+	</group>
  
-	<!-- back LIDAR  -->
-	<!-- <group if="$(arg back_lidar)"> -->
-	<include file="$(find gigatron_hardware)/launch/sensors/xvlidar.launch" >
-		<arg name="topic" default="scan_xv" />
-	</include>
+	<!-- front bottom LIDAR  -->
+	<group ns="xvlidar">
+	<include file="$(find gigatron_hardware)/launch/sensors/xvlidar.launch" />
 	<include file="$(find scan_filters)/launch/angle_filter.launch" >
-    	<arg name="filter_name" value="xvlidar_angle_filter" />
+    	<arg name="filter_name" value="angle_filter" />
     	<arg name="config" value="laser_angle_filter_forward_180_degrees" />
-    	<arg name="input_topic" value="scan_xv" />
-    	<arg name="output_topic" value="scan_xv/front_180" />
+    	<arg name="input_topic" value="scan" />
+    	<arg name="output_topic" value="scan/forward" />
 	</include>
-	<node name="back_scan_relay" type="relay" pkg="topic_tools" args="/scan_xv/front_180 /scan"/>
-	<!-- </group> -->
+	<node name="scan_relay" type="relay" pkg="topic_tools" args="scan/forward /scan"/>
+	</group>
 
 </launch>

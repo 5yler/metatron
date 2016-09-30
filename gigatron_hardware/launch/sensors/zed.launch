@@ -12,6 +12,7 @@
   <arg name="tf_prefix" default="" />
   <arg name="pi/2" value="1.5707963267948966" />
   <arg name="optical_rotate" value="0 0 0 -$(arg pi/2) 0 -$(arg pi/2)" />
+  <arg name="cloud_topic" value="point_cloud/cloud" />
 
   <node pkg="tf2_ros" type="static_transform_publisher" name="odom_$(arg camera)_initial_link" args="0.197, 0.000, 0.081 -0.500, 0.500, -0.500, 0.500 odom $(arg camera)_initial_frame" /> 
 
@@ -46,27 +47,29 @@
       <param name="depth_cam_info_topic"  value="depth/camera_info" />
       <param name="depth_frame_id"        value="$(arg camera)_optical_frame" />
 
-      <param name="point_cloud_topic"     value="point_cloud/cloud" />
+      <param name="point_cloud_topic"     value="$(arg cloud_topic)" />
       <param name="cloud_frame_id"        value="$(arg camera)_link" />
 
       <param name="odometry_topic"                value="odom" />
       <param name="odometry_frame_id"             value="$(arg camera)_initial_frame" />
       <param name="odometry_transform_frame_id"   value="$(arg camera)_tracked_frame" />
     </node>
-  </group>
 
-  <!-- pointcloud to laserscan -->
-  <include file="$(find gigatron_hardware)/launch/pointcloud_to_scan.launch">
-    <arg name="scan_topic"     value="scan_zed"           doc="output scan topic" />
-    <arg name="scan_frame_id"  value="base_link" />
-    <arg name="min_height"     value="0.5"     doc="min height to sample in point cloud" />
-    <arg name="max_height"     value="1.5"     doc="max height to sample in point cloud" />
-  </include>
-  <include file="$(find gigatron_hardware)/launch/pointcloud_to_scan.launch">
-    <arg name="scan_topic"     value="scan_zed_low"           doc="output scan topic" />
-    <arg name="scan_frame_id"  value="base_footprint" />
-    <arg name="min_height"     value="0.0"     doc="min height to sample in point cloud" />
-    <arg name="max_height"     value="0.5"     doc="max height to sample in point cloud" />
-  </include>
+    <!-- pointcloud to laserscan -->
+    <include file="$(find gigatron_hardware)/launch/pointcloud_to_scan.launch">
+      <arg name="cloud_topic"    value="$(arg cloud_topic)" />
+      <arg name="scan_topic"     value="scan"           doc="output scan topic" />
+      <arg name="scan_frame_id"  value="base_link" />
+      <arg name="min_height"     value="0.5"     doc="min height to sample in point cloud" />
+      <arg name="max_height"     value="1.5"     doc="max height to sample in point cloud" />
+    </include>
+    <include file="$(find gigatron_hardware)/launch/pointcloud_to_scan.launch">
+      <arg name="cloud_topic"    value="$(arg cloud_topic)" />
+      <arg name="scan_topic"     value="scan_low"           doc="output scan topic" />
+      <arg name="scan_frame_id"  value="base_footprint" />
+      <arg name="min_height"     value="0.0"     doc="min height to sample in point cloud" />
+      <arg name="max_height"     value="0.5"     doc="max height to sample in point cloud" />
+    </include>
+  </group>
 
 </launch>

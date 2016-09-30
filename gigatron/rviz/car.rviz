@@ -191,7 +191,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.02
       Style: Flat Squares
-      Topic: /scan_xv
+      Topic: /xvlidar/scan
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: false
@@ -221,7 +221,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.05
       Style: Flat Squares
-      Topic: /scan_xv/front_180
+      Topic: /xvlidar/scan/forward
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -329,7 +329,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.01
       Style: Flat Squares
-      Topic: /scan_rp/front_180
+      Topic: /rplidar/scan
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -359,7 +359,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.05
       Style: Flat Squares
-      Topic: /scan_zed
+      Topic: /zed/scan
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -401,7 +401,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.05
       Style: Flat Squares
-      Topic: /scan_zed_low
+      Topic: /zed/scan_low
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true

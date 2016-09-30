@@ -142,7 +142,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.01
       Style: Flat Squares
-      Topic: /scan_rp
+      Topic: /rplidar/scan
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
@@ -165,14 +165,14 @@ Visualization Manager:
       Max Intensity: 209
       Min Color: 0; 0; 0
       Min Intensity: 7
-      Name: Scan Back
+      Name: XV LIDAR Scan Forward
       Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
       Size (Pixels): 3
       Size (m): 0.02
       Style: Flat Squares
-      Topic: /scan_back
+      Topic: /xvlidar/scan/forward
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: false
@@ -195,14 +195,14 @@ Visualization Manager:
       Max Intensity: 16
       Min Color: 0; 0; 0
       Min Intensity: 9
-      Name: Scan Forward 180
+      Name: RPLIDAR Scan Forward 180
       Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
       Size (Pixels): 3
       Size (m): 0.05
       Style: Flat Squares
-      Topic: /scan_front
+      Topic: /rplidar/scan/forward
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true

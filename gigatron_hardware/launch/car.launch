@@ -36,11 +36,13 @@
 	<!-- sensors -->
 
 	<!-- Adafruit 9DOF IMU -->
-	<include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
-		<arg name="car" value="$(arg car)" />
-		<arg name="frame_id" default="imu_link"/>
-		<arg name="update_rate" default="20" />
-	</include>
+	<group if="$(optenv NVIDIA_JETSON false)"> <!-- auto detect platform and only launch on Jetsons -->
+		<include file="$(find gigatron_hardware)/launch/sensors/imu.launch" >
+			<arg name="car" value="$(arg car)" />
+			<arg name="frame_id" default="imu_link"/>
+			<arg name="update_rate" default="20" />
+		</include>
+	</group>
 
 	<!-- launch GPS sensor if applicable -->
 	<group if="$(arg gps)" >
@@ -51,8 +53,8 @@
 	</group>
 
 	<!-- launch ZED sensor if applicable -->
-	<group if="$(arg zed)" >
-		<include file="$(find gigatron_hardware)/launch/sensors/zed.launch" />
+	<group unless="$(optenv OS_X false)"> <!-- auto detect platform and only launch on Jetsons -->
+		<include if="$(arg zed)" file="$(find gigatron_hardware)/launch/sensors/zed.launch" />
 	</group>
 
 	<!-- /sensors -->

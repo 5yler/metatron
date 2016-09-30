@@ -8,6 +8,7 @@
     -->
 <launch>
 
+    <arg name="cloud_topic" doc="name of the input point cloud topic" />
     <arg name="scan_topic" doc="name of the output scan topic" />
     <arg name="scan_frame_id" doc="transform the pointcloud into this frame before converting to a laser scan" />
     <arg name="min_height" doc="minimum height to sample in the point cloud" />
@@ -21,7 +22,7 @@
     <!-- run pointcloud_to_laserscan node -->
     <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="cloud_to_$(arg scan_topic)">
 
-        <remap from="cloud_in" to="$(arg camera)/point_cloud/cloud"/>
+        <remap from="cloud_in" to="$(arg cloud_topic)"/>
         <remap from="scan" to="$(arg scan_topic)"/>
         <rosparam subst_value="true">
             target_frame: $(arg scan_frame_id)
