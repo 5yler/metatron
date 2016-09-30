@@ -17,6 +17,7 @@
 
 
 	<arg name="car" doc="'kilotron' or 'gigatron'?" />
+	<arg name="semiautomatic" doc="true for autonomous steering with RC throttle" />
 
 	<arg name="gps" doc="using GPS sensor or no?" />
 	<arg name="zed" doc="using ZED sensor or no?" />
@@ -29,6 +30,8 @@
 		<arg name="car" value="$(arg car)" />
 	</include>
 
+	<!-- publish semiautomatic mode command message, if applicable -->
+	<node if="$(arg semiautomatic)" pkg="rostopic" name="semiautomatic_pub" type="rostopic" args="pub -l /arduino/command/mode std_msgs/UInt8 1" output="screen"/>
 
 	<!-- sensors -->
 
