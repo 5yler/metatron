@@ -13,6 +13,12 @@
 	<arg name="inverted_lidar" default="false" doc="true if LIDAR is rotated 180 degrees" />
 	<arg name="max" default="5" doc="maximum forward velocity in m/s" />
 
+	<arg name="car" doc="'kilotron' or 'gigatron'?" default="gigatron" />
+
+    <!-- load car platform parameters into "car" namespace -->
+    <rosparam file="$(find gigatron_hardware)/config/$(arg car)_platform.yaml" ns="car" command="load" /> 
+
+
 	<!-- reactive drive controller -->
 	<node pkg="gigatron" type="drive" name="reactive_drive">
 		<param name="scan_topic" value="$(arg scan_topic)" />

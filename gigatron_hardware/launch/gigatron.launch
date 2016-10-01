@@ -36,7 +36,7 @@
 	</group>
 
 	<!-- front LIDAR  -->
-	<group ns="rplidar">
+	<group ns="rplidar" unless="$(optenv NVIDIA_JETSON_TX1 false)">
 	<include file="$(find gigatron_hardware)/launch/sensors/rplidar.launch" />
 	<!-- the laser angle filter unfortunately does not work at removing the middle part of a laser scan, so it won't work on inverted LIDAR -->
 	<include file="$(find scan_filters)/launch/angle_filter.launch" >
@@ -49,7 +49,7 @@
 	</group>
  
 	<!-- front bottom LIDAR  -->
-	<group ns="xvlidar">
+	<group ns="xvlidar" unless="$(optenv NVIDIA_JETSON_TX1 false)">
 	<include file="$(find gigatron_hardware)/launch/sensors/xvlidar.launch" />
 	<include file="$(find scan_filters)/launch/angle_filter.launch" >
     	<arg name="filter_name" value="angle_filter" />
