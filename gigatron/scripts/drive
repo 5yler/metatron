@@ -147,7 +147,7 @@ class Driver():
         '''
         v = self.throttle(drive_angle)
         v_left, v_right = self.split_throttle(drive_angle, v)
-        # drive_angle, v_left, v_right = proportional_throttle(steer_angle, ranges)
+        drive_angle, v_left, v_right = self.proportional_throttle(drive_angle, scan)
     
 
         if abs(drive_angle) > self._abs_max_steering_angle:
@@ -265,33 +265,43 @@ class Driver():
       
         return v_left, v_right
 
-    '''
-    def proportional_throttle(self, steer_angle, ranges):
-        v = self.throttle(steer_angle)
-        points_ahead = self.generate_narrow_fov_points(ranges, (steer_angle - math.pi/8), (steer_angle + math.pi/8))
+    
+    def proportional_throttle(self, steer_angle, scan):
+        
+        angles = self.generate_scan_angles(self._angle_min, self._angle_max, self._angle_increment, yaw_offset=self._lidar_yaw)
+        scan_points = Points([angles, scan.ranges])
+        points_ahead = self.narrow_fov(scan_points, -math.pi/8, math.pi/8)
+
         ranges_ahead = []
+        for r in points_ahead.ranges:
+            ranges_ahead.append(r)
+
+        v = self.throttle(steer_angle)
         rospy.logwarn("proportional_throttle v: %4.1f", v)
-        for p in zip(points_ahead[0], points_ahead[1]):
-            ranges_ahead.append(p[0])
 
         if (len(ranges_ahead) > 0):
             min_dist = min(ranges_ahead)
             if (min_dist < 5):
                 angle = steer_angle
-                v *= (self._v_faster / self._v_forward) * (min_dist / self._fast_dist)
-                v = max(v, self.v_slowest)
-                v_left, v_right = split_throttle(angle, v)
+                # v *= (self._v_faster / self._v_forward) * (min_dist / self._fast_dist)
+                v = max(v, self._v_slowest)
+                rospy.logerr("NOT CLEAR AHEAD")
+
             else:
                 angle = 0
-                v_left = v_right = self.v_max
+                # v_left = v_right = self.v_max
+                rospy.logerr("ALMOST CLEAR AHEAD")
+            v_left, v_right = self.split_throttle(angle, v)
         else:
-            angle = steer_angle
-            v_left, v_right = split_throttle(angle, v)
+            angle = 0
+            v_left = v_right = self._v_max
+            rospy.logerr("CLEAR AHEAD")
+            
 
         
         return angle, v_left, v_right
 
-
+    '''
     def ahead_clear(self, scan_unfiltered):
         Projector = LaserProjection()
         cloud = Projector.projectLaser(scan) #gets PointCloud2
