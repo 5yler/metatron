@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# bag
+#
+# Bash script for recording rosbag with a list of excluded topics
+# 
+# @author   Syler Wagner    <syler@mit.edu>
+#
+# @date     2016-09-18      creation
+
+INBAG_BASENAME=${INBAG%.*}
+if [ "$#" -gt 1 ]; then
+    OUTBAG=$1
+fi
+echo ' [>  ]  Recording rosbag to '$OUTBAG
+
+echo ' [>> ] Excluding topics: '
+
+
+EXCLUDE='('
+
+# auto-generate python expression as input for rosbag filter from config file
+while read line; do 
+	EXCLUDE=$EXCLUDE$line'|'; 
+	echo '       - '$line
+done < `rospack find gigatron`/config/rosbag_exclude/$2'.yaml'
+
+
+EXCLUDE=$EXCLUDE')'
+echo ''
+echo 'rosbag record -a -o ' $OUTBAG ' -x ' \'$EXCLUDE\'
+
+rosbag record -a -o  $OUTBAG  -x  $EXCLUDE
+
+echo ' [>>>] Done.'
