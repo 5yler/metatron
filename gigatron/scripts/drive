@@ -59,11 +59,9 @@ class Points():
         if len(point_list) != 0:
             self.angles = point_list[0]
             self.ranges = point_list[1]
-            self.intensities = point_list[2]
         else:
             self.angles = []
             self.ranges = []
-            self.intensities = []
         
     def num_points(self):
         print str(len(self.ranges))+" valid points"
@@ -83,12 +81,12 @@ class Driver():
         self._pub = rospy.Publisher('/command/drive', Drive, queue_size=5)
 
         scan_topic = rospy.get_param('~scan_topic', 'scan')
+        self._got_lidar_parameters = False
+        self._lidar_yaw = 0
+        self._upside_down_lidar = False
 
-        # scan subscriber
         self._ignore_tf = rospy.get_param("~ignore_tf", False)
 
-        rospy.Subscriber(scan_topic, LaserScan, self.callback)
-        rospy.logwarn("Subscribing to scan topic: %s", scan_topic)
 
         # get some parameters
         self._car_name = rospy.get_param("car/name")
@@ -117,10 +115,6 @@ class Driver():
 
         rospy.logwarn("Got parameters for car: %s", self._car_name)
 
-        self._got_lidar_parameters = False
-
-        self._lidar_yaw = 0
-        self._upside_down_lidar = False
 
         # note: this will be overridden by tf information if available
         if rospy.has_param("~lidar_yaw"):
@@ -128,6 +122,11 @@ class Driver():
 
         if rospy.has_param("~upside_down_lidar"):
             self._upside_down_lidar = rospy.get_param("~upside_down_lidar")
+
+
+        # scan subscriber
+        rospy.Subscriber(scan_topic, LaserScan, self.callback)
+        rospy.logwarn("Subscribing to scan topic: %s", scan_topic)
 
         rospy.spin()
 
@@ -148,7 +147,7 @@ class Driver():
         '''
         v = self.throttle(drive_angle)
         v_left, v_right = self.split_throttle(drive_angle, v)
-        # drive_angle, v_left, v_right = proportional_throttle(steer_angle, ranges, intensities)
+        # drive_angle, v_left, v_right = proportional_throttle(steer_angle, ranges)
     
 
         if abs(drive_angle) > self._abs_max_steering_angle:
@@ -203,14 +202,14 @@ class Driver():
 
     # helper functions
     def point_ok(self, point):
-        angle, r, intensity = point[0], point[1], point[2]
+        angle, r = point[0], point[1]
 
         if math.isnan(r): # check for inf
             return False
         if r < 0:
             return False
-        elif intensity <= 0.0: # this might not be necessary
-            return False
+#        elif intensity <= 0.0: # this might not be necessary
+#            return False
         elif r < self._range_min or r > self._range_max: 
             return False
         else:
@@ -218,13 +217,13 @@ class Driver():
 
     # return OK points with yaw in specified range
     def narrow_fov(self, points, yaw_min, yaw_max):
-        narrow = [p for p in zip(points.angles, points.ranges, points.intensities) if yaw_min < p[0] < yaw_max and self.point_ok(p)]
+        narrow = [p for p in zip(points.angles, points.ranges) if yaw_min < p[0] < yaw_max and self.point_ok(p)]
         return Points([list(n) for n in zip(*narrow)])
 
     def polar_integrate(self, narrow):
         integral = 0;
         dirintegral = 0;
-        for p in zip(narrow.angles, narrow.ranges, narrow.intensities):
+        for p in zip(narrow.angles, narrow.ranges):
             yaw = p[0]
             r = p[1]
             # use -= because we want to steer away from points
@@ -234,7 +233,7 @@ class Driver():
 
     def steer(self, scan, yaw_offset, yaw_min=-math.pi/2, yaw_max=math.pi/2):
         angles = self.generate_scan_angles(self._angle_min, self._angle_max, self._angle_increment, yaw_offset=self._lidar_yaw)
-        scan_points = Points([angles, scan.ranges, scan.intensities])
+        scan_points = Points([angles, scan.ranges])
         narrow_points = self.narrow_fov(scan_points, yaw_min, yaw_max)
         if narrow_points.is_empty():
             drive_angle = 0 
@@ -267,12 +266,12 @@ class Driver():
         return v_left, v_right
 
     '''
-    def proportional_throttle(self, steer_angle, ranges, intensities):
+    def proportional_throttle(self, steer_angle, ranges):
         v = self.throttle(steer_angle)
-        points_ahead = self.generate_narrow_fov_points(ranges, intensities, (steer_angle - math.pi/8), (steer_angle + math.pi/8))
+        points_ahead = self.generate_narrow_fov_points(ranges, (steer_angle - math.pi/8), (steer_angle + math.pi/8))
         ranges_ahead = []
         rospy.logwarn("proportional_throttle v: %4.1f", v)
-        for p in zip(points_ahead[0], points_ahead[1], points_ahead[2]):
+        for p in zip(points_ahead[0], points_ahead[1]):
             ranges_ahead.append(p[0])
 
         if (len(ranges_ahead) > 0):
