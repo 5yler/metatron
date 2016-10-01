@@ -30,6 +30,8 @@
 		<arg name="gps" value="$(arg gps)" />
 		<arg name="zed" default="true" doc="using ZED sensor or no?" />
 	</include>
+	<!-- ZED laser scans -->
+	<include if="$(arg zed)" file="$(find gigatron_hardware)/launch/sensors/zed_scan.launch" />
 
 	<group ns="zed">
 		<node name="scan_relay" type="relay" pkg="topic_tools" args="scan /scan"/>
