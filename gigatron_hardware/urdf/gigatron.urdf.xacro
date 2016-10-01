@@ -34,7 +34,7 @@
     <!-- XV LIDAR low-mounted on front, placement relative to base_link -->
     <xacro:property name="xvlidar_x" value="${wheelbase_length/2 + 0.19}" /> 
     <xacro:property name="xvlidar_y" value="0" />
-    <xacro:property name="xvlidar_z" value="-0.3" /> 
+    <xacro:property name="xvlidar_z" value="-0.03" /> 
     <xacro:property name="xvlidar_roll" value="${M_PI}" />
     <xacro:property name="xvlidar_pitch" value="0" />
     <xacro:property name="xvlidar_yaw" value="${M_PI}" />
@@ -61,10 +61,10 @@
             <inertia  ixx="0.2" ixy="0.0"  ixz="0.0"  iyy="0.2"  iyz="0.0"  izz="0.2" />
         </inertial>
         <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
+            <origin xyz="0 0 ${car_height/4+0.02}" rpy="0 0 0" />
             <geometry>
-                <box size="${car_length} ${wheelbase_width} ${car_height}" />
-            </geometry>
+                 <box size="${car_length} ${wheelbase_width} ${car_height}" />
+             </geometry>
             <material name="Grey"/>
         </visual>
         <collision>
