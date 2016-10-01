@@ -11,6 +11,7 @@
 	<arg name="scan_topic" default="zed/scan" />
 	<arg name="ignore_tf" default="false" doc="true if laser frame tf infomation should be ignored"/>
 	<arg name="inverted_lidar" default="false" doc="true if LIDAR is rotated 180 degrees" />
+	<arg name="upside_down" default="false" doc="true if LIDAR is upside down" />
 	<arg name="max" default="5" doc="maximum forward velocity in m/s" />
 
 	<arg name="car" doc="'kilotron' or 'gigatron'?" default="gigatron" />
@@ -24,6 +25,7 @@
 		<param name="scan_topic" value="$(arg scan_topic)" />
 		<param name="ignore_tf" value="$(arg ignore_tf)" />
 		<param if="$(arg inverted_lidar)" name="lidar_yaw" value="3.141592653589793" />
+		<param name="upside_down_lidar" value="$(arg upside_down)" />
 		<param name="v_max" value="$(arg max)" />
 	</node>
 

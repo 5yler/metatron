@@ -120,10 +120,14 @@ class Driver():
         self._got_lidar_parameters = False
 
         self._lidar_yaw = 0
+        self._upside_down_lidar = False
 
         # note: this will be overridden by tf information if available
         if rospy.has_param("~lidar_yaw"):
             self._lidar_yaw = rospy.get_param("~lidar_yaw")
+
+        if rospy.has_param("~upside_down_lidar"):
+            self._upside_down_lidar = rospy.get_param("~upside_down_lidar")
 
         rospy.spin()
 
@@ -190,7 +194,11 @@ class Driver():
         angles = []
         for i in xrange(n_points):
             angle = wrap_angle(angle_min + i*angle_increment + yaw_offset)
-            angles.append(angle)
+            if not self._upside_down_lidar:
+                angles.append(angle)
+            else:
+                angles.append(-angle)
+
         return angles
 
     # helper functions
