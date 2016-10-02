@@ -26,7 +26,7 @@ import sensor_msgs.point_cloud2 as pc2
 import tf   # for laser transform
 
 follow_syler = False
-avgPts = 5 #Number of scans to average (Set to 1 to keep prior behavior)
+avgPts = 2 #Number of scans to average (Set to 1 to keep prior behavior)
 
 fast_dist = 5   #Assumes with 5m of clearance ahead we can go as fast as possible
 
@@ -79,6 +79,7 @@ class Driver():
 
         #integral averaging for reactive control
         self.avgScan = 0
+        self.ang = 0
 
         # control publisher
         self._pub = rospy.Publisher('/command/drive', Drive, queue_size=5)
@@ -107,14 +108,15 @@ class Driver():
 
         self._abs_max_steering_angle = 0.5 * self._steering_angle_range
         self._v_max = self._max_motor_rpm * self._rpm_to_vel * self._gear_ratio
-
+        """
         if rospy.has_param("~v_max"):
             self._v_max = rospy.get_param("~v_max")
             rospy.logerr("SETTING MAX AUTO VELOCITY TO %4.2f m/s", self._v_max)
-
+        """
+        self._v_max = 1.5
         self._v_faster = self._v_max
-        self._v_forward = 0.5 * self._v_max
-        self._v_slowest = 0.25 * self._v_max
+        self._v_forward = .7 * self._v_max
+        self._v_slowest = 0.5 * self._v_max
 
         rospy.logwarn("Got parameters for car: %s", self._car_name)
 
@@ -157,7 +159,7 @@ class Driver():
             drive_angle = drive_angle * (self._abs_max_steering_angle / abs(drive_angle))
 
         control = Drive()
-
+        self.ang = drive_angle
         # set velocity commands
         control.angle = drive_angle  # driving angle 
         control.vel_left = max(v_left, 0)  # left wheel velocity
@@ -226,57 +228,27 @@ class Driver():
     def polar_integrate(self, narrow):
         integral = 0;
         dirintegral = 0;
-        kP = 1
-        for p in zip(narrow.angles, narrow.ranges):
-            yaw = p[0]
-            r = p[1]
-            # use -= because we want to steer away from points
-            dirintegral -= sign(yaw) * (1/r) * math.cos(yaw)
-            integral += (1/r) * math.cos(yaw)
-        self.avgScan = (1.0/avgPts)*(dirintegral/integral) + (1-1.0/avgPts)*self.avgScan
-        return kP * self.avgScan #dirintegral/integral
-
-    def sqrt_integrate(self, narrow):
-        integral = 0;
-        dirintegral = 0;
-        kP = 1
         for p in zip(narrow.angles, narrow.ranges):
             yaw = p[0]
             r = p[1]
             # use -= because we want to steer away from points
             dirintegral -= sign(yaw) * (1/math.sqrt(r)) * math.cos(yaw)
             integral += (1/math.sqrt(r)) * math.cos(yaw)
-        self.avgScan = (1.0/avgPts)*(dirintegral/integral) + (1-1.0/avgPts)*self.avgScan        
-        rospy.logwarn('avgScan: %4.1f',self.avgScan)
-        return kP * self.avgScan #dirintegral/integral
+        return dirintegral/integral
 
     def pow_integrate(self, narrow):
         integral = 0;
         dirintegral = 0;
-        kP = 0.1
-        pwr = 0.6
+        kP = 0.01
+        pwr = 0.25
         for p in zip(narrow.angles, narrow.ranges):
-            yaw = p[0]
+            yaw = p[0]-self.ang
             r = p[1]
             # use -= because we want to steer away from points
             dirintegral -= sign(yaw) * (1/math.pow(r,pwr)) * math.cos(yaw)
         self.avgScan = (1.0/avgPts)*(dirintegral) + (1-1.0/avgPts)*self.avgScan        
-        rospy.logwarn('avgScan: %4.1f',self.avgScan)
         return kP * self.avgScan #dirintegral/integral
 
-    def stupid_integrate(self, narrow):
-        integral = 0;
-        dirintegral = 0;
-        kP = 0.5
-        for p in zip(narrow.angles, narrow.ranges):
-            yaw = p[0]
-            r = p[1]
-            # use -= because we want to steer away from points
-            dirintegral -= sign(yaw)# * (1/math.sqrt(r)) * math.cos(yaw)
-            integral = 1# += (1/math.sqrt(r)) * math.cos(yaw)
-        self.avgScan = (1.0/avgPts)*(dirintegral/integral) + (1-1.0/avgPts)*self.avgScan
-        rospy.logwarn('avgScan: %4.1f',self.avgScan)
-        return kP * self.avgScan #dirintegral/integral
 
     def steer(self, scan, yaw_offset, yaw_min=-math.pi/2, yaw_max=math.pi/2):
         angles = self.generate_scan_angles(self._angle_min, self._angle_max, self._angle_increment, yaw_offset=self._lidar_yaw)
@@ -317,35 +289,55 @@ class Driver():
         angles = self.generate_scan_angles(self._angle_min, self._angle_max, self._angle_increment, yaw_offset=self._lidar_yaw)
         scan_points = Points([angles, scan.ranges])
         points_ahead = self.narrow_fov(scan_points, -math.pi/8, math.pi/8)
+        points_steer_ahead = self.narrow_fov(scan_points, steer_angle-math.pi/8, steer_angle+math.pi/8)
 
         ranges_ahead = []
         for r in points_ahead.ranges:
             ranges_ahead.append(r)
 
+        ranges_steer_ahead = []
+        for r in points_steer_ahead.ranges:
+            ranges_steer_ahead.append(r)
+
         v = self.throttle(steer_angle)
         rospy.logwarn("proportional_throttle v: %4.1f", v)
-        angle = steer_angle
-        v_left, v_right = self.split_throttle(angle, v)
 
-        """
         if (len(ranges_ahead) > 0):
             min_dist = min(ranges_ahead)
             if (min_dist < 5):
                 angle = steer_angle
                 # v *= (self._v_faster / self._v_forward) * (min_dist / self._fast_dist)
                 v = max(v, self._v_slowest)
-                rospy.logerr("NOT CLEAR AHEAD")
+                rospy.logerr("[STRAIGHT AHEAD] NOT CLEAR")
 
             else:
-                angle = 0
+                angle = 0.5*steer_angle
                 # v_left = v_right = self.v_max
-                rospy.logerr("ALMOST CLEAR AHEAD")
+                rospy.logerr("[STRAIGHT AHEAD] ALMOST CLEAR")
+            v_left, v_right = self.split_throttle(angle, v)
+        else:
+            angle = 0.3*steer_angle
+            v_left = v_right = self._v_max
+            rospy.logerr("[STRAIGHT AHEAD] CLEAR")
+
+        if (len(ranges_ahead) > 0):
+            min_dist = min(ranges_ahead)
+            if (min_dist < 5):
+                angle = steer_angle
+                # v *= (self._v_faster / self._v_forward) * (min_dist / self._fast_dist)
+                v = max(v, self._v_slowest)
+                rospy.logerr("[STEER] NOT CLEAR")
+
+            else:
+                angle = 0.2*steer_angle
+                # v_left = v_right = self.v_max
+                rospy.logerr("[STEER] ALMOST CLEAR")
             v_left, v_right = self.split_throttle(angle, v)
         else:
             angle = 0
             v_left = v_right = self._v_max
-            rospy.logerr("CLEAR AHEAD")
-        """
+            rospy.logerr("[STEER] CLEAR")
+            
 
         
         return angle, v_left, v_right
