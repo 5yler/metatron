@@ -288,12 +288,12 @@ class Driver():
                 rospy.logerr("NOT CLEAR AHEAD")
 
             else:
-                angle = 0
+                angle = 0.5*steer_angle
                 # v_left = v_right = self.v_max
                 rospy.logerr("ALMOST CLEAR AHEAD")
             v_left, v_right = self.split_throttle(angle, v)
         else:
-            angle = 0
+            angle = 0.3*steer_angle
             v_left = v_right = self._v_max
             rospy.logerr("CLEAR AHEAD")
             
