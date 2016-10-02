@@ -51,7 +51,7 @@
 	</group>
  
 	<!-- front bottom LIDAR  -->
-	<include file="$(find gigatron_hardware)/launch/sensors/xvlidar.launch" unless="$(optenv NVIDIA_JETSON_TX1 false)"/>
+<!-- 	<include file="$(find gigatron_hardware)/launch/sensors/xvlidar.launch" unless="$(optenv NVIDIA_JETSON_TX1 false)"/>
 	<group ns="xvlidar">
 		<include file="$(find scan_filters)/launch/angle_filter.launch" >
     	<arg name="filter_name" value="angle_filter" />
@@ -60,6 +60,6 @@
     	<arg name="output_topic" value="scan/forward" />
 	</include>
 	<node name="scan_relay" type="relay" pkg="topic_tools" args="scan/forward /scan"/>
-	</group>
+	</group> -->
 
 </launch>
