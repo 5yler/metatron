@@ -227,11 +227,11 @@ class Driver():
             yaw = p[0]
             r = p[1]
             # use -= because we want to steer away from points
-            dirintegral -= sign(yaw) * (1/r) * math.cos(yaw)
-            integral += (1/r) * math.cos(yaw)
+            dirintegral -= sign(yaw) * (1/math.sqrt(r)) * math.cos(yaw)
+            integral += (1/math.sqrt(r)) * math.cos(yaw)
         return dirintegral/integral
 
-    def steer(self, scan, yaw_offset, yaw_min=-math.pi/2, yaw_max=math.pi/2):
+    def steer(self, scan, yaw_offset, yaw_min=-math.pi/4, yaw_max=math.pi/4):
         angles = self.generate_scan_angles(self._angle_min, self._angle_max, self._angle_increment, yaw_offset=self._lidar_yaw)
         scan_points = Points([angles, scan.ranges])
         narrow_points = self.narrow_fov(scan_points, yaw_min, yaw_max)
