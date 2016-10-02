@@ -239,8 +239,8 @@ class Driver():
     def pow_integrate(self, narrow):
         integral = 0;
         dirintegral = 0;
-        kP = 0.01
-        pwr = 0.25
+        kP = 0.015
+        pwr = 0.27
         for p in zip(narrow.angles, narrow.ranges):
             yaw = p[0]-self.ang
             r = p[1]

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!-- drive.launch
+     Launch file for reactive drive controller
+
+     @author  Syler Wagner  <syler@mit.edu>
+     
+     @date    2016-09-17   syler   creation
+    -->
+<launch>
+
+	<arg name="semiautomatic" default="true" />
+	<arg name="max" default="2" doc="maximum forward velocity in m/s" />
+
+    <!-- load car platform parameters into "car" namespace -->
+    <rosparam file="$(find gigatron_hardware)/config/gigatron_platform.yaml" ns="car" command="load" /> 
+
+
+	<!-- reactive drive controller -->
+	<include file="$(find gigatron)/launch/drive.launch">
+		<arg name="scan_topic" value="rplidar/scan" />
+		<arg name="upside_down" value="true" />
+		<arg name="ignore_tf" value="true" />
+		<arg name="inverted_lidar" value="true" />
+		<arg name="max" value="$(arg max)" />
+	</include>
+<!-- 
+	<include file="$(find gigatron_hardware)/launch/gigatron.launch">
+		<arg name="rviz" value="true" />
+		<arg name="semiautomatic" value="$(arg semiautomatic)" />
+	</include>
+ -->
+
+
+</launch>
