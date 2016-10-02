@@ -32,12 +32,12 @@
             min_height: $(arg min_height) # minimum height to sample in the point cloud [m]
             max_height: $(arg max_height) # maximum height to sample in the point cloud [m]
 
-            angle_min: -1.5708      # -M_PI
-            angle_max: 1.5708       # M_PI
+            angle_min: -1      # -M_PI
+            angle_max: 1       # M_PI
             angle_increment: 0.017453  # M_PI/180.0 resolution of laser scan in [radians per ray]
-            scan_time: 0.3333       # scan rate in seconds
+            scan_time: 0.1       # scan rate in seconds
             range_min: 0.45         # minimum range value to return [m]
-            range_max: 20.0         # maximum ranges to return [m]
+            range_max: 25.0         # maximum ranges to return [m]
             
             use_inf: true
             # If disabled, report infinite range (no obstacle) as range_max + 1. Otherwise report infinite range as +inf. Associated with the inf_is_valid parameter for costmap_2d obstacle layers.

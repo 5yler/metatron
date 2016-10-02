@@ -37,29 +37,33 @@
 		<node name="scan_relay" type="relay" pkg="topic_tools" args="scan /scan"/>
 	</group>
 
-	<!-- front LIDAR  -->
-	<include file="$(find gigatron_hardware)/launch/sensors/rplidar.launch" unless="$(optenv NVIDIA_JETSON_TX1 false)"/>
-	<!-- the laser angle filter unfortunately does not work at removing the middle part of a laser scan, so it won't work on inverted LIDAR -->
-	<group ns="rplidar">
-	<include file="$(find scan_filters)/launch/angle_filter.launch" >
-    	<arg name="filter_name" value="angle_filter" />
-    	<arg name="config" value="inverted_laser_angle_filter_forward_180_degrees" />
-    	<arg name="input_topic" value="scan" />
-    	<arg name="output_topic" value="scan/forward" /> 
-	</include>
-	<node name="scan_relay" type="relay" pkg="topic_tools" args="scan/forward /scan"/>
-	</group>
- 
-	<!-- front bottom LIDAR  -->
-	<include file="$(find gigatron_hardware)/launch/sensors/xvlidar.launch" unless="$(optenv NVIDIA_JETSON_TX1 false)"/>
-	<group ns="xvlidar">
+	<!-- launch LIDARs except on TX1 -->
+	<group unless="$(optenv NVIDIA_JETSON_TX1 false)">
+	
+		<!-- front LIDAR  -->
+		<include file="$(find gigatron_hardware)/launch/sensors/rplidar.launch"/>
+		<group ns="rplidar">
 		<include file="$(find scan_filters)/launch/angle_filter.launch" >
-    	<arg name="filter_name" value="angle_filter" />
-    	<arg name="config" value="laser_angle_filter_forward_180_degrees" />
-    	<arg name="input_topic" value="scan" />
-    	<arg name="output_topic" value="scan/forward" />
-	</include>
-	<node name="scan_relay" type="relay" pkg="topic_tools" args="scan/forward /scan"/>
+	    	<arg name="filter_name" value="angle_filter" />
+	    	<arg name="config" value="inverted_laser_angle_filter_forward_180_degrees" />
+	    	<arg name="input_topic" value="scan" />
+	    	<arg name="output_topic" value="scan/forward" /> 
+		</include>
+		<node name="scan_relay" type="relay" pkg="topic_tools" args="scan/forward /scan"/>
+		</group>
+	 
+		<!-- front bottom LIDAR  -->
+		<include file="$(find gigatron_hardware)/launch/sensors/xvlidar.launch"/>
+		<group ns="xvlidar">
+			<include file="$(find scan_filters)/launch/angle_filter.launch" >
+	    	<arg name="filter_name" value="angle_filter" />
+	    	<arg name="config" value="laser_angle_filter_forward_180_degrees" />
+	    	<arg name="input_topic" value="scan" />
+	    	<arg name="output_topic" value="scan/forward" />
+		</include>
+		<node name="scan_relay" type="relay" pkg="topic_tools" args="scan/forward /scan"/>
+		</group>
+
 	</group>
 
 </launch>
