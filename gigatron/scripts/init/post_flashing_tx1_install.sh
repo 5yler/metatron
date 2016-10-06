@@ -11,8 +11,7 @@
 sudo apt-get -y --force-yes install nano # Install Nano
 echo "export EDITOR='nano' # use nano as default text editor"  >> ~/.bashrc
 
-sudo apt-get -y --force-yes install samba # for networked drives
-sudo apt-get -y --force-yes install tmux # tmux for splitting terminal into panes
+sudo apt-get -y --force-yes install git nano samba exfat-fuse exfat-utils openssh-server tree tmux
 
 sudo ntpdate ntp.ubuntu.com # set ubuntu date server
 # This will ensure that your machine polls the ubuntu server to get the right time and date for your timezone. 
