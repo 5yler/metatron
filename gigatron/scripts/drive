@@ -79,6 +79,9 @@ class Driver():
 
         #integral averaging for reactive control
         self.avgScan = 0
+
+        #For callback
+        self.vel = 0
         self.ang = 0
 
         # control publisher
@@ -141,7 +144,17 @@ class Driver():
         if not self._got_lidar_parameters:
             self.initialize_laser_parameters(scan)
 
-        drive_angle = self.steer(scan, yaw_offset=self._lidar_yaw, yaw_min=-math.pi/2, yaw_max=math.pi/2)
+        #Scan cone tightens with increased velocity and relative to the steering angle.
+        yaw_min = self.ang - math.abs(1 - 0.75*self.vel/self.v_max)*math.pi/2
+        yaw_max = self.ang + math.abs(1 - 0.75*self.vel/self.v_max)*math.pi/2
+
+        #limit the scan cone values
+        if(yaw_min < -math.pi/2):
+            yaw_min = -math.pi/2
+        if(yaw_max > math.pi/2):
+            yaw_max = math.pi/2
+
+        drive_angle = self.steer(scan, yaw_offset=self._lidar_yaw, yaw_min, yaw_max)
      
         '''
         if self.ahead_clear(scan): #if clear, go fast!
@@ -150,16 +163,19 @@ class Driver():
             control.vel_right = self._v_max
         else: #drive normally
         '''
-        v = self.throttle(drive_angle)
-        v_left, v_right = self.split_throttle(drive_angle, v)
+
+        # v = self.throttle(drive_angle)
+        # v_left, v_right = self.split_throttle(drive_angle, v)
+
+        #This renders the above two lines obsolete, and can override drive_angle
         drive_angle, v_left, v_right = self.proportional_throttle(drive_angle, scan)
     
 
         if abs(drive_angle) > self._abs_max_steering_angle:
-            drive_angle = drive_angle * (self._abs_max_steering_angle / abs(drive_angle))
+            drive_angle = drive_angle * (self._abs_max_steering_angle / abs(drive_angle))        
+        self.ang = drive_angle
 
         control = Drive()
-        self.ang = drive_angle
         # set velocity commands
         control.angle = drive_angle  # driving angle 
         control.vel_left = max(v_left, 0)  # left wheel velocity
@@ -202,7 +218,6 @@ class Driver():
                 angles.append(angle)
             else:
                 angles.append(-angle)
-
         return angles
 
     # helper functions
@@ -288,8 +303,9 @@ class Driver():
         
         angles = self.generate_scan_angles(self._angle_min, self._angle_max, self._angle_increment, yaw_offset=self._lidar_yaw)
         scan_points = Points([angles, scan.ranges])
-        points_ahead = self.narrow_fov(scan_points, -math.pi/8, math.pi/8)
-        points_steer_ahead = self.narrow_fov(scan_points, steer_angle-math.pi/8, steer_angle+math.pi/8)
+
+        points_ahead = self.narrow_fov(scan_points, yaw_min, yaw_max)
+        points_steer_ahead = self.narrow_fov(scan_points, steer_angle-yaw_min, steer_angle+yaw_max)
 
         ranges_ahead = []
         for r in points_ahead.ranges:
@@ -300,6 +316,7 @@ class Driver():
             ranges_steer_ahead.append(r)
 
         v = self.throttle(steer_angle)
+        self.vel = v
         rospy.logwarn("proportional_throttle v: %4.1f", v)
 
         if (len(ranges_ahead) > 0):
