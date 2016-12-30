@@ -94,18 +94,17 @@ sudo apt-get -y --force-yes install libi2c-dev i2c-tools
 # add udev rule so i2c devices aren't only owned by root
 sudo sh -c 'echo "KERNEL==\"i2c-[0-7]\",MODE=\"0666\"" > /etc/udev/rules.d/90-i2c.rules'
 
-
+#TODO: fix this and ros key
 cd ~
 git clone https://github.com/richardstechnotes/RTIMULib2.git
-cd RTIMULib/Linux
-mkcd build
+cd RTIMULib2/Linux
 mkdir build
 cd build/
 cmake ..
 make -j4
 sudo make install
 sudo ldconfig
-sudo rm -rf ~/RTIMULib
+sudo rm -rf ~/RTIMULib2
 
 #####################################################################################
 ## Update Everything Again ################################################################
