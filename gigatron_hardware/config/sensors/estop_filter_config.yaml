@@ -1,0 +1,6 @@
+scan_filter_chain:
+- name: estop_filter
+  type: LaserScanRangeFilter
+  params:
+    lower_threshold: 0.3
+    upper_threshold: 1
