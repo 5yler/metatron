@@ -207,13 +207,13 @@
     </xacro:rplidar_v0>
 
     <!-- XV LIDAR -->
-    <xacro:xvlidar_v0 
+    <!-- <xacro:xvlidar_v0 
         name="xvlidar" 
         parent="base_link">
         <origin 
             xyz="${xvlidar_x} ${xvlidar_y} ${xvlidar_z}" 
             rpy="${xvlidar_roll} ${xvlidar_pitch} ${xvlidar_yaw}" /> 
-    </xacro:xvlidar_v0>
+    </xacro:xvlidar_v0> -->
 
     <!-- IMU -->
     <xacro:bno055_imu_v0 
