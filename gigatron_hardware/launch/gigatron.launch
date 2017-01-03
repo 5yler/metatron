@@ -13,7 +13,7 @@
 	<arg name="semiautomatic" default="true" doc="true for autonomous steering with RC throttle" />
 
 	<arg name="car" value="gigatron" />
-	<arg name="rviz" default="true" /> <!-- display robot in RViz -->
+	<arg name="rviz" default="false" /> <!-- display robot in RViz -->
 	<arg name="gps" default="false" doc="using GPS sensor or no?" />
 <!-- 	<arg name="back_lidar" default="false" doc="using rear LIDAR or no?"/>
  -->
