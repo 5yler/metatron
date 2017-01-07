@@ -325,24 +325,6 @@ class Driver():
                 angle = steer_angle
                 # v *= (self._v_faster / self._v_forward) * (min_dist / self._fast_dist)
                 v = max(v, self._v_slowest)
-                rospy.logerr("[STRAIGHT AHEAD] NOT CLEAR")
-
-            else:
-                angle = 0.5*steer_angle
-                # v_left = v_right = self.v_max
-                rospy.logerr("[STRAIGHT AHEAD] ALMOST CLEAR")
-            v_left, v_right = self.split_throttle(angle, v)
-        else:
-            angle = 0.3*steer_angle
-            v_left = v_right = self._v_max
-            rospy.logerr("[STRAIGHT AHEAD] CLEAR")
-
-        if (len(ranges_ahead) > 0):
-            min_dist = min(ranges_ahead)
-            if (min_dist < 5):
-                angle = steer_angle
-                # v *= (self._v_faster / self._v_forward) * (min_dist / self._fast_dist)
-                v = max(v, self._v_slowest)
                 rospy.logerr("[STEER] NOT CLEAR")
 
             else:
