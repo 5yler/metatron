@@ -17,7 +17,7 @@
 
 //$ motor commands
 #include <gigatron_hardware/MotorCommand.h>
-#include <gigatron/Drive.h>
+#include <gigatron/DriveStamped.h>
 #include <gigatron/ExtendedState.h>
 
 //$ debugging messages
@@ -161,9 +161,9 @@ public:
 /*$
   Callback method for Drive messages. The desired steering angle and wheel velocities get translated to servo PWM for steering motor and motor RPM for drive motors. 
  */
-  void driveCallback(const gigatron::Drive::ConstPtr& msg) 
+  void driveCallback(const gigatron::DriveStamped::ConstPtr& msg) 
   {
-    double tmp_angle = msg->angle;
+    double tmp_angle = msg->drive.angle;
 
     //$ error checking 
     if (tmp_angle > _abs_max_steering_angle) 
@@ -201,13 +201,13 @@ public:
       cmd_msg_.rpm_left = 0;
       cmd_msg_.rpm_right = 0;
     } else {
-      cmd_msg_.rpm_left = msg->vel_left / (_rpm_to_vel * _gear_ratio);
-      cmd_msg_.rpm_right = msg->vel_right / (_rpm_to_vel * _gear_ratio);
+      cmd_msg_.rpm_left = msg->drive.vel_left / (_rpm_to_vel * _gear_ratio);
+      cmd_msg_.rpm_right = msg->drive.vel_right / (_rpm_to_vel * _gear_ratio);
     }
     control_pub_.publish(cmd_msg_);
     // ROS_INFO("Published PWM %d (%d)", tmp_angle_pwm_cmd, cmd_msg_.angle_command);
 
-    publishDriveVectors(tmp_angle, msg->vel_left, msg->vel_right);
+    publishDriveVectors(tmp_angle, msg->drive.vel_left, msg->drive.vel_right);
 
   }
 
