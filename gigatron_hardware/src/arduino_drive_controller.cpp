@@ -18,7 +18,7 @@
 //$ motor commands
 #include <gigatron_hardware/MotorCommand.h>
 #include <gigatron/Drive.h>
-#include <gigatron/State.h>
+#include <gigatron/ExtendedState.h>
 
 //$ debugging messages
 #include <gigatron_hardware/Radio.h>
@@ -92,10 +92,12 @@ public:
     motor_sub_ = n_.subscribe("arduino/motors", 5, &ArduinoDriveController::motorCallback, this);
     steer_sub_ = n_.subscribe("arduino/steering", 5, &ArduinoDriveController::steerCallback, this);
     mode_sub_ = n_.subscribe("arduino/mode", 5, &ArduinoDriveController::modeCallback, this);
+    estop_sub_ = n_.subscribe("arduino/command/stop", 5, &ArduinoDriveController::estopCallback, this);
+
 
     //$ set up ROS publishers
     control_pub_ = n_.advertise<gigatron_hardware::MotorCommand>("arduino/command/motors", 5);
-    state_pub_ = n_.advertise<gigatron::State>("state", 5);
+    state_pub_ = n_.advertise<gigatron::ExtendedState>("state", 5);
     joint_pub_ = n_.advertise<sensor_msgs::JointState>("joint_states", 1);
     vis_pub_ = n_.advertise<visualization_msgs::MarkerArray>( "visualization_marker_array", 0);
 
@@ -278,6 +280,14 @@ public:
   }
 
 /*$
+  Callback method for estop messages from the Arduino. 
+ */
+  void estopCallback(const std_msgs::Bool::ConstPtr& msg) 
+  {
+    estop_ = msg->data;
+  }
+
+/*$
   Publish the current mode, steering angle and wheel velocities based on information coming in from the Arduino. 
  */
   void publishState()
@@ -303,6 +313,8 @@ public:
     //$ TODO: double check this is correct
     state_msg_.drive.vel_left = motor_rpm_left_ * _rpm_to_vel * _gear_ratio;
     state_msg_.drive.vel_right = motor_rpm_right_ * _rpm_to_vel * _gear_ratio;
+
+    state_msg_.estop = estop_;
 
     state_pub_.publish(state_msg_);
 
@@ -336,6 +348,7 @@ private:
   ros::Subscriber motor_sub_;
   ros::Subscriber steer_sub_;
   ros::Subscriber mode_sub_;
+  ros::Subscriber estop_sub_;
 
   ros::Publisher control_pub_;
   ros::Publisher state_pub_;
@@ -343,7 +356,7 @@ private:
   ros::Publisher vis_pub_;
   
   gigatron_hardware::MotorCommand cmd_msg_; //$ command message
-  gigatron::State state_msg_; //$ state message
+  gigatron::ExtendedState state_msg_; //$ state message
   sensor_msgs::JointState joint_msg_;
   visualization_msgs::Marker angle_marker_;
   visualization_msgs::Marker l_wheel_marker_;
