@@ -163,6 +163,8 @@ public:
  */
   void driveCallback(const gigatron::DriveStamped::ConstPtr& msg) 
   {
+
+    drive_stamp_ = msg->header.stamp;
     double tmp_angle = msg->drive.angle;
 
     //$ error checking 
@@ -216,10 +218,10 @@ public:
  */
   void publishDriveVectors(double drive_angle, double v_left, double v_right)
   {
-    ros::Time now = ros::Time::now();
-    angle_marker_.header.stamp = now;
-    l_wheel_marker_.header.stamp = now;
-    r_wheel_marker_.header.stamp = now;
+    //E ros::Time now = ros::Time::now();
+    angle_marker_.header.stamp = drive_stamp_;// now;
+    l_wheel_marker_.header.stamp = drive_stamp_; // now;
+    r_wheel_marker_.header.stamp = drive_stamp_; // now;
 
     angle_marker_.pose.orientation = tf::createQuaternionMsgFromYaw(drive_angle);
     l_wheel_marker_.scale.x = v_left * 0.25;
@@ -296,7 +298,7 @@ public:
  */
   void publishState()
   {
-    state_msg_.header.stamp = ros::Time::now();
+    state_msg_.header.stamp = drive_stamp_; // ros::Time::now();
     // state_msg_.header.frame_id = "odom"; ?
 
     //$ convert mode int to string
@@ -331,7 +333,7 @@ public:
  */
   void publishJointState()
   {
-    joint_msg_.header.stamp = ros::Time::now();
+    joint_msg_.header.stamp = drive_stamp_; // ros::Time::now();
     //update joint_msg_
     joint_msg_.name.resize(2);
     joint_msg_.position.resize(2);
@@ -362,6 +364,7 @@ private:
   gigatron_hardware::MotorCommand cmd_msg_; //$ command message
   gigatron::ExtendedState state_msg_; //$ state message
   sensor_msgs::JointState joint_msg_;
+  ros::Time drive_stamp_;
   visualization_msgs::Marker angle_marker_;
   visualization_msgs::Marker l_wheel_marker_;
   visualization_msgs::Marker r_wheel_marker_;

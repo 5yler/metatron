@@ -137,7 +137,8 @@ class Driver():
             self.initialize_laser_parameters(scan)
 
         drive_angle = self.steer(scan, yaw_offset=self._lidar_yaw, yaw_min=-math.pi/2, yaw_max=math.pi/2)
-     
+        
+        scan_stamp = scan.header.stamp #E get timestamp from laser scan
         '''
         if self.ahead_clear(scan): #if clear, go fast!
             control.angle = 0.0
@@ -158,7 +159,7 @@ class Driver():
 
         # msg header
         control.header.frame_id = "base_link"
-        control.header.stamp = rospy.Time.now()
+        control.header.stamp = scan_stamp
         # set velocity commands
         control.drive.angle = drive_angle  # driving angle 
         control.drive.vel_left = max(v_left, 0)  # left wheel velocity
