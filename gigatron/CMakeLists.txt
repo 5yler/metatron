@@ -58,6 +58,7 @@ add_message_files(
   Drive.msg
   State.msg
   ExtendedState.msg
+  DriveStamped.msg
 )
 
 ## Generate services in the 'srv' folder
