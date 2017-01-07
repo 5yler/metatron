@@ -272,8 +272,12 @@ public:
       //$ make angle marker blue
       angle_marker_.color.r = 0.0;
       angle_marker_.color.b = 1.0;
-    } else { //$ automatic or semiautomatic
-      //$ make angle marker red
+    } else if (mode_ == 1) { //$ semiautomatic
+      //E make angle marker purple
+      angle_marker_.color.r = 0.5;
+      angle_marker_.color.b = 0.5;
+    } else { //$ 2AUTO4U
+      // $ make angle marker red
       angle_marker_.color.r = 1.0;
       angle_marker_.color.b = 0.0;
     }
