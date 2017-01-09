@@ -183,7 +183,7 @@
         <origin 
             xyz="${lidar_x} ${lidar_y} ${lidar_z}" 
             rpy="0 0 ${lidar_yaw}" /> 
-    </xacro:rplidar_v0>
+    </xacro:xvlidar_v0>
 
     <!-- IMU -->
     <xacro:bno055_imu_v0 
