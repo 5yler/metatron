@@ -24,7 +24,7 @@
     <xacro:property name="lidar_x" value="0.1016" /> 
     <xacro:property name="lidar_y" value="0" />
     <xacro:property name="lidar_z" value="0.05715" /> 
-    <xacro:property name="lidar_yaw" value="${M_PI}" />
+    <xacro:property name="lidar_yaw" value="0" />
 
     <!-- ZED placement relative to base_link -->
     <xacro:property name="zed_x" value="0.1778" /> 
@@ -177,8 +177,8 @@
     </link>
 
     <!-- RPLIDAR -->
-    <xacro:rplidar_v0 
-        name="rplidar" 
+    <xacro:xvlidar_v0 
+        name="xvlidar" 
         parent="base_link">
         <origin 
             xyz="${lidar_x} ${lidar_y} ${lidar_z}" 

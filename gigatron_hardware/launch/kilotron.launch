@@ -13,7 +13,7 @@
 	<arg name="semiautomatic" default="true" doc="true for autonomous steering with RC throttle" />
 
 	<arg name="car" value="kilotron" />
-	<arg name="lidar" default="rplidar" doc="'rplidar' or 'xvlidar'?" /> 
+	<arg name="lidar" default="xvlidar" doc="'rplidar' or 'xvlidar'?" /> 
 	<arg name="rviz" default="false" /> <!-- display robot in RViz -->
 	<arg name="gps" default="true" doc="using GPS sensor or no?" />
 	<arg name="zed" default="true" doc="using ZED sensor or no?" />
@@ -35,16 +35,15 @@
 	<include if="$(arg zed)" file="$(find gigatron_hardware)/launch/sensors/zed_scan.launch" />
 
 	<!-- front LIDAR  -->
-	<group ns="rplidar">
-	<include file="$(find gigatron_hardware)/launch/sensors/rplidar.launch" />
+	<include file="$(find gigatron_hardware)/launch/sensors/xvlidar.launch" />
+	<group ns="xvlidar">
 	<!-- the laser angle filter unfortunately does not work at removing the middle part of a laser scan, so it won't work on inverted LIDAR -->
 	<include file="$(find scan_filters)/launch/angle_filter.launch" >
     	<arg name="filter_name" value="angle_filter" />
-    	<arg name="config" value="inverted_laser_angle_filter_forward_180_degrees" />
+    	<arg name="config" value="laser_angle_filter_forward_180_degrees" />
     	<arg name="input_topic" value="scan" />
     	<arg name="output_topic" value="scan/forward" /> 
 	</include>
-	<node name="scan_relay" type="relay" pkg="topic_tools" args="scan/forward /scan"/>
 	</group>
 
 </launch>
