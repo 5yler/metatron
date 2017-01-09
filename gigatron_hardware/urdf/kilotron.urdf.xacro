@@ -6,7 +6,7 @@
     <xacro:include filename="$(find gigatron_hardware)/urdf/common.urdf.xacro" />
     <xacro:include filename="$(find gigatron_hardware)/urdf/sensors/zed.urdf.xacro" />
     <xacro:include filename="$(find gigatron_hardware)/urdf/sensors/bno055_imu.urdf.xacro" />
-    <xacro:include filename="$(find gigatron_hardware)/urdf/sensors/rplidar.urdf.xacro" />
+    <xacro:include filename="$(find gigatron_hardware)/urdf/sensors/xvlidar.urdf.xacro" />
 
     <!-- Dimension Macros -->
     <xacro:property name="car_length" value="0.254" /> <!-- 10" -->
