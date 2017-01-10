@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<launch>
+
+<arg name="max" default="2" doc="maximum forward velocity in m/s" />
+
+    <!-- load car platform parameters into "car" namespace -->
+    <rosparam file="$(find gigatron_hardware)/config/kilotron_platform.yaml" ns="car" command="load" /> 
+
+
+	<!-- reactive drive controller -->
+	<include file="$(find gigatron)/launch/drive.launch">
+		<arg name="scan_topic" value="xvlidar/scan" />
+		<arg name="upside_down" value="false" />
+		<arg name="ignore_tf" value="false" />
+		<arg name="inverted_lidar" value="false" />
+		<arg name="max" value="$(arg max)" />
+	</include>
+</launch>
