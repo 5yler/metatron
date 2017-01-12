@@ -18,6 +18,7 @@ import numpy as np
 import math
 from sensor_msgs.msg import LaserScan   # for switching Jetson/RC mode
 from gigatron.msg import Drive   # for sending controls
+from gigatron.msg import ExtendedState   # for reading current steering angle
 
 from laser_geometry import LaserProjection # for getting and using PointCloud from LaserScan
 from sensor_msgs.msg import PointCloud2 
@@ -80,14 +81,14 @@ class Driver():
         #integral averaging for reactive control
         self.avgScan = 0
 
-        #For callback
-        self.vel = 0
-        self.ang = 0
+        self._v_desired = 0
+        self._measured_angle = 0 # For callback
 
         # control publisher
         self._pub = rospy.Publisher('/command/drive', Drive, queue_size=5)
 
         scan_topic = rospy.get_param('~scan_topic', 'scan')
+        state_topic = rospy.get_param('~state_topic', 'state')
         self._got_lidar_parameters = False
         self._lidar_yaw = 0
         self._upside_down_lidar = False
@@ -133,20 +134,29 @@ class Driver():
 
 
         # scan subscriber
-        rospy.Subscriber(scan_topic, LaserScan, self.callback)
+        rospy.Subscriber(scan_topic, LaserScan, self.scan_callback)
         rospy.logwarn("Subscribing to scan topic: %s", scan_topic)
+
+        # state subscriber
+        rospy.Subscriber(state_topic, ExtendedState, self.state_callback)
+        rospy.logwarn("Subscribing to scan topic: %s", scan_topic)
+
 
         rospy.spin()
 
+    # stat callback method
+    def state_callback(self, state):
+        self._measured_angle = state.drive.angle
+
     # laser scan callback method
-    def callback(self, scan):
+    def scan_callback(self, scan):
 
         if not self._got_lidar_parameters:
             self.initialize_laser_parameters(scan)
 
         #Scan cone tightens with increased velocity and relative to the steering angle.
-        yaw_min = self.ang - math.abs(1 - 0.75*self.vel/self.v_max)*math.pi/2
-        yaw_max = self.ang + math.abs(1 - 0.75*self.vel/self.v_max)*math.pi/2
+        yaw_min = self._measured_angle - math.abs(1 - 0.75*self._v_desired/self.v_max)*math.pi/2
+        yaw_max = self._measured_angle + math.abs(1 - 0.75*self._v_desired/self.v_max)*math.pi/2
 
         #limit the scan cone values
         if(yaw_min < -math.pi/2):
@@ -173,8 +183,6 @@ class Driver():
 
         if abs(drive_angle) > self._abs_max_steering_angle:
             drive_angle = drive_angle * (self._abs_max_steering_angle / abs(drive_angle))        
-        self.ang = drive_angle
-
         control = Drive()
         # set velocity commands
         control.angle = drive_angle  # driving angle 
@@ -254,10 +262,10 @@ class Driver():
     def pow_integrate(self, narrow):
         integral = 0;
         dirintegral = 0;
-        kP = 0.015
-        pwr = 0.27
+        kP = 0.015  
+        pwr = 0.27  # these worked well for Gigatron at NYMF
         for p in zip(narrow.angles, narrow.ranges):
-            yaw = p[0]-self.ang
+            yaw = p[0] - self._measured_angle
             r = p[1]
             # use -= because we want to steer away from points
             dirintegral -= sign(yaw) * (1/math.pow(r,pwr)) * math.cos(yaw)
@@ -316,7 +324,7 @@ class Driver():
             ranges_steer_ahead.append(r)
 
         v = self.throttle(steer_angle)
-        self.vel = v
+        self._v_desired = v
         rospy.logwarn("proportional_throttle v: %4.1f", v)
 
         if (len(ranges_ahead) > 0):
