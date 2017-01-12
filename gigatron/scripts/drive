@@ -157,6 +157,7 @@ class Driver():
         #Scan cone tightens with increased velocity and relative to the steering angle.
         yaw_min = self._measured_angle - math.abs(1 - 0.75*self._v_desired/self.v_max)*math.pi/2
         yaw_max = self._measured_angle + math.abs(1 - 0.75*self._v_desired/self.v_max)*math.pi/2
+        #Scan cone is never less than 1/4 the maximum size. 
 
         #limit the scan cone values
         if(yaw_min < -math.pi/2):
@@ -268,6 +269,8 @@ class Driver():
         return dirintegral/integral
 
     def pow_integrate(self, narrow):
+        # We integrate and weigh each point by (radius)^-pwr to ensure we steer away from points
+        #Then we apply a scaling gain kP to the entire integrated value. 
         integral = 0;
         dirintegral = 0;
         kP = 0.015  
