@@ -19,7 +19,8 @@
         <visual>
             <origin rpy="0 0 0" xyz="0 0 0.02"/>
             <geometry>
-                <cylinder radius="0.035" length="0.035"/>
+                <!-- <cylinder radius="0.035" length="0.035"/> -->
+                <mesh filename="package://gigatron_hardware/meshes/rplidar.stl" />
             </geometry>
             <material name="DarkGrey"/>
         </visual>
