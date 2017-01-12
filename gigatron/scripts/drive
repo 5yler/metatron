@@ -341,6 +341,7 @@ class Driver():
                 rospy.logerr("[STEER] ALMOST CLEAR")
             v_left, v_right = self.split_throttle(angle, v)
         else:
+            # Using desired angle here could cause oscillatory behavior
             angle = 0
             v_left = v_right = self._v_max
             rospy.logerr("[STEER] CLEAR")
