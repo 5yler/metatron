@@ -18,8 +18,8 @@ import numpy as np
 import math
 from sensor_msgs.msg import LaserScan   # for switching Jetson/RC mode
 from gigatron.msg import Drive   # for sending controls
+from gigatron.msg import DriveStamped   # for sending controls
 from gigatron.msg import ExtendedState   # for reading current steering angle
-
 from laser_geometry import LaserProjection # for getting and using PointCloud from LaserScan
 from sensor_msgs.msg import PointCloud2 
 import sensor_msgs.point_cloud2 as pc2
@@ -85,7 +85,7 @@ class Driver():
         self._measured_angle = 0 # For callback
 
         # control publisher
-        self._pub = rospy.Publisher('/command/drive', Drive, queue_size=5)
+        self._pub = rospy.Publisher('/command/drive', DriveStamped, queue_size=5)
 
         scan_topic = rospy.get_param('~scan_topic', 'scan')
         state_topic = rospy.get_param('~state_topic', 'state')
@@ -166,6 +166,7 @@ class Driver():
 
         drive_angle = self.steer(scan, yaw_offset=self._lidar_yaw, yaw_min, yaw_max)
      
+        scan_stamp = scan.header.stamp #E get timestamp from laser scan
         '''
         if self.ahead_clear(scan): #if clear, go fast!
             control.angle = 0.0
@@ -182,14 +183,21 @@ class Driver():
     
 
         if abs(drive_angle) > self._abs_max_steering_angle:
-            drive_angle = drive_angle * (self._abs_max_steering_angle / abs(drive_angle))        
-        control = Drive()
-        # set velocity commands
-        control.angle = drive_angle  # driving angle 
-        control.vel_left = max(v_left, 0)  # left wheel velocity
-        control.vel_right = max(v_right, 0) # right wheel velocity
 
-        rospy.logwarn("angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s", control.angle, control.vel_left, control.vel_right)
+            drive_angle = drive_angle * (self._abs_max_steering_angle / abs(drive_angle))
+
+        control = DriveStamped()
+
+
+        # msg header
+        control.header.frame_id = "base_link"
+        control.header.stamp = scan_stamp
+        # set velocity commands
+        control.drive.angle = drive_angle  # driving angle 
+        control.drive.vel_left = max(v_left, 0)  # left wheel velocity
+        control.drive.vel_right = max(v_right, 0) # right wheel velocity
+
+        rospy.logwarn("angle: %4.1f rad  V_l: %4.1f m/s  V_r: %4.1f m/s", control.drive.angle, control.drive.vel_left, control.drive.vel_right)
         self._pub.publish(control)
 
     def initialize_laser_parameters(self, scan):

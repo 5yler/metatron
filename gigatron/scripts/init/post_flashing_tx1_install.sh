@@ -11,8 +11,7 @@
 sudo apt-get -y --force-yes install nano # Install Nano
 echo "export EDITOR='nano' # use nano as default text editor"  >> ~/.bashrc
 
-sudo apt-get -y --force-yes install samba # for networked drives
-sudo apt-get -y --force-yes install tmux # tmux for splitting terminal into panes
+sudo apt-get -y --force-yes install git nano samba exfat-fuse exfat-utils openssh-server tree tmux
 
 sudo ntpdate ntp.ubuntu.com # set ubuntu date server
 # This will ensure that your machine polls the ubuntu server to get the right time and date for your timezone. 
@@ -95,23 +94,23 @@ sudo apt-get -y --force-yes install libi2c-dev i2c-tools
 # add udev rule so i2c devices aren't only owned by root
 sudo sh -c 'echo "KERNEL==\"i2c-[0-7]\",MODE=\"0666\"" > /etc/udev/rules.d/90-i2c.rules'
 
+#TODO: fix this and ros key
 cd ~
-git clone git@github.com:jetsonhacks/RTIMULib.git
-cd RTIMULib/Linux
-mkcd build
+git clone https://github.com/richardstechnotes/RTIMULib2.git
+cd RTIMULib2/Linux
 mkdir build
 cd build/
 cmake ..
 make -j4
 sudo make install
 sudo ldconfig
-sudo rm -rf ~/RTIMULib
+sudo rm -rf ~/RTIMULib2
 
 #####################################################################################
 ## Update Everything Again ################################################################
 
-sudo apt-get update        # Fetches the list of available updates
-sudo apt-get upgrade       # Strictly upgrades the current packages
+sudo apt-get -y --force-yes update        # Fetches the list of available updates
+sudo apt-get -y --force-yes upgrade       # Strictly upgrades the current packages
 
 #####################################################################################
 ## Additional Setup Notes ###########################################################

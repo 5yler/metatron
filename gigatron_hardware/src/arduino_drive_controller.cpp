@@ -17,8 +17,8 @@
 
 //$ motor commands
 #include <gigatron_hardware/MotorCommand.h>
-#include <gigatron/Drive.h>
-#include <gigatron/State.h>
+#include <gigatron/DriveStamped.h>
+#include <gigatron/ExtendedState.h>
 
 //$ debugging messages
 #include <gigatron_hardware/Radio.h>
@@ -92,10 +92,12 @@ public:
     motor_sub_ = n_.subscribe("arduino/motors", 5, &ArduinoDriveController::motorCallback, this);
     steer_sub_ = n_.subscribe("arduino/steering", 5, &ArduinoDriveController::steerCallback, this);
     mode_sub_ = n_.subscribe("arduino/mode", 5, &ArduinoDriveController::modeCallback, this);
+    estop_sub_ = n_.subscribe("arduino/command/stop", 5, &ArduinoDriveController::estopCallback, this);
+
 
     //$ set up ROS publishers
     control_pub_ = n_.advertise<gigatron_hardware::MotorCommand>("arduino/command/motors", 5);
-    state_pub_ = n_.advertise<gigatron::State>("state", 5);
+    state_pub_ = n_.advertise<gigatron::ExtendedState>("state", 5);
     joint_pub_ = n_.advertise<sensor_msgs::JointState>("joint_states", 1);
     vis_pub_ = n_.advertise<visualization_msgs::MarkerArray>( "visualization_marker_array", 0);
 
@@ -159,9 +161,11 @@ public:
 /*$
   Callback method for Drive messages. The desired steering angle and wheel velocities get translated to servo PWM for steering motor and motor RPM for drive motors. 
  */
-  void driveCallback(const gigatron::Drive::ConstPtr& msg) 
+  void driveCallback(const gigatron::DriveStamped::ConstPtr& msg) 
   {
-    double tmp_angle = msg->angle;
+
+    drive_stamp_ = msg->header.stamp;
+    double tmp_angle = msg->drive.angle;
 
     //$ error checking 
     if (tmp_angle > _abs_max_steering_angle) 
@@ -199,13 +203,13 @@ public:
       cmd_msg_.rpm_left = 0;
       cmd_msg_.rpm_right = 0;
     } else {
-      cmd_msg_.rpm_left = msg->vel_left / (_rpm_to_vel * _gear_ratio);
-      cmd_msg_.rpm_right = msg->vel_right / (_rpm_to_vel * _gear_ratio);
+      cmd_msg_.rpm_left = msg->drive.vel_left / (_rpm_to_vel * _gear_ratio);
+      cmd_msg_.rpm_right = msg->drive.vel_right / (_rpm_to_vel * _gear_ratio);
     }
     control_pub_.publish(cmd_msg_);
     // ROS_INFO("Published PWM %d (%d)", tmp_angle_pwm_cmd, cmd_msg_.angle_command);
 
-    publishDriveVectors(tmp_angle, msg->vel_left, msg->vel_right);
+    publishDriveVectors(tmp_angle, msg->drive.vel_left, msg->drive.vel_right);
 
   }
 
@@ -214,10 +218,10 @@ public:
  */
   void publishDriveVectors(double drive_angle, double v_left, double v_right)
   {
-    ros::Time now = ros::Time::now();
-    angle_marker_.header.stamp = now;
-    l_wheel_marker_.header.stamp = now;
-    r_wheel_marker_.header.stamp = now;
+    //E ros::Time now = ros::Time::now();
+    angle_marker_.header.stamp = drive_stamp_;// now;
+    l_wheel_marker_.header.stamp = drive_stamp_; // now;
+    r_wheel_marker_.header.stamp = drive_stamp_; // now;
 
     angle_marker_.pose.orientation = tf::createQuaternionMsgFromYaw(drive_angle);
     l_wheel_marker_.scale.x = v_left * 0.25;
@@ -270,11 +274,23 @@ public:
       //$ make angle marker blue
       angle_marker_.color.r = 0.0;
       angle_marker_.color.b = 1.0;
-    } else { //$ automatic or semiautomatic
-      //$ make angle marker red
+    } else if (mode_ == 1) { //$ semiautomatic
+      //E make angle marker purple
+      angle_marker_.color.r = 0.5;
+      angle_marker_.color.b = 0.5;
+    } else { //$ 2AUTO4U
+      // $ make angle marker red
       angle_marker_.color.r = 1.0;
       angle_marker_.color.b = 0.0;
     }
+  }
+
+/*$
+  Callback method for estop messages from the Arduino. 
+ */
+  void estopCallback(const std_msgs::Bool::ConstPtr& msg) 
+  {
+    estop_ = msg->data;
   }
 
 /*$
@@ -282,7 +298,7 @@ public:
  */
   void publishState()
   {
-    state_msg_.header.stamp = ros::Time::now();
+    state_msg_.header.stamp = drive_stamp_; // ros::Time::now();
     // state_msg_.header.frame_id = "odom"; ?
 
     //$ convert mode int to string
@@ -304,6 +320,8 @@ public:
     state_msg_.drive.vel_left = motor_rpm_left_ * _rpm_to_vel * _gear_ratio;
     state_msg_.drive.vel_right = motor_rpm_right_ * _rpm_to_vel * _gear_ratio;
 
+    state_msg_.estop = estop_;
+
     state_pub_.publish(state_msg_);
 
   }
@@ -315,7 +333,7 @@ public:
  */
   void publishJointState()
   {
-    joint_msg_.header.stamp = ros::Time::now();
+    joint_msg_.header.stamp = drive_stamp_; // ros::Time::now();
     //update joint_msg_
     joint_msg_.name.resize(2);
     joint_msg_.position.resize(2);
@@ -336,6 +354,7 @@ private:
   ros::Subscriber motor_sub_;
   ros::Subscriber steer_sub_;
   ros::Subscriber mode_sub_;
+  ros::Subscriber estop_sub_;
 
   ros::Publisher control_pub_;
   ros::Publisher state_pub_;
@@ -343,8 +362,9 @@ private:
   ros::Publisher vis_pub_;
   
   gigatron_hardware::MotorCommand cmd_msg_; //$ command message
-  gigatron::State state_msg_; //$ state message
+  gigatron::ExtendedState state_msg_; //$ state message
   sensor_msgs::JointState joint_msg_;
+  ros::Time drive_stamp_;
   visualization_msgs::Marker angle_marker_;
   visualization_msgs::Marker l_wheel_marker_;
   visualization_msgs::Marker r_wheel_marker_;
