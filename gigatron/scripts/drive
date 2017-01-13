@@ -132,15 +132,13 @@ class Driver():
         if rospy.has_param("~upside_down_lidar"):
             self._upside_down_lidar = rospy.get_param("~upside_down_lidar")
 
-
         # scan subscriber
         rospy.Subscriber(scan_topic, LaserScan, self.scan_callback)
         rospy.logwarn("Subscribing to scan topic: %s", scan_topic)
 
         # state subscriber
         rospy.Subscriber(state_topic, ExtendedState, self.state_callback)
-        rospy.logwarn("Subscribing to scan topic: %s", scan_topic)
-
+        rospy.logwarn("Subscribing to state topic: %s", state_topic)
 
         rospy.spin()
 
@@ -165,7 +163,7 @@ class Driver():
         if(yaw_max > math.pi/2):
             yaw_max = math.pi/2
 
-        drive_angle = self.steer(scan, yaw_offset=self._lidar_yaw, yaw_min, yaw_max)
+        drive_angle = self.steer(scan, yaw_offset=self._lidar_yaw, yaw_min=yaw_min, yaw_max=yaw_max)
      
         scan_stamp = scan.header.stamp #E get timestamp from laser scan
         '''
