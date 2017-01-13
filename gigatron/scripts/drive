@@ -122,6 +122,8 @@ class Driver():
         self._v_forward = .7 * self._v_max
         self._v_slowest = 0.5 * self._v_max
 
+        self._velocity_scaling = 0
+
         rospy.logwarn("Got parameters for car: %s", self._car_name)
 
 
@@ -153,8 +155,8 @@ class Driver():
             self.initialize_laser_parameters(scan)
 
         #Scan cone tightens with increased velocity and relative to the steering angle.
-        yaw_min = self._measured_angle - math.abs(1 - 0.75*self._v_desired/self.v_max)*math.pi/2
-        yaw_max = self._measured_angle + math.abs(1 - 0.75*self._v_desired/self.v_max)*math.pi/2
+        yaw_min = self._measured_angle - math.fabs(1 - 0.75*self._v_desired/self._v_max)*math.pi/2
+        yaw_max = self._measured_angle + math.fabs(1 - 0.75*self._v_desired/self._v_max)*math.pi/2
         #Scan cone is never less than 1/4 the maximum size. 
 
         #limit the scan cone values
@@ -178,7 +180,7 @@ class Driver():
         # v_left, v_right = self.split_throttle(drive_angle, v)
 
         #This renders the above two lines obsolete, and can override drive_angle
-        drive_angle, v_left, v_right = self.proportional_throttle(drive_angle, scan)
+        drive_angle, v_left, v_right = self.proportional_throttle(drive_angle, scan, yaw_min, yaw_max)
     
 
         if abs(drive_angle) > self._abs_max_steering_angle:
@@ -273,10 +275,10 @@ class Driver():
         integral = 0
         dirintegral = 0
         radiusintegral = 0
-        r_kP = 1.0 # this is new as of 1/12/2017
+        r_kP = 0.1#1.0 # this is new as of 1/12/2017
         kP = 0.015  
-        pwr = 0.27  # these worked well for Gigatron at NYMF
-        r_pwr = 1.0 # this is new as of 1/12/2017
+        pwr = 0.4  # these worked well for Gigatron at NYMF
+        r_pwr = 0.1#1.0 # this is new as of 1/12/2017
         for p in zip(narrow.angles, narrow.ranges):
             yaw = p[0] - self._measured_angle
             r = p[1]
@@ -287,8 +289,6 @@ class Driver():
         self.avgScan = (1.0/avgPts)*(dirintegral) + (1-1.0/avgPts)*self.avgScan        
         self._velocity_scaling = (r_kP*1.0/avgPts)*radiusintegral + (1-1.0/avgPts)*self._velocity_scaling
         return kP * self.avgScan #dirintegral/integral
-
-    def 
 
 
     def steer(self, scan, yaw_offset, yaw_min=-math.pi/2, yaw_max=math.pi/2):
@@ -325,7 +325,7 @@ class Driver():
         return v_left, v_right
 
     
-    def proportional_throttle(self, steer_angle, scan):
+    def proportional_throttle(self, steer_angle, scan,yaw_min,yaw_max):
         
         angles = self.generate_scan_angles(self._angle_min, self._angle_max, self._angle_increment, yaw_offset=self._lidar_yaw)
         scan_points = Points([angles, scan.ranges])
@@ -347,7 +347,7 @@ class Driver():
 
         if (len(ranges_ahead) > 0):
             min_dist = min(ranges_ahead)
-            v -= self._velocity_scaling
+            # v -= self._velocity_scaling
             if (min_dist < 5):
                 angle = steer_angle
                 # v *= (self._v_faster / self._v_forward) * (min_dist / self._fast_dist)
