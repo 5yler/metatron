@@ -271,17 +271,26 @@ class Driver():
     def pow_integrate(self, narrow):
         # We integrate and weigh each point by (radius)^-pwr to ensure we steer away from points
         #Then we apply a scaling gain kP to the entire integrated value. 
-        integral = 0;
-        dirintegral = 0;
+        # For radiusintegral, 
+        integral = 0
+        dirintegral = 0
+        radiusintegral = 0
+        r_kP = 1.0 # this is new as of 1/12/2017
         kP = 0.015  
         pwr = 0.27  # these worked well for Gigatron at NYMF
+        r_pwr = 1.0 # this is new as of 1/12/2017
         for p in zip(narrow.angles, narrow.ranges):
             yaw = p[0] - self._measured_angle
             r = p[1]
             # use -= because we want to steer away from points
             dirintegral -= sign(yaw) * (1/math.pow(r,pwr)) * math.cos(yaw)
+            radiusintegral += (1/math.pow(r,r_pwr)) * math.sin(yaw)
+        # This is a lowpass filter for the scan integral
         self.avgScan = (1.0/avgPts)*(dirintegral) + (1-1.0/avgPts)*self.avgScan        
+        self._velocity_scaling = (r_kP*1.0/avgPts)*radiusintegral + (1-1.0/avgPts)*self._velocity_scaling
         return kP * self.avgScan #dirintegral/integral
+
+    def 
 
 
     def steer(self, scan, yaw_offset, yaw_min=-math.pi/2, yaw_max=math.pi/2):
@@ -340,6 +349,7 @@ class Driver():
 
         if (len(ranges_ahead) > 0):
             min_dist = min(ranges_ahead)
+            v -= self._velocity_scaling
             if (min_dist < 5):
                 angle = steer_angle
                 # v *= (self._v_faster / self._v_forward) * (min_dist / self._fast_dist)
