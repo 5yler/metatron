@@ -1,1 +1,94 @@
-#! 
+#! /usr/bin/env python
+
+# save_training_data
+#
+# Python script for saving LIDAR and RC inputs as training data for end-to-end learning
+# 
+# @author   Syler Wagner	<syler@mit.edu>
+#
+# @date	 2017-01-13	  creation
+
+import csv
+import rospy
+# from gigatron.msg import ExtendedState   
+from gigatron.msg import State   
+from gigatron_hardware.msg import Radio  
+from sensor_msgs.msg import LaserScan  
+
+import csv
+
+class TrainingDataSaver():
+
+	def __init__(self):
+		# init
+		# get parameters 
+		# scan topic
+		scan_topic = rospy.get_param('~scan_topic', 'scan_rp') 
+		# radio topic
+		radio_topic = rospy.get_param('~radio_topic', '/arduino/radio') 
+		# car name
+		# state topic
+		state_topic = rospy.get_param('~state_topic', '/state') 
+
+		# output folder
+		self._output_folder = rospy.get_param('~output_folder', '/Users/Syler/Downloads/test_ml/') 
+
+
+		# self._steering_angle_range = rospy.get_param("car/steering_angle_range")
+
+		# subscribers
+		rospy.Subscriber(scan_topic, LaserScan, self.scan_callback)
+		rospy.Subscriber(radio_topic, Radio, self.radio_callback)
+		# rospy.Subscriber(state_topic, ExtendedState, self.state_callback)
+
+		rospy.Subscriber(state_topic, State, self.state_callback)
+		# initialize values
+		self._rc = False
+		self._throttle = 0
+		self._angle = 128
+
+		self._i = 0
+
+		rospy.spin()
+	# laser scan callback method
+	# save forward 180 degrees of scan as a row in csv file if RC
+	def scan_callback(self, msg):
+		myfile = open(self._output_folder+str(self._i)+'_scan'+'.csv', 'wb')
+		wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+		wr.writerow(msg.ranges)
+		wr.writerow(msg.intensities)
+		myfile.close()
+
+		myfile = open(self._output_folder+str(self._i)+'_command'+'.csv', 'wb')
+		wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+		wr.writerow([self._throttle, self._angle])
+		myfile.close()
+
+		rospy.logwarn('saved frame %d', self._i)
+		self._i = self._i + 1
+
+	# state callback
+	# update variable keeping track of whether current state is RC
+	def state_callback(self, msg):
+		if msg.mode == "RC":
+			self._rc = True
+		else:
+			self._rc = False
+
+
+	# radio callback
+	# update variable keeping track of last RC commands
+	def radio_callback(self, msg):
+		self._throttle = msg.angle
+		self._angle = msg.speed_left
+
+
+
+if __name__=="__main__":
+	rospy.init_node('drive_test_pub')
+	
+	try:
+		TrainingDataSaver()
+	except rospy.ROSInterruptException:
+		print " [!!!] drive_test_pub: ROSInterruptException!"
+		pass
