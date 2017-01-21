@@ -1,0 +1,55 @@
+##
+# .bash_gigatron
+# bash aliases for Gigatron
+# 
+# @author   Syler Wagner    <syler@mit.edu>
+# @date     2017-01-12		
+
+## BASH ALIASES #------------------------------------------------------------------##
+
+# GO PLACES
+alias cdc='cd ~/catkin_ws/' # 2015-07-06
+alias cdcs='cd ~/catkin_ws/src/' # 2015-07-06
+
+alias cg='roscd gigatron' # 2017-01-12
+alias cgn='roscd gigatron_nav' # 2017-01-12
+alias cgh='roscd gigatron_hardware' # 2017-01-12
+
+alias ..='cd ..' # 2015-03-23
+alias ...='cd ../..' # 2015-03-23
+alias ....='cd ../../..' # 2015-03-23
+alias .....='cd ../../../..' # 2015-03-23
+alias ......='cd ../../../../..' # 2015-03-23
+
+# CATKIN
+alias cm='cdc; catkin_make' # 2015-07-06
+
+# SOURCE STUFF
+alias scw='source ~/catkin_ws/devel/setup.bash' # 2015-07-06
+alias sri='source /opt/ros/indigo/setup.bash' # 2015-07-06
+
+# RUN ROS STUFF
+alias rc='roscore' # 2015-07-06
+
+alias rtl='rostopic list' # 2015-07-26
+alias rte='rostopic echo' # 2015-07-26
+
+alias rbp='rosbag play' # 2015-09-12
+alias rbr='rosbag record -a' # 2015-07-26
+alias rbi='rosbag info' # 2017-01-12
+
+alias rqt_plot='rosrun rqt_plot rqt_plot' # 2015-07-12
+alias rqt_graph='rosrun rqt_graph rqt_graph' # 2015-07-16
+
+# METATRON ROS STUFF
+
+alias rrg='scw; rosrun gigatron' # 2017-01-12
+alias rrgn='scw; rosrun gigatron_nav' # 2017-01-12
+alias rrgh='scw; rosrun gigatron_hardware' # 2017-01-12
+
+alias rlg='roslaunch gigatron' # 2017-01-12
+alias rlgn='roslaunch gigatron_nav' # 2017-01-12
+alias rlgh='roslaunch gigatron_hardware' # 2017-01-12
+
+alias rlghg='roslaunch gigatron_hardware gigatron.launch' # 2017-01-12
+alias rlghk='roslaunch gigatron_hardware kilotron.launch' # 2017-01-12

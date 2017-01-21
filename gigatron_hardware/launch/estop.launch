@@ -17,8 +17,8 @@
 <launch>
 
     <arg name="filter_name" doc="name of filter node" default="estop_filter" />
-    <arg name="input_topic" doc="scan topic the filter subscribes to" default="rplidar/scan" />
-    <arg name="output_topic" doc="scan topic the filter publishes to" default="rplidar/scan/estop" />
+    <arg name="input_topic" doc="scan topic the filter subscribes to" default="scan" />
+    <arg name="output_topic" doc="scan topic the filter publishes to" default="$(arg input_topic)/estop" />
     <arg name="estop_topic" default="arduino/command/stop" />
 
     <!-- filter range too close -->
