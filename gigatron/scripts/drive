@@ -288,8 +288,6 @@ class Driver():
         self._velocity_scaling = (r_kP*1.0/avgPts)*radiusintegral + (1-1.0/avgPts)*self._velocity_scaling
         return kP * self.avgScan #dirintegral/integral
 
-    def 
-
 
     def steer(self, scan, yaw_offset, yaw_min=-math.pi/2, yaw_max=math.pi/2):
         angles = self.generate_scan_angles(self._angle_min, self._angle_max, self._angle_increment, yaw_offset=self._lidar_yaw)
