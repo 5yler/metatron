@@ -11,7 +11,7 @@
 
 import rospy
 import sys
-from gigatron.msg import Drive   # for sending commands
+from gigatron.msg import DriveStamped   # for sending commands
 
 class DriveTestPub():
 
@@ -19,14 +19,14 @@ class DriveTestPub():
 	
 		self.topic = rospy.get_param('~topic', 'command/drive') # 
 		# Drive message publisher
-		drive_test_pub = rospy.Publisher(self.topic, Drive, queue_size=1)
+		drive_test_pub = rospy.Publisher(self.topic, DriveStamped, queue_size=1)
 
-		msg = Drive()
+		msg = DriveStamped()
 
 		if len(sys.argv) == 4:
-			msg.angle = float(sys.argv[1])
-			msg.vel_left = float(sys.argv[2]) 
-			msg.vel_right = float(sys.argv[3])
+			msg.drive.angle = float(sys.argv[1])
+			msg.drive.vel_left = float(sys.argv[2]) 
+			msg.drive.vel_right = float(sys.argv[3])
 		else:
 			rospy.logerr('drive_test_pub used with incorrect arguments!')
 			rospy.logerr('Usage:')
@@ -35,7 +35,7 @@ class DriveTestPub():
 			
 		while not rospy.is_shutdown():
 			drive_test_pub.publish(msg)
-			rospy.loginfo('Published angle: %4.1f, vel_left: %4.1f, vel_right: %4.1f', msg.angle, msg.vel_left, msg.vel_right)
+			rospy.loginfo('Published angle: %4.1f, vel_left: %4.1f, vel_right: %4.1f', msg.drive.angle, msg.drive.vel_left, msg.drive.vel_right)
 			rospy.sleep(1)
 
 if __name__=="__main__":
