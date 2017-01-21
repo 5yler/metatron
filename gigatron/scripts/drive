@@ -94,6 +94,7 @@ class Driver():
         self._upside_down_lidar = False
 
         self._ignore_tf = rospy.get_param("~ignore_tf", False)
+        self._cone_scaling = rospy.get_param("~cone_scaling", False)
 
 
         # get some parameters
@@ -154,10 +155,14 @@ class Driver():
         if not self._got_lidar_parameters:
             self.initialize_laser_parameters(scan)
 
-        #Scan cone tightens with increased velocity and relative to the steering angle.
-        yaw_min = self._measured_angle - math.fabs(1 - 0.75*self._v_desired/self._v_max)*math.pi/2
-        yaw_max = self._measured_angle + math.fabs(1 - 0.75*self._v_desired/self._v_max)*math.pi/2
-        #Scan cone is never less than 1/4 the maximum size. 
+        if self._cone_scaling:
+            #Scan cone tightens with increased velocity and relative to the steering angle.
+            yaw_min = self._measured_angle - math.fabs(1 - 0.75*self._v_desired/self._v_max)*math.pi/2
+            yaw_max = self._measured_angle + math.fabs(1 - 0.75*self._v_desired/self._v_max)*math.pi/2
+            #Scan cone is never less than 1/4 the maximum size. 
+        else:
+            yaw_min = self._measured_angle - math.pi/2
+            yaw_max = self._measured_angle + math.pi/2
 
         #limit the scan cone values
         if(yaw_min < -math.pi/2):

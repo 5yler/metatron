@@ -11,8 +11,9 @@
 	<arg name="scan_topic" default="rplidar/scan" />
 	<arg name="ignore_tf" default="false" doc="true if laser frame tf infomation should be ignored"/>
 	<arg name="inverted_lidar" default="false" doc="true if LIDAR is rotated 180 degrees" />
-	<arg name="upside_down" default="true" doc="true if LIDAR is upside down" />
+	<arg name="upside_down" default="false" doc="true if LIDAR is upside down" />
 	<arg name="max" default="5" doc="maximum forward velocity in m/s" />
+    <arg name="cone_scaling" default="false" doc="true if we want to change LIDAR cone based on velocity" />
 
 	<arg name="car" doc="'kilotron' or 'gigatron'?" default="gigatron" />
 
