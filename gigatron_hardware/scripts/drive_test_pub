@@ -11,7 +11,7 @@
 
 import rospy
 import sys
-from gigatron.msg import DriveStamped   # for sending commands
+from gigatron_msgs.msg import DriveStamped   # for sending commands
 
 class DriveTestPub():
 

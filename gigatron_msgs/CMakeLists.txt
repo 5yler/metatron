@@ -1,16 +1,13 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(gigatron_nav)
+project(gigatron_msgs)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  gigatron_hardware
-  move_base
-  actionlib
+  std_msgs
   geometry_msgs
-  tf
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -46,12 +43,17 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * uncomment the generate_messages entry below
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  Radio.msg
+  Steering.msg
+  Motors.msg
+  MotorCommand.msg
+  Drive.msg
+  State.msg
+  ExtendedState.msg
+  DriveStamped.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -68,10 +70,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  geometry_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -104,8 +107,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES gigatron_nav
- CATKIN_DEPENDS move_base tf roscpp geometry_msgs actionlib
+#  LIBRARIES gigatron_msgs
+#  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
 
@@ -116,40 +119,28 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
 
 ## Declare a C++ library
-# add_library(gigatron_nav
-#   src/${PROJECT_NAME}/gigatron_nav.cpp
+# add_library(gigatron_msgs
+#   src/${PROJECT_NAME}/gigatron_msgs.cpp
 # )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(gigatron_nav ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# add_dependencies(gigatron_msgs ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-# add_executable(gigatron_nav_node src/gigatron_nav_node.cpp)
-add_executable(nav_goal_publisher src/nav_goal_publisher.cpp)
+# add_executable(gigatron_msgs_node src/gigatron_msgs_node.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-# add_dependencies(gigatron_nav_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(nav_goal_publisher 
-  ${${gigatron_msgs}_EXPORTED_TARGETS}
-	${catkin_EXPORTED_TARGETS}
-)
+# add_dependencies(gigatron_msgs_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(gigatron_nav_node
+# target_link_libraries(gigatron_msgs_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(nav_goal_publisher
-	yaml-cpp
- 	${catkin_LIBRARIES}
-)
 
 #############
 ## Install ##
@@ -166,17 +157,11 @@ target_link_libraries(nav_goal_publisher
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS gigatron_nav gigatron_nav_node
+# install(TARGETS gigatron_msgs gigatron_msgs_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
-install(TARGETS 
-  nav_goal_publisher
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
@@ -197,7 +182,7 @@ install(TARGETS
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_gigatron_nav.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_gigatron_msgs.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

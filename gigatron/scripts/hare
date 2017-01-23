@@ -11,7 +11,7 @@
 ##
 
 import rospy
-from gigatron.msg import Drive   # for sending controls
+from gigatron_msgs.msg import Drive   # for sending controls
 import sys, select, termios, tty, math
 
 help_msg = """

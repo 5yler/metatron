@@ -16,14 +16,14 @@
 #include <boost/thread/thread.hpp>
 
 //$ motor commands
-#include <gigatron_hardware/MotorCommand.h>
-#include <gigatron/DriveStamped.h>
-#include <gigatron/ExtendedState.h>
+#include <gigatron_msgs/MotorCommand.h>
+#include <gigatron_msgs/DriveStamped.h>
+#include <gigatron_msgs/ExtendedState.h>
 
 //$ debugging messages
-#include <gigatron_hardware/Radio.h>
-#include <gigatron_hardware/Steering.h>
-#include <gigatron_hardware/Motors.h>
+#include <gigatron_msgs/Radio.h>
+#include <gigatron_msgs/Steering.h>
+#include <gigatron_msgs/Motors.h>
 #include <std_msgs/UInt8.h>
 #include <std_msgs/Bool.h>
 
@@ -96,8 +96,8 @@ public:
 
 
     //$ set up ROS publishers
-    control_pub_ = n_.advertise<gigatron_hardware::MotorCommand>("arduino/command/motors", 5);
-    state_pub_ = n_.advertise<gigatron::ExtendedState>("state", 5);
+    control_pub_ = n_.advertise<gigatron_msgs::MotorCommand>("arduino/command/motors", 5);
+    state_pub_ = n_.advertise<gigatron_msgs::ExtendedState>("state", 5);
     joint_pub_ = n_.advertise<sensor_msgs::JointState>("joint_states", 1);
     vis_pub_ = n_.advertise<visualization_msgs::MarkerArray>( "visualization_marker_array", 0);
 
@@ -161,7 +161,7 @@ public:
 /*$
   Callback method for Drive messages. The desired steering angle and wheel velocities get translated to servo PWM for steering motor and motor RPM for drive motors. 
  */
-  void driveCallback(const gigatron::DriveStamped::ConstPtr& msg) 
+  void driveCallback(const gigatron_msgs::DriveStamped::ConstPtr& msg) 
   {
 
     drive_stamp_ = msg->header.stamp;
@@ -249,7 +249,7 @@ public:
 /*$
   Callback method for Steering messages from the Arduino. 
  */
-  void steerCallback(const gigatron_hardware::Steering::ConstPtr& msg) 
+  void steerCallback(const gigatron_msgs::Steering::ConstPtr& msg) 
   {
     angle_pwm_ = msg->angle;
   }
@@ -257,7 +257,7 @@ public:
 /*$
   Callback method for Motors messages from the Arduino. 
  */
-  void motorCallback(const gigatron_hardware::Motors::ConstPtr& msg) 
+  void motorCallback(const gigatron_msgs::Motors::ConstPtr& msg) 
   {
     motor_rpm_left_ = msg->rpm_left;
     motor_rpm_right_ = msg->rpm_right;
@@ -361,8 +361,8 @@ private:
   ros::Publisher joint_pub_;
   ros::Publisher vis_pub_;
   
-  gigatron_hardware::MotorCommand cmd_msg_; //$ command message
-  gigatron::ExtendedState state_msg_; //$ state message
+  gigatron_msgs::MotorCommand cmd_msg_; //$ command message
+  gigatron_msgs::ExtendedState state_msg_; //$ state message
   sensor_msgs::JointState joint_msg_;
   ros::Time drive_stamp_;
   visualization_msgs::Marker angle_marker_;

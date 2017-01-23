@@ -16,7 +16,6 @@ set(THIS_PACKAGE_ROS_DEPS
 
 find_package(catkin REQUIRED COMPONENTS
   ${THIS_PACKAGE_ROS_DEPS}
-  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -53,13 +52,11 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  Drive.msg
-  State.msg
-  ExtendedState.msg
-  DriveStamped.msg
-)
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -76,10 +73,10 @@ add_message_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs  # Or other packages containing msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+# )
 
 
 ###################################
@@ -127,7 +124,7 @@ add_executable(odom_tf_publisher src/odom_tf_publisher.cpp)
 # add_dependencies(ThrottlePub gigatron_generate_messages_cpp)
 # add_dependencies(control_pub_sub gigatron_generate_messages_cpp)
 add_dependencies(odom_tf_publisher 
-  ${${gigatron}_EXPORTED_TARGETS}
+  ${${gigatron_msgs}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
 # add_dependencies(vector_pub gigatron_generate_messages_cpp)

@@ -9,8 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   geometry_msgs
   tf
-  message_generation
   gigatron
+  gigatron_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -47,13 +47,11 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  Radio.msg
-  Steering.msg
-  Motors.msg
-  MotorCommand.msg
-)
+# add_message_files(
+#   FILES
+#   Message1.msg
+#   Message2.msg
+# )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -70,12 +68,10 @@ add_message_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  geometry_msgs
-  nav_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -109,7 +105,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES gigatron_hardware
-  CATKIN_DEPENDS message_runtime roscpp std_msgs geometry_msgs gigatron
+  CATKIN_DEPENDS message_runtime roscpp std_msgs geometry_msgs gigatron gigatron_msgs
 #  DEPENDS system_lib
 )
 
@@ -143,16 +139,13 @@ add_executable(arduino_drive_controller src/arduino_drive_controller.cpp)
 ## same as for the library above
 # add_dependencies(gigatron_hardware_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(encoder_debug 
-  gigatron_hardware_generate_messages_cpp
-  ${${gigatron_hardware}_EXPORTED_TARGETS}
+     ${${gigatron_msgs}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
 
 add_dependencies(arduino_drive_controller 
-  gigatron_hardware_generate_messages_cpp
   ${catkin_EXPORTED_TARGETS}
-  ${${gigatron_hardware}_EXPORTED_TARGETS}
-  ${${gigatron}_EXPORTED_TARGETS}
+  ${${gigatron_msgs}_EXPORTED_TARGETS}
 )
 
 

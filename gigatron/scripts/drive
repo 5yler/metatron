@@ -17,7 +17,7 @@ import sys
 import numpy as np
 import math
 from sensor_msgs.msg import LaserScan   # for switching Jetson/RC mode
-from gigatron.msg import DriveStamped   # for sending controls
+from gigatron_msgs.msg import DriveStamped   # for sending controls
 
 from laser_geometry import LaserProjection # for getting and using PointCloud from LaserScan
 from sensor_msgs.msg import PointCloud2 

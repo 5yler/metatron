@@ -1,3 +1,3 @@
 Header header
 string mode
-gigatron/Drive drive
+gigatron_msgs/Drive drive

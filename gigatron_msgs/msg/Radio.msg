@@ -1,5 +1,5 @@
 Header header
-uint8 speed_left
-uint8 speed_right
+int8 speed_left
+int8 speed_right
 uint8 angle
 uint8 kill

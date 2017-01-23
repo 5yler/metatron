@@ -15,7 +15,7 @@
  **/
 
 #include "ros/ros.h"
-#include <gigatron/ExtendedState.h>
+#include <gigatron_msgs/ExtendedState.h>
 #include "nav_msgs/Odometry.h"
 #include "tf/transform_broadcaster.h"
 
@@ -30,7 +30,7 @@ int rate_;
 
 double _wheelbase_width;
 
-void driveStateCallback(const gigatron::ExtendedState::ConstPtr& msg)
+void driveStateCallback(const gigatron_msgs::ExtendedState::ConstPtr& msg)
 {
   left_wheel_velocity_ = msg->drive.vel_left;
   right_wheel_velocity_ = msg->drive.vel_right;

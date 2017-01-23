@@ -11,7 +11,7 @@ dgonz@mit.edu
 
 import rospy, math
 from rospy.rostime import Time
-from gigatron.msg import State
+from gigatron_msgs.msg import State
 
 distL = 0
 distR = 0

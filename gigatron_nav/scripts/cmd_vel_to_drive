@@ -12,7 +12,7 @@
 
 import rospy, math
 from geometry_msgs.msg import Twist
-from gigatron.msg import Drive
+from gigatron_msgs.msg import Drive
 
 def convert_trans_rot_vel_to_steering_angle(v, omega, wheelbase_length):
   if omega == 0 or v == 0:

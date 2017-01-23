@@ -10,9 +10,9 @@
 
 import csv
 import rospy
-# from gigatron.msg import ExtendedState   
-from gigatron.msg import State   
-from gigatron_hardware.msg import Radio  
+# from gigatron_msgs.msg import ExtendedState   
+from gigatron_msgs.msg import State   
+from gigatron_msgs.msg import Radio  
 from sensor_msgs.msg import LaserScan  
 
 import csv
