@@ -10,9 +10,8 @@
 
 import csv
 import rospy
-# from gigatron.msg import ExtendedState   
-from gigatron.msg import State   
-from gigatron_hardware.msg import Radio  
+from gigatron.msg import State, ExtendedState   
+from gigatron_hardware.msg import Radio, Motors 
 from sensor_msgs.msg import LaserScan  
 
 import csv
@@ -23,15 +22,16 @@ class TrainingDataSaver():
 		# init
 		# get parameters 
 		# scan topic
-		scan_topic = rospy.get_param('~scan_topic', 'scan_rp') 
+		scan_topic = rospy.get_param('~scan_topic', '/rplidar/scan') 
 		# radio topic
 		radio_topic = rospy.get_param('~radio_topic', '/arduino/radio') 
-		# car name
+		# motor topic
+		motor_topic = rospy.get_param('~motor_topic', '/arduino/motors') 
 		# state topic
 		state_topic = rospy.get_param('~state_topic', '/state') 
 
 		# output folder
-		self._output_folder = rospy.get_param('~output_folder', '/Users/Syler/Downloads/test_ml/') 
+		self._output_folder = rospy.get_param('~output_folder', '/Users/Syler/Downloads/test_ml_2/') 
 
 
 		# self._steering_angle_range = rospy.get_param("car/steering_angle_range")
@@ -39,9 +39,13 @@ class TrainingDataSaver():
 		# subscribers
 		rospy.Subscriber(scan_topic, LaserScan, self.scan_callback)
 		rospy.Subscriber(radio_topic, Radio, self.radio_callback)
-		# rospy.Subscriber(state_topic, ExtendedState, self.state_callback)
+		rospy.Subscriber(motor_topic, Motors, self.motor_callback)
 
-		rospy.Subscriber(state_topic, State, self.state_callback)
+		if rospy.get_param('~extended_state', True):
+			rospy.Subscriber(state_topic, ExtendedState, self.state_callback)
+		else:
+			rospy.Subscriber(state_topic, State, self.state_callback)
+
 		# initialize values
 		self._rc = False
 		self._throttle = 0
@@ -49,23 +53,29 @@ class TrainingDataSaver():
 
 		self._i = 0
 
+		rospy.loginfo("Saving output to %s", self._output_folder)
+		rospy.loginfo("Waiting for first LaserScan message on %s...", scan_topic)
 		rospy.spin()
+
 	# laser scan callback method
 	# save forward 180 degrees of scan as a row in csv file if RC
 	def scan_callback(self, msg):
-		myfile = open(self._output_folder+str(self._i)+'_scan'+'.csv', 'wb')
-		wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-		wr.writerow(msg.ranges)
-		wr.writerow(msg.intensities)
-		myfile.close()
+		if self._rc:
+			myfile = open(self._output_folder+str(self._i)+'_scan'+'.csv', 'wb')
+			wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+			wr.writerow(msg.ranges)
+			wr.writerow(msg.intensities)
+			myfile.close()
 
-		myfile = open(self._output_folder+str(self._i)+'_command'+'.csv', 'wb')
-		wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-		wr.writerow([self._throttle, self._angle])
-		myfile.close()
+			myfile = open(self._output_folder+str(self._i)+'_command'+'.csv', 'wb')
+			wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+			wr.writerow([self._throttle, self._angle])
+			myfile.close()
 
-		rospy.logwarn('saved frame %d', self._i)
-		self._i = self._i + 1
+			rospy.logwarn('Saved frame %d', self._i)
+			self._i = self._i + 1
+		else:
+			rospy.loginfo('Discarding non-RC mode frame')
 
 	# state callback
 	# update variable keeping track of whether current state is RC
@@ -79,16 +89,19 @@ class TrainingDataSaver():
 	# radio callback
 	# update variable keeping track of last RC commands
 	def radio_callback(self, msg):
-		self._throttle = msg.angle
-		self._angle = msg.speed_left
+		# self._throttle =  msg.speed_left
+		self._angle = msg.angle
 
-
+	# motor callback
+	# update variable keeping track of last motor commands
+	def motor_callback(self, msg):
+		self._throttle = msg.usec_left
 
 if __name__=="__main__":
-	rospy.init_node('drive_test_pub')
+	rospy.init_node('save_training_data')
 	
 	try:
 		TrainingDataSaver()
 	except rospy.ROSInterruptException:
-		print " [!!!] drive_test_pub: ROSInterruptException!"
+		print " [!!!] save_training_data: ROSInterruptException!"
 		pass
