@@ -59,14 +59,16 @@ class TrainingDataSaver():
 	# laser scan callback method
 	# save forward 180 degrees of scan as a row in csv file if RC
 	def scan_callback(self, msg):
+		timestamp_string = str(msg.header.stamp.secs)+'.'+format(msg.header.stamp.nsecs, '09')
 		if self._rc and self._angle > 0: # add angle check because of some suspect data
-			myfile = open(self._output_folder+str(self._i)+'_scan'+'.csv', 'wb')
+
+			myfile = open(self._output_folder+timestamp_string+'_scan'+'.csv', 'wb')
 			wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
 			wr.writerow(msg.ranges)
 			wr.writerow(msg.intensities)
 			myfile.close()
 
-			myfile = open(self._output_folder+str(self._i)+'_command'+'.csv', 'wb')
+			myfile = open(self._output_folder+timestamp_string+'_command'+'.csv', 'wb')
 			wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
 			wr.writerow([self._throttle, self._angle])
 			myfile.close()
@@ -74,7 +76,7 @@ class TrainingDataSaver():
 			rospy.logwarn('Saved frame %d. Angle: %d Throttle: %d', self._i, self._angle, self._throttle)
 			self._i = self._i + 1
 		else:
-			rospy.loginfo('Discarding non-RC mode frame ')
+			rospy.loginfo('Discarding non-RC mode frame at time %s', timestamp_string)
 
 	# state callback
 	# update variable keeping track of whether current state is RC
@@ -94,7 +96,7 @@ class TrainingDataSaver():
 	# motor callback
 	# update variable keeping track of last motor commands
 	def motor_callback(self, msg):
-		self._throttle = msg.usec_left
+		self._throttle = (msg.usec_left - 1500) / 2
 
 if __name__=="__main__":
 	rospy.init_node('save_training_data')
