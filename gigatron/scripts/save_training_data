@@ -33,7 +33,6 @@ class TrainingDataSaver():
 		# output folder
 		self._output_folder = rospy.get_param('~output_folder', '/Users/Syler/Downloads/test_ml_2/') 
 
-
 		# self._steering_angle_range = rospy.get_param("car/steering_angle_range")
 
 		# subscribers
@@ -48,7 +47,7 @@ class TrainingDataSaver():
 
 		# initialize values
 		self._rc = False
-		self._throttle = 0
+		self._throttle = 1500
 		self._angle = 128
 
 		self._i = 0
@@ -60,7 +59,7 @@ class TrainingDataSaver():
 	# laser scan callback method
 	# save forward 180 degrees of scan as a row in csv file if RC
 	def scan_callback(self, msg):
-		if self._rc:
+		if self._rc and self._angle > 0: # add angle check because of some suspect data
 			myfile = open(self._output_folder+str(self._i)+'_scan'+'.csv', 'wb')
 			wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
 			wr.writerow(msg.ranges)
@@ -72,10 +71,10 @@ class TrainingDataSaver():
 			wr.writerow([self._throttle, self._angle])
 			myfile.close()
 
-			rospy.logwarn('Saved frame %d', self._i)
+			rospy.logwarn('Saved frame %d. Angle: %d Throttle: %d', self._i, self._angle, self._throttle)
 			self._i = self._i + 1
 		else:
-			rospy.loginfo('Discarding non-RC mode frame')
+			rospy.loginfo('Discarding non-RC mode frame ')
 
 	# state callback
 	# update variable keeping track of whether current state is RC
