@@ -136,18 +136,11 @@ include_directories(include
 
 ## Declare a C++ executable
 # add_executable(gigatron_hardware_node src/gigatron_hardware_node.cpp)
-add_executable(encoder_debug src/encoder_debug.cpp)
 add_executable(arduino_drive_controller src/arduino_drive_controller.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(gigatron_hardware_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(encoder_debug 
-  gigatron_hardware_generate_messages_cpp
-  ${${gigatron_hardware}_EXPORTED_TARGETS}
-  ${catkin_EXPORTED_TARGETS}
-)
-
 add_dependencies(arduino_drive_controller 
   gigatron_hardware_generate_messages_cpp
   ${catkin_EXPORTED_TARGETS}
@@ -160,9 +153,6 @@ add_dependencies(arduino_drive_controller
 # target_link_libraries(gigatron_hardware_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(encoder_debug
-  ${catkin_LIBRARIES}
-)
 target_link_libraries(arduino_drive_controller
   ${catkin_LIBRARIES}
 )
@@ -188,7 +178,6 @@ target_link_libraries(arduino_drive_controller
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 install(TARGETS 
-  encoder_debug
   arduino_drive_controller
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
