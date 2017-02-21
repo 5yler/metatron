@@ -22,7 +22,7 @@ class TrainingDataSaver():
 		# init
 		# get parameters 
 		# scan topic
-		scan_topic = rospy.get_param('~scan_topic', '/rplidar/scan') 
+		scan_topic = rospy.get_param('~scan_topic', '/scan_rp') 
 		# radio topic
 		radio_topic = rospy.get_param('~radio_topic', '/arduino/radio') 
 		# motor topic
@@ -31,7 +31,7 @@ class TrainingDataSaver():
 		state_topic = rospy.get_param('~state_topic', '/state') 
 
 		# output folder
-		self._output_folder = rospy.get_param('~output_folder', '/Users/Syler/Downloads/test_ml_2/') 
+		self._output_folder = rospy.get_param('~output_folder', '/Users/Syler/gigann/20160916_avc_track/') 
 
 		# self._steering_angle_range = rospy.get_param("car/steering_angle_range")
 
@@ -49,6 +49,7 @@ class TrainingDataSaver():
 		self._rc = False
 		self._throttle = 1500
 		self._angle = 128
+		self._v = 0.0 # current velocity
 
 		self._i = 0
 
@@ -60,32 +61,38 @@ class TrainingDataSaver():
 	# save forward 180 degrees of scan as a row in csv file if RC
 	def scan_callback(self, msg):
 		timestamp_string = str(msg.header.stamp.secs)+'.'+format(msg.header.stamp.nsecs, '09')
-		if self._rc and self._angle > 0: # add angle check because of some suspect data
 
-			myfile = open(self._output_folder+timestamp_string+'_scan'+'.csv', 'wb')
-			wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-			wr.writerow(msg.ranges)
-			wr.writerow(msg.intensities)
-			myfile.close()
+		
+		if self._rc: 
+			# add angle check because of some suspect data
+			# check if velocity is greater than 0.5
+			if self._v > 0.5 and self._angle > 0:
+				myfile = open(self._output_folder+timestamp_string+'_scan'+'.csv', 'wb')
+				wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+				wr.writerow(msg.ranges)
+				wr.writerow(msg.intensities)
+				myfile.close()
 
-			myfile = open(self._output_folder+timestamp_string+'_command'+'.csv', 'wb')
-			wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-			wr.writerow([self._throttle, self._angle])
-			myfile.close()
+				myfile = open(self._output_folder+timestamp_string+'_command'+'.csv', 'wb')
+				wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+				wr.writerow([self._throttle, self._angle])
+				myfile.close()
 
-			rospy.logwarn('Saved frame %d. Angle: %d Throttle: %d', self._i, self._angle, self._throttle)
-			self._i = self._i + 1
+				rospy.logwarn('Saved frame %d. Angle: %d Throttle: %d', self._i, self._angle, self._throttle)
+				self._i = self._i + 1
+			else:
+				rospy.loginfo('Discarding frame at time %s because car was barely moving', timestamp_string)
 		else:
 			rospy.loginfo('Discarding non-RC mode frame at time %s', timestamp_string)
 
 	# state callback
 	# update variable keeping track of whether current state is RC
 	def state_callback(self, msg):
+		self._v = msg.drive.vel_left
 		if msg.mode == "RC":
 			self._rc = True
 		else:
 			self._rc = False
-
 
 	# radio callback
 	# update variable keeping track of last RC commands

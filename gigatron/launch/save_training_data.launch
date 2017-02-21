@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!-- drive.launch
+     Launch file for saving machine learning training data
+
+     @author  Syler Wagner  <syler@mit.edu>
+     
+     @date    2017-02-20   syler   creation
+ -->
+ <launch>
+
+ 	<!-- reactive drive controller -->
+ 	<node pkg="gigatron" type="save_training_data" name="save_training_data">
+ 		<rosparam>
+            # topic names
+            scan_topic: /scan_rp
+            radio_topic: /arduino/radio
+            motor_topic: /arduino/motors
+            state_topic: /state
+            extended_state: false
+            # files
+            output_folder: /Users/Syler/gigann/20160916_avc_track/
+        </rosparam>
+ 	</node>
+
+	<!-- <node pkg="rosbag" type="play" name="rosbag_play" output="log" args="$(arg output_folder)$(arg rosbag).bag $(arg path)$(arg file_2).bag"/> -->
+
+ </launch>
