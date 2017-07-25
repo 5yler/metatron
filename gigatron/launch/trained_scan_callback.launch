@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!-- drive.launch
+     Launch file for saving machine learning training data
+
+     @author  Syler Wagner  <syler@mit.edu>
+     
+     @date    2017-02-20   syler   creation
+ -->
+ <launch>
+
+    <rosparam>
+        # topic names
+        scan_topic: /rplidar/scan
+        scan_topic_queue_size: 1
+        drive_command_topic: /command/drive
+        drive_command_queue_size: 1
+
+        # files
+        torch_model_filepath: /Users/Syler/gigann/model.t7
+    </rosparam>
+
+ 	<!-- reactive drive controller -->
+ 	<node pkg="gigatron" type="launch_torch_callback" name="trained_scan_callback" output="screen">
+
+ 	</node>
+
+
+ </launch>

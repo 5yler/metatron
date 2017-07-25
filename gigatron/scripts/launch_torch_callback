@@ -1,0 +1,6 @@
+#! /bin/bash
+
+sleep 2
+echo "Starting lua code"
+th `rospack find gigatron`/scripts/trained_scan_callback.lua
+
