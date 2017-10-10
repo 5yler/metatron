@@ -33,7 +33,6 @@
 #include <visualization_msgs/Marker.h>
 #include <tf/transform_datatypes.h>
 
-
 #define PI 3.141592653589793238463
 
 class ArduinoDriveController
@@ -81,8 +80,6 @@ public:
       ros::shutdown();
     }
 
-
-
     _rpm_to_vel = (2 * PI * _wheel_radius) / 60.0;
 
     //$ set up ROS subscribers
@@ -93,6 +90,14 @@ public:
     steer_sub_ = n_.subscribe("arduino/steering", 5, &ArduinoDriveController::steerCallback, this);
     mode_sub_ = n_.subscribe("arduino/mode", 5, &ArduinoDriveController::modeCallback, this);
     estop_sub_ = n_.subscribe("arduino/command/stop", 5, &ArduinoDriveController::estopCallback, this);
+
+    // Koolaid Mods:
+    brake_left_sub = n_.subscribe("arduino/brake_left", 5, &ArduinoDriveController::brakeLeftCallback, this);
+    brake_right_sub  = n_.subscribe("arduino/brake_right", 5, &ArduinoDriveController::brakeRightCallback, this);
+    drive_dir_sub = n_.subscribe("arduino/drive_dir", 5, &ArduinoDriveController::driveDirCallback, this);
+    motor_rpm_sub = n_.subscribe("arduino/motor_rpm", 5, &ArduinoDriveController::motorRPMCallback, this);
+    steer_angle_sub = n_.subscribe("arduino/steer_angle", 5, &ArduinoDriveController::steerAngleCallback, this);
+    throttle_sub = n_.subscribe("arduino/throttle", 5, &ArduinoDriveController::throttleCallback, this);
 
 
     //$ set up ROS publishers
@@ -163,7 +168,6 @@ public:
  */
   void driveCallback(const gigatron::DriveStamped::ConstPtr& msg) 
   {
-
     drive_stamp_ = msg->header.stamp;
     double tmp_angle = msg->drive.angle;
 
@@ -207,7 +211,7 @@ public:
       cmd_msg_.rpm_right = msg->drive.vel_right / (_rpm_to_vel * _gear_ratio);
     }
     control_pub_.publish(cmd_msg_);
-    // ROS_INFO("Published PWM %d (%d)", tmp_angle_pwm_cmd, cmd_msg_.angle_command);
+    ROS_INFO("Published PWM %d (%d)", tmp_angle_pwm_cmd, cmd_msg_.angle_command);
 
     publishDriveVectors(tmp_angle, msg->drive.vel_left, msg->drive.vel_right);
 
@@ -261,6 +265,54 @@ public:
   {
     motor_rpm_left_ = msg->rpm_left;
     motor_rpm_right_ = msg->rpm_right;
+  }
+
+  /*$
+  Callback method for Motor RPM from the Arduino. 
+  */
+  void motorRPMCallback(const std_msgs::UInt8::ConstPtr& msg) 
+  {
+    motor_rpm_left_ = msg->data;
+    motor_rpm_right_ = msg->data;
+  }
+
+  /*$
+  Callback method for Steer Angle from the Arduino. 
+ */
+  void steerAngleCallback(const std_msgs::UInt8::ConstPtr& msg) 
+  {
+    steer_angle_ = msg->data;
+    publishDriveVectors(steer_angle_, motor_rpm_left_, motor_rpm_right_);
+  }
+
+  /*$
+  Callback method for Throttle from the Arduino. 
+ */
+  void throttleCallback(const std_msgs::UInt8::ConstPtr& msg) 
+  {
+    throttle_ = msg->data;
+  }
+  /*$
+  Callback method for Left Brake from the Arduino. 
+ */
+  void brakeLeftCallback(const std_msgs::Bool::ConstPtr& msg) 
+  {
+    brake_left_ = msg->data;
+  }
+  /*$
+  Callback method for Right Brake from the Arduino. 
+ */
+  void brakeRightCallback(const std_msgs::Bool::ConstPtr& msg) 
+  {
+    brake_right_ = msg->data;
+  }
+
+    /*$
+  Callback method for Right Brake from the Arduino. 
+ */
+  void driveDirCallback(const std_msgs::Bool::ConstPtr& msg) 
+  {
+    drive_dir_ = msg->data;
   }
 
 /*$
@@ -356,6 +408,23 @@ private:
   ros::Subscriber mode_sub_;
   ros::Subscriber estop_sub_;
 
+  /*
+  From Koolaid:
+  /arduino/brake_left
+  /arduino/brake_right
+  /arduino/drive_dir
+  /arduino/motor_rpm
+  /arduino/steer_angle
+  /arduino/throttle
+  */
+
+  ros::Subscriber brake_left_sub;
+  ros::Subscriber brake_right_sub;
+  ros::Subscriber drive_dir_sub;
+  ros::Subscriber motor_rpm_sub;
+  ros::Subscriber steer_angle_sub;
+  ros::Subscriber throttle_sub;
+
   ros::Publisher control_pub_;
   ros::Publisher state_pub_;
   ros::Publisher joint_pub_;
@@ -390,6 +459,12 @@ private:
   double angle_pwm_;  //$ current steering angle PWM value
   double motor_rpm_right_, motor_rpm_left_; //$ current motor RPM values
   bool estop_;  //$ estop
+
+  int throttle_;
+  int steer_angle_;
+  bool brake_left_;
+  bool brake_right_;
+  bool drive_dir_;
 
 }; //$ end of class ArduinoDriveController
 
