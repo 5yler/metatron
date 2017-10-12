@@ -24,7 +24,10 @@
 #include <gigatron_hardware/Radio.h>
 #include <gigatron_hardware/Steering.h>
 #include <gigatron_hardware/Motors.h>
+#include <std_msgs/Int8.h>
 #include <std_msgs/UInt8.h>
+#include <std_msgs/UInt16.h>
+#include <std_msgs/Int16.h>
 #include <std_msgs/Bool.h>
 
 //$ joint state for wheels
@@ -270,7 +273,7 @@ public:
   /*$
   Callback method for Motor RPM from the Arduino. 
   */
-  void motorRPMCallback(const std_msgs::UInt8::ConstPtr& msg) 
+  void motorRPMCallback(const std_msgs::UInt16::ConstPtr& msg) 
   {
     motor_rpm_left_ = msg->data;
     motor_rpm_right_ = msg->data;
@@ -279,7 +282,7 @@ public:
   /*$
   Callback method for Steer Angle from the Arduino. 
  */
-  void steerAngleCallback(const std_msgs::UInt8::ConstPtr& msg) 
+  void steerAngleCallback(const std_msgs::Int8::ConstPtr& msg) 
   {
     steer_angle_ = msg->data;
     publishDriveVectors(steer_angle_, motor_rpm_left_, motor_rpm_right_);
